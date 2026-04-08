@@ -1,38 +1,42 @@
 {
   "world": {
-    "package": "plato-world-skill-test-generator:0.4.46",
+    "package": "plato-world-skill-test-generator:0.3.1",
     "runtime": {
       "type": "vm",
       "vm": {
         "cpus": 2,
         "memory": 4096,
-        "disk": 20480,
+        "disk": 10240,
         "timeout": 14400
       }
     },
     "config": {
       "s3_skills": [
-        "Exhaustively paginate list before identifying extremum record",
-        "Distinguish between similarly-named record types in navigation menus"
+        "Resolve truncated text in data grid cells before using value",
+        "Exhaustively paginate list before identifying extremum record"
       ],
       "specs_per_skill": 2,
-      "design_concurrency": 4,
+      "concurrency": 6,
       "max_skills": 2,
       "output_tasks_per_variant": 2,
-      "mutation_tasks_per_variant": 0,
+      "mutation_tasks_per_variant": 2,
       "sessions_per_testcase": 2,
-      "run_concurrency": 10,
-      "vm_concurrency": 4,
+      "run_concurrency": 4,
+      "max_parallel_pipelines": 10,
       "pipeline_vm_cpus": 2,
       "pipeline_vm_memory": 4096,
       "eval_agent_model": "amazon/nova-act",
-      "cua_world_package": "plato-world-cua-benchmark:3.8.1",
-      "cua_agent_package": "computer-use-agent:3.2.61",
+      "eval_agent": {
+        "package": "computer-use-agent:latest",
+        "config": {}
+      },
+      "cua_world_package": "plato-world-cua-benchmark:3.3.19",
+      "cua_agent_package": "computer-use-agent:latest",
       "coder_agent": {
         "package": "claude-code:latest",
         "config": {
-          "model_name": "claude-sonnet-4-6",
-          "max_turns": 200,
+          "model_name": "claude-opus-4-6",
+          "max_turns": 150,
           "anthropic_api_key": "${ANTHROPIC_API_KEY}"
         }
       },
@@ -41,16 +45,7 @@
       "aws_session_token": "${AWS_SESSION_TOKEN}",
       "anthropic_api_key": "${ANTHROPIC_API_KEY}",
       "plato_api_key": "${PLATO_API_KEY}",
-      "nova_act_workflow_name": "${NOVA_ACT_WORKFLOW_NAME}",
-      "autoverify": true,
-      "autoverify_sessions": 4,
-      "autoverify_model": "anthropic/claude-sonnet-4-6",
-      "hillclimb": {
-        "enabled": true,
-        "total_failures": 1,
-        "max_retries": 2
-      },
-      "dry_run": false
+      "nova_act_workflow_name": "${NOVA_ACT_WORKFLOW_NAME}"
     }
   },
   "retry": {

@@ -1,0 +1,16 @@
+# Runtime
+server.json
+logs/
+.env
+
+# Next.js
+web/node_modules/
+web/.next/
+web/out/
+
+# Local data / env
+web/.env.local
+
+# General
+*.log
+.DS_Store

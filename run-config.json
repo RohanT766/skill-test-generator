@@ -1,0 +1,30 @@
+{
+  "skills": [
+    {
+      "name": "Resolve truncated text in data grid cells before using value"
+    },
+    {
+      "name": "Interact with native select dropdown via option selection"
+    },
+    {
+      "name": "Exhaustively paginate list before identifying extremum record"
+    }
+  ],
+  "template_name": "sohan",
+  "sim_name_prefix": "skill-test",
+  "specs_per_skill": 2,
+  "concurrency": 3,
+  "max_skills": 3,
+  "local_preview_ports": 5001,
+  "codegen_verify_port": 4000,
+  "record_sessions": true,
+  "code": "/tmp/skill-test-gen/code",
+  "output": "/tmp/skill-test-gen/output",
+  "aws_access_key_id": "${AWS_ACCESS_KEY_ID}",
+  "aws_secret_access_key": "${AWS_SECRET_ACCESS_KEY}",
+  "state": {
+    "enabled": false,
+    "path": "/tmp/skill-test-gen/state"
+  },
+  "anthropic_api_key": "${ANTHROPIC_API_KEY}"
+}
