@@ -959,6 +959,7 @@ class SkillTestGeneratorWorld(
                         override_dataset="base",
                         internal_app_port=3000,
                         flows=flows_yaml,
+                        target="sims.plato.so",
                     ),
                     x_api_key=api_key,
                 )
