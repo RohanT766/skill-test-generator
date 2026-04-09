@@ -172,7 +172,9 @@ class SkillTestGeneratorWorld(
         state = self.state
 
         if config.resume_variants and not state.variants:
-            logger.info("Resuming from pre-existing variants (%d)", len(config.resume_variants))
+            logger.info(
+                "Resuming from pre-existing variants (%d)", len(config.resume_variants)
+            )
             for rv in config.resume_variants:
                 vs = VariantStatus(
                     skill_name=rv["skill_name"],
@@ -269,18 +271,30 @@ class SkillTestGeneratorWorld(
             base_slug = _slugify(s.short_name or s.name)
             short = s.short_name or ""
             if sps == 1:
-                variants.append(VariantStatus(skill_name=s.name, short_name=short, slug=base_slug))
+                variants.append(
+                    VariantStatus(skill_name=s.name, short_name=short, slug=base_slug)
+                )
             else:
                 for vi in range(1, sps + 1):
                     variants.append(
-                        VariantStatus(skill_name=s.name, short_name=short, slug=f"{base_slug}-v{vi}")
+                        VariantStatus(
+                            skill_name=s.name,
+                            short_name=short,
+                            slug=f"{base_slug}-v{vi}",
+                        )
                     )
         self.state.variants = variants
         (self.config.output / "skills.json").write_text(
             json.dumps([s.model_dump() for s in self._skills], indent=2)
         )
         for i, s in enumerate(self._skills, 1):
-            logger.info("  %d. [%d sess] %s (short: %s)", i, len(s.session_ids), s.name, s.short_name)
+            logger.info(
+                "  %d. [%d sess] %s (short: %s)",
+                i,
+                len(s.session_ids),
+                s.name,
+                s.short_name,
+            )
 
     # ------------------------------------------------------------------
     # DESIGN — parallel spec generation via streaming LLM calls
@@ -1182,9 +1196,7 @@ class SkillTestGeneratorWorld(
                         vs.plato_session_ids.append(result.get("plato_id", ""))
                         vs.task_results.append(result)
 
-                        status_str = (
-                            "PASS" if result.get("score", 0) > 0 else "FAIL"
-                        )
+                        status_str = "PASS" if result.get("score", 0) > 0 else "FAIL"
                         logger.info(
                             "    %s | score=%.2f | chronos=%s | plato=%s",
                             status_str,
@@ -1205,7 +1217,10 @@ class SkillTestGeneratorWorld(
                         )
 
             await asyncio.gather(
-                *[_run_one(i, vs, tc_id, task, tn, sn) for i, (vs, tc_id, task, tn, sn) in enumerate(work_items)]
+                *[
+                    _run_one(i, vs, tc_id, task, tn, sn)
+                    for i, (vs, tc_id, task, tn, sn) in enumerate(work_items)
+                ]
             )
 
         for vs in self.state.variants:

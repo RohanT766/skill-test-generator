@@ -774,5 +774,3 @@ async def design_all_variants(
     total_expected = len(skills) * specs_per_skill
     logger.info("Designed %d/%d variant specs", len(results), total_expected)
     return results
-
-

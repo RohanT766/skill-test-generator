@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 import boto3
 
 if TYPE_CHECKING:
-    from mypy_boto3_s3 import S3Client
+    pass
 
 from .config import SkillDefinition
 
@@ -55,7 +55,9 @@ def load_skills_from_s3(
     """
     client = boto3.client(
         "s3",
-        **_s3_client_kwargs(aws_access_key_id, aws_secret_access_key, aws_session_token),
+        **_s3_client_kwargs(
+            aws_access_key_id, aws_secret_access_key, aws_session_token
+        ),
     )
 
     merged: dict[str, SkillDefinition] = {}
@@ -122,7 +124,9 @@ def _load_all_s3_skills(
     """Load all skills from all benchmark-analysis files in S3."""
     client = boto3.client(
         "s3",
-        **_s3_client_kwargs(aws_access_key_id, aws_secret_access_key, aws_session_token),
+        **_s3_client_kwargs(
+            aws_access_key_id, aws_secret_access_key, aws_session_token
+        ),
     )
 
     merged: dict[str, SkillDefinition] = {}
@@ -212,7 +216,9 @@ def _resolve_s3_skill_names(
             )
             resolved.append(match)
         else:
-            logger.warning("  Skill '%s' not found in S3 benchmark data, skipping", name)
+            logger.warning(
+                "  Skill '%s' not found in S3 benchmark data, skipping", name
+            )
 
     return resolved
 
@@ -236,7 +242,9 @@ def prepare_skills(
             aws_session_token,
         )
         skills.extend(s for s in s3_resolved if s.testable)
-        logger.info("Resolved %d S3 skills (of %d names)", len(skills), len(s3_skill_names))
+        logger.info(
+            "Resolved %d S3 skills (of %d names)", len(skills), len(s3_skill_names)
+        )
 
     if custom_skills:
         custom_valid = [s for s in custom_skills if s.name and s.description]
@@ -273,7 +281,7 @@ async def generate_short_names(
 
     import anthropic
 
-    numbered = "\n".join(f'{i+1}. "{s.name}"' for i, s in enumerate(missing))
+    numbered = "\n".join(f'{i + 1}. "{s.name}"' for i, s in enumerate(missing))
     prompt = (
         "For each skill name below, produce a concise 2-3 word abbreviated name "
         "(lowercase, hyphenated, no quotes). It should capture the core action/concept.\n\n"
@@ -328,7 +336,9 @@ def persist_short_names_to_s3(
 
     client = boto3.client(
         "s3",
-        **_s3_client_kwargs(aws_access_key_id, aws_secret_access_key, aws_session_token),
+        **_s3_client_kwargs(
+            aws_access_key_id, aws_secret_access_key, aws_session_token
+        ),
     )
 
     updated_files = 0
@@ -348,7 +358,10 @@ def persist_short_names_to_s3(
                 continue
             for cat in categories:
                 cat_name = cat.get("name", "").strip()
-                if cat_name in name_to_short and cat.get("short_name") != name_to_short[cat_name]:
+                if (
+                    cat_name in name_to_short
+                    and cat.get("short_name") != name_to_short[cat_name]
+                ):
                     cat["short_name"] = name_to_short[cat_name]
                     modified = True
 
