@@ -707,6 +707,25 @@ class SkillTestGeneratorWorld(
                 )
                 logger.info("  [%s] bun install: %s", vs.slug, out[-300:])
 
+                await _exec(
+                    f"""python3 -c "
+import pathlib, re
+p = pathlib.Path('{app_dir}/db/client.ts')
+src = p.read_text()
+if 'mkdirSync' not in src:
+    src = 'import fs from \\"node:fs\\";\\n' + src
+    src = src.replace(
+        'const c = new PGlite(getDataDir())',
+        'const dataDir = getDataDir();\\n      fs.mkdirSync(dataDir, {{ recursive: true }});\\n      const c = new PGlite(dataDir)',
+    )
+    p.write_text(src)
+    print('Patched db/client.ts with mkdirSync')
+else:
+    print('db/client.ts already patched')
+" """,
+                    timeout=10,
+                )
+
                 # ── VERIFY (dev server) ───────────────────────────────
                 await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
                 await _exec(
