@@ -1114,8 +1114,8 @@ class SkillTestGeneratorWorld(
     async def _run_agent_eval(self) -> None:
         config = self.config
 
-        if not config.eval_agent:
-            logger.info("Skipping RUN stage: no eval_agent configured")
+        if config.sessions_per_testcase <= 0:
+            logger.info("Skipping RUN stage: sessions_per_testcase is 0")
             return
 
         if not self._all_tasks:
@@ -1428,8 +1428,8 @@ class SkillTestGeneratorWorld(
     async def _run_evaluate(self) -> None:
         config = self.config
 
-        if not config.eval_agent:
-            logger.info("Skipping EVALUATE stage: no eval_agent configured")
+        if config.sessions_per_testcase <= 0:
+            logger.info("Skipping EVALUATE stage: sessions_per_testcase is 0")
             return
 
         final_results = []

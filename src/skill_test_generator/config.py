@@ -225,14 +225,6 @@ class SkillTestGeneratorConfig(RunConfig):
         )
     )
 
-    eval_agent: Annotated[
-        AgentConfig | None,
-        Agent(
-            description="CUA agent to run generated tasks against live variants",
-            required=False,
-        ),
-    ] = None
-
     code: Annotated[
         Path,
         WorkspaceMarker(

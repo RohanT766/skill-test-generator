@@ -27,7 +27,6 @@
   "codegen_verify_port": 4000,
 
   "eval_agent_model": "amazon/nova-act",
-  "eval_agent": null,
   "eval_max_turns": 99,
   "eval_display_width": 1600,
   "eval_display_height": 813,
