@@ -722,7 +722,7 @@ async def design_all_variants(
     async def design_skill_variants(skill: SkillDefinition) -> list[dict]:
         skill_results: list[dict] = []
         prior_scenarios: list[str] = []
-        base_slug = _slugify(skill.name)
+        base_slug = _slugify(skill.short_name or skill.name)
 
         for vi in range(1, specs_per_skill + 1):
             slug = base_slug if specs_per_skill == 1 else f"{base_slug}-v{vi}"
