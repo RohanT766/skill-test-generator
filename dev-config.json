@@ -1,14 +1,12 @@
 {
   "$schema": "./src/skill_test_generator/schema.json",
 
-  "skills": [
+  "custom_skills": [
     {
       "name": "Navigate paginated list exhaustively to find global extremum",
-      "description": ""
+      "description": "User must click through all pages of a paginated list to find the row with the highest or lowest value"
     }
   ],
-  "benchmark_sims": null,
-  "min_sessions": 2,
   "max_skills": 20,
   "specs_per_skill": 1,
 
@@ -27,7 +25,6 @@
     }
   },
   "codegen_verify_port": 4000,
-  "local_preview_ports": null,
 
   "eval_agent_model": "amazon/nova-act",
   "eval_agent": null,

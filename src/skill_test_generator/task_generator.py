@@ -5,73 +5,14 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import re
 from pathlib import Path
 
 import anthropic
 
+from .json_utils import extract_json as _extract_json
 from .prompts import TASK_GENERATION_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
-
-
-def _extract_json(text: str) -> dict:
-    text = text.strip().removeprefix("\ufeff")
-
-    fence = re.search(r"```(?:json)?\s*\n([\s\S]*?)\n\s*```", text)
-    if fence:
-        text = fence.group(1).strip()
-
-    if "{" not in text:
-        raise ValueError("No JSON object found in LLM output")
-
-    brace_start = text.index("{")
-    depth = 0
-    in_string = False
-    escape_next = False
-    end = brace_start
-    for i, ch in enumerate(text[brace_start:], brace_start):
-        if escape_next:
-            escape_next = False
-            continue
-        if ch == "\\" and in_string:
-            escape_next = True
-            continue
-        if ch == '"' and not escape_next:
-            in_string = not in_string
-            continue
-        if in_string:
-            continue
-        if ch == "{":
-            depth += 1
-        elif ch == "}":
-            depth -= 1
-            if depth == 0:
-                end = i
-                break
-
-    if end == brace_start:
-        last_brace = text.rfind("}")
-        if last_brace > brace_start:
-            end = last_brace
-
-    raw = text[brace_start : end + 1]
-
-    def _clean_js(s: str) -> str:
-        s = re.sub(r"//[^\n]*", "", s)
-        s = re.sub(r"/\*.*?\*/", "", s, flags=re.DOTALL)
-        s = re.sub(r",\s*([}\]])", r"\1", s)
-        return s
-
-    for candidate in (raw, _clean_js(raw)):
-        try:
-            return json.loads(candidate)
-        except json.JSONDecodeError:
-            continue
-
-    raise ValueError(
-        f"Failed to parse JSON from LLM output (first 500 chars): {raw[:500]}"
-    )
 
 
 async def generate_tasks_for_variant(

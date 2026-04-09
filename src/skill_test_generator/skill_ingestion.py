@@ -129,10 +129,11 @@ def _load_all_s3_skills(
     prefix = "benchmark-analysis/"
 
     try:
-        resp = client.list_objects_v2(Bucket=S3_BUCKET, Prefix=prefix)
+        paginator = client.get_paginator("list_objects_v2")
         keys = [
             obj["Key"]
-            for obj in resp.get("Contents", [])
+            for page in paginator.paginate(Bucket=S3_BUCKET, Prefix=prefix)
+            for obj in page.get("Contents", [])
             if obj["Key"].endswith(".json")
         ]
     except Exception as exc:

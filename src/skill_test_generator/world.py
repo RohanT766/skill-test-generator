@@ -394,6 +394,15 @@ class SkillTestGeneratorWorld(
                 vs.error = "no spec found"
                 return
 
+            try:
+                await _single_pipeline_inner(vs, spec)
+            except Exception as e:
+                logger.error("  [%s] Unhandled pipeline error: %s", vs.slug, e)
+                if vs.stage != "published":
+                    vs.stage = "pipeline_failed"
+                    vs.error = vs.error or f"unhandled: {e}"
+
+        async def _single_pipeline_inner(vs: VariantStatus, spec: dict) -> None:
             variant_dir = variants_dir / vs.slug
             sim_name = vs.sim_name or f"{config.sim_name_prefix}-{vs.slug}"
             vs.sim_name = sim_name

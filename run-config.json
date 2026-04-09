@@ -1,21 +1,14 @@
 {
-  "skills": [
-    {
-      "name": "Resolve truncated text in data grid cells before using value"
-    },
-    {
-      "name": "Interact with native select dropdown via option selection"
-    },
-    {
-      "name": "Exhaustively paginate list before identifying extremum record"
-    }
+  "s3_skills": [
+    "Resolve truncated text in data grid cells before using value",
+    "Interact with native select dropdown via option selection",
+    "Exhaustively paginate list before identifying extremum record"
   ],
   "template_name": "sohan",
   "sim_name_prefix": "skill-test",
   "specs_per_skill": 2,
   "concurrency": 3,
   "max_skills": 3,
-  "local_preview_ports": 5001,
   "codegen_verify_port": 4000,
   "record_sessions": true,
   "code": "/tmp/skill-test-gen/code",
