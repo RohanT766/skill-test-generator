@@ -239,6 +239,32 @@ effort on page content (app/page.tsx and any sub-pages).
 chrome (header/sidebar/strip). Do NOT add your own header or sidebar — \
 it is already provided by the layout.
 
+CRITICAL #5 — Client-side data fetching (THIS MAKES OR BREAKS THE APP):
+The app is served behind a reverse proxy at https://<id>.sims.plato.so — NOT \
+at localhost. Client-side fetch calls to http://localhost:3000 WILL FAIL \
+(mixed-content block, wrong host). Follow these rules strictly:
+- "use client" components MUST fetch data through API routes using RELATIVE \
+URLs only: `fetch("/api/incidents")`, NEVER `fetch("http://localhost:3000/api/incidents")`.
+- Use the provided helpers from `@/lib/api`: \
+`import { apiGet, apiPost } from "@/lib/api"` then `apiGet<T>("/api/...")`.
+- Use TanStack Query for all data fetching in client components:
+  ```
+  import { useQuery } from "@tanstack/react-query";
+  import { apiGet } from "@/lib/api";
+  const { data, isLoading } = useQuery({
+    queryKey: ["items"],
+    queryFn: () => apiGet<ItemsResponse>("/api/items"),
+  });
+  ```
+- NEVER import `getDb`, `@/db/client`, `@/db/seed`, or any db/* module in \
+"use client" components. The database runs server-side only. Client \
+components access data exclusively through API routes.
+- NEVER use `http://localhost`, `http://127.0.0.1`, or any absolute URL in \
+client-side fetch calls. Only relative paths like `/api/...`.
+- The app MUST be fully functional when accessed via HTTPS on a proxy domain. \
+Test your mental model: if the browser is at https://example.com and your \
+code does fetch("http://localhost:3000/api/x"), it WILL be blocked.
+
 Other rules:
 - ALWAYS include "db/schema.ts" with the complete Drizzle schema
 - ALWAYS include "db/seed.ts" with deterministic seed data insertion

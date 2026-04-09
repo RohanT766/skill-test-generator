@@ -123,6 +123,24 @@ def _validate_code_files(code_files: dict[str, str]) -> list[str]:
     if layout and ";</html>" in layout.replace(" ", ""):
         errors.append("app/layout.tsx has semicolon after </html>")
 
+    for path, content in code_files.items():
+        if path.startswith("app/api/") or path.startswith("db/"):
+            continue
+        is_client = '"use client"' in content or "'use client'" in content
+        if is_client and re.search(
+            r"""from\s+['"]@/db/(?:client|seed|index|bootstrap)['"]""", content
+        ):
+            errors.append(
+                f"{path} is a 'use client' component but imports server-only db module"
+            )
+        if not path.startswith("app/api/") and re.search(
+            r"""https?://(?:localhost|127\.0\.0\.1)(?::\d+)?/api/""", content
+        ):
+            errors.append(
+                f"{path} uses absolute localhost URL for API calls "
+                f"(will break behind HTTPS proxy)"
+            )
+
     return errors
 
 
@@ -347,6 +365,37 @@ def _post_process_code(code_files: dict[str, str]) -> dict[str, str]:
                     break
             if bad_import:
                 del code_files[route_path]
+
+    # Fix absolute localhost URLs in client-side code — these break when
+    # served behind https://<id>.sims.plato.so (mixed-content block).
+    _LOCALHOST_RE = _re.compile(
+        r"""https?://(?:localhost|127\.0\.0\.1)(?::\d+)?(/api/[^\s"'`)]*)""",
+    )
+    for path, content in list(code_files.items()):
+        if not path.startswith("app/api/") and (
+            path.endswith(".tsx") or path.endswith(".ts")
+        ):
+            new_content = _LOCALHOST_RE.sub(r"\1", content)
+            if new_content != content:
+                logger.warning("Replaced absolute localhost URL(s) in %s", path)
+                content = new_content
+                code_files[path] = content
+
+    # Prevent client components from importing server-only db modules.
+    _DB_IMPORT_RE = _re.compile(
+        r"""^import\s+.*from\s+['"]@/db/(?:client|seed|index|bootstrap)['"];?\s*$""",
+        _re.MULTILINE,
+    )
+    for path, content in list(code_files.items()):
+        if path.startswith("app/api/") or path.startswith("db/"):
+            continue
+        is_client = '"use client"' in content or "'use client'" in content
+        if is_client and _DB_IMPORT_RE.search(content):
+            logger.warning(
+                "Removing server-only db import(s) from client component %s", path
+            )
+            content = _DB_IMPORT_RE.sub("// [removed: server-only db import]", content)
+            code_files[path] = content
 
     for path, content in list(code_files.items()):
         if path.endswith("page.tsx") or (

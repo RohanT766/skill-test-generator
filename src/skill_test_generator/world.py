@@ -763,6 +763,31 @@ class SkillTestGeneratorWorld(
                         }
                     )
 
+                page_html, _ = await _exec(
+                    "curl -s http://127.0.0.1:3000/ 2>&1 | head -c 50000",
+                    timeout=15,
+                )
+                has_localhost = (
+                    "localhost:3000/api" in page_html
+                    or "127.0.0.1:3000/api" in page_html
+                )
+                if has_localhost:
+                    checks.append(
+                        {
+                            "name": "no_localhost_urls",
+                            "pass": False,
+                            "error": "Page HTML contains hardcoded localhost API URLs",
+                        }
+                    )
+                    logger.warning(
+                        "  [%s] Frontend has localhost URLs in HTML — will break behind proxy",
+                        vs.slug,
+                    )
+                else:
+                    checks.append(
+                        {"name": "no_localhost_urls", "pass": True, "error": ""}
+                    )
+
                 n_pass = sum(1 for c in checks if c["pass"])
                 n_fail = sum(1 for c in checks if not c["pass"])
                 logger.info(
