@@ -175,7 +175,7 @@ def _build_v2_scoring_config(task: dict, sim_name: str) -> dict | None:
         for mut in task.get("expected_mutations", []):
             mutations.append(
                 {
-                    "table": mut.get("table", ""),
+                    "tablename": mut.get("table", ""),
                     "action": mut.get("action", "update"),
                     "row_filter": mut.get("row_filter", {}),
                     "values": mut.get("values", {}),

@@ -1256,10 +1256,13 @@ class SkillTestGeneratorWorld(
                 agent_config["nova_act_workflow_name"] = config.nova_act_workflow_name
 
         if config.aws_access_key_id:
+            agent_config["aws_access_key_id"] = config.aws_access_key_id
             agent_config["envgen_aws_access_key_id"] = config.aws_access_key_id
         if config.aws_secret_access_key:
+            agent_config["aws_secret_access_key"] = config.aws_secret_access_key
             agent_config["envgen_aws_secret_access_key"] = config.aws_secret_access_key
         if config.aws_session_token:
+            agent_config["aws_session_token"] = config.aws_session_token
             agent_config["envgen_aws_session_token"] = config.aws_session_token
         agent_config.setdefault("envgen_aws_region", "us-west-1")
         agent_config.setdefault(
