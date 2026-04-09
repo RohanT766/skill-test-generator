@@ -902,6 +902,9 @@ class SkillTestGeneratorWorld(
                     "    timeout: 60000\n"
                     "    retries: 3\n"
                     "    retry_delay_ms: 5000\n"
+                    "  - type: verify_url\n"
+                    "    url: sims.plato.so\n"
+                    "    contains: true\n"
                     "  - type: wait\n"
                     "    duration: 5000\n"
                     "  - type: wait_for_selector\n"
@@ -1279,6 +1282,8 @@ class SkillTestGeneratorWorld(
             "envs": [],
             "record_session": config.record_sessions,
             "login_flow": True,
+            "login_flow_retries": 6,
+            "login_flow_retry_delay_ms": 15000,
             "agent": {
                 "package": config.cua_agent_package,
                 "config": agent_config,
