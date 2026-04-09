@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 
@@ -18,7 +19,9 @@ function getDataDir(): string {
 export async function getDb(): Promise<AppDb> {
   if (!initPromise) {
     initPromise = (async () => {
-      const c = new PGlite(getDataDir());
+      const dataDir = getDataDir();
+      fs.mkdirSync(dataDir, { recursive: true });
+      const c = new PGlite(dataDir);
       const d = drizzle(c, { schema });
       await ensureSchema(d);
       client = c;

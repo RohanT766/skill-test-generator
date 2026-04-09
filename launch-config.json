@@ -1,6 +1,6 @@
 {
   "world": {
-    "package": "plato-world-skill-test-generator:0.3.9",
+    "package": "plato-world-skill-test-generator:0.3.11",
     "runtime": {
       "type": "vm",
       "vm": {
@@ -26,7 +26,7 @@
       "pipeline_vm_cpus": 2,
       "pipeline_vm_memory": 4096,
       "eval_agent_model": "amazon/nova-act",
-      "cua_world_package": "plato-world-cua-benchmark:3.3.21",
+      "cua_world_package": "plato-world-cua-benchmark:3.3.22",
       "cua_agent_package": "computer-use-agent:3.2.48",
       "coder_agent": {
         "package": "claude-code:latest",
