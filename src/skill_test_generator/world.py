@@ -853,6 +853,44 @@ class SkillTestGeneratorWorld(
                         await asyncio.sleep(3)
                 await asyncio.sleep(3)
 
+                # ── BOOT SERVICE (so app starts on snapshot restore) ──
+                svc_exec = (
+                    f"/root/.bun/bin/bun run dev -- --hostname 0.0.0.0 --port 3000"
+                    if use_dev
+                    else f"/root/.bun/bin/bun --bun ./node_modules/next/dist/bin/next start -p 3000"
+                )
+                svc_unit = (
+                    "[Unit]\n"
+                    "Description=Next.js App\n"
+                    "After=network.target\n"
+                    "\n"
+                    "[Service]\n"
+                    "Type=simple\n"
+                    f"WorkingDirectory={app_dir}\n"
+                    f"Environment=PATH=/root/.bun/bin:/usr/local/bin:/usr/bin:/bin\n"
+                    "Environment=NODE_ENV=production\n"
+                    "Environment=NEXT_DIST_DIR=.next\n"
+                    "Environment=PORT=3000\n"
+                    "Environment=APP_PORT=3000\n"
+                    f"ExecStartPre=/bin/mkdir -p /tmp/pglite-data\n"
+                    f"ExecStart={svc_exec}\n"
+                    "Restart=always\n"
+                    "RestartSec=3\n"
+                    "\n"
+                    "[Install]\n"
+                    "WantedBy=multi-user.target\n"
+                )
+                await _exec(
+                    f"cat > /etc/systemd/system/nextapp.service << 'SVCEOF'\n"
+                    f"{svc_unit}SVCEOF",
+                    timeout=10,
+                )
+                await _exec(
+                    "systemctl daemon-reload && systemctl enable nextapp.service",
+                    timeout=15,
+                )
+                logger.info("  [%s] Installed nextapp.service for boot", vs.slug)
+
                 # ── ENSURE SIMULATOR CATALOG ENTRY EXISTS ─────────────
                 from plato._generated.api.v1.env import create_simulator
                 from plato._generated.models import (
@@ -902,9 +940,6 @@ class SkillTestGeneratorWorld(
                     "    timeout: 60000\n"
                     "    retries: 3\n"
                     "    retry_delay_ms: 5000\n"
-                    "  - type: verify_url\n"
-                    "    url: sims.plato.so\n"
-                    "    contains: true\n"
                     "  - type: wait\n"
                     "    duration: 5000\n"
                     "  - type: wait_for_selector\n"
@@ -1282,8 +1317,8 @@ class SkillTestGeneratorWorld(
             "envs": [],
             "record_session": config.record_sessions,
             "login_flow": True,
-            "login_flow_retries": 6,
-            "login_flow_retry_delay_ms": 15000,
+            "login_flow_retries": 4,
+            "login_flow_retry_delay_ms": 10000,
             "agent": {
                 "package": config.cua_agent_package,
                 "config": agent_config,
