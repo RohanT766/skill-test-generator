@@ -1,18 +1,42 @@
 /**
  * Plato mutation logger — reports DB writes to the Plato scoring system.
  *
- * When running on a Plato sim VM, env vars PLATO_JOB_ID and PLATO_API_URL
- * are set. After each successful INSERT/UPDATE/DELETE the API route should
- * call `logMutation(...)`. If the env vars are missing (local dev), this
+ * Job ID discovery (in order):
+ *   1. PLATO_JOB_ID / JOB_ID env var
+ *   2. Extracted from the request Host header ({job_id}--{port}.sims.plato.so)
+ *
+ * After each successful INSERT/UPDATE/DELETE the API route should call
+ * `logMutation(...)`. If no job ID can be determined (local dev), this
  * is a silent no-op.
  */
 
-const PLATO_JOB_ID = process.env.PLATO_JOB_ID || process.env.JOB_ID;
+import { headers } from "next/headers";
+
 const PLATO_API_URL = (
   process.env.PLATO_API_URL || process.env.PLATO_BASE_URL || "https://plato.so"
 ).replace(/\/+$/, "").replace(/\/api$/, "");
 
-const enabled = Boolean(PLATO_JOB_ID);
+let _cachedJobId: string | undefined;
+
+async function getJobId(): Promise<string | null> {
+  const envId = process.env.PLATO_JOB_ID || process.env.JOB_ID;
+  if (envId) return envId;
+
+  if (_cachedJobId) return _cachedJobId;
+
+  try {
+    const h = await headers();
+    const host = h.get("host") || "";
+    const m = host.match(/^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:--\d+)?\.sims\.plato\.so$/);
+    if (m) {
+      _cachedJobId = m[1];
+      return m[1];
+    }
+  } catch {
+    // headers() unavailable outside request context
+  }
+  return null;
+}
 
 export type MutationAction = "insert" | "update" | "delete";
 
@@ -33,7 +57,8 @@ export async function logMutation(
   rowFilter: Record<string, unknown>,
   values?: Record<string, unknown>,
 ): Promise<void> {
-  if (!enabled) return;
+  const jobId = await getJobId();
+  if (!jobId) return;
 
   const mutation: MutationPayload = {
     tablename,
@@ -50,7 +75,7 @@ export async function logMutation(
   };
 
   try {
-    await fetch(`${PLATO_API_URL}/api/v2/jobs/${PLATO_JOB_ID}/log`, {
+    await fetch(`${PLATO_API_URL}/api/v2/jobs/${jobId}/log`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
