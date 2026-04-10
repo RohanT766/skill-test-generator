@@ -85,6 +85,23 @@ ensure_node_modules() {
   (cd "$WEB_DIR" && bun install)
 }
 
+ensure_production_build() {
+  if [[ -f "$WEB_DIR/.next/BUILD_ID" ]]; then
+    return 0
+  fi
+
+  echo "No production build found; running next build..."
+  (
+    cd "$WEB_DIR"
+    NODE_ENV=production NEXT_DIST_DIR=.next \
+      node ./node_modules/next/dist/bin/next build > "$LOG_DIR/build.log" 2>&1
+  ) || {
+    echo "ERROR: next build failed" >&2
+    tail -n 200 "$LOG_DIR/build.log" >&2 || true
+    exit 1
+  }
+}
+
 wait_for_app() {
   local tries=0
   until curl -sf "http://127.0.0.1:${APP_PORT}/api/health" >/dev/null 2>&1; do
@@ -136,12 +153,7 @@ if [[ -f "$PGLITE_SNAPSHOT" ]]; then
 fi
 
 # Scope Next.js build dir per port so parallel instances don't conflict
-NEXT_DIST_DIR="${NEXT_DIST_DIR:-.next-${APP_PORT}}"
-# Remove default .next dir to avoid stale lock from hardlinked base workspace.
-# Next.js checks .next/dev/lock before reading distDir from next.config.ts,
-# so hardlinked copies inherit the base workspace's lock. Safe to remove since
-# this instance uses .next-<port> via NEXT_DIST_DIR.
-rm -rf "$WEB_DIR/.next"
+NEXT_DIST_DIR="${NEXT_DIST_DIR:-.next}"
 
 cat > "$RUNTIME_ENV" <<RUNTIME
 export PGLITE_DATA_DIR="$PGLITE_DATA_DIR"
@@ -149,10 +161,13 @@ export NEXT_DIST_DIR="$NEXT_DIST_DIR"
 export APP_PORT="$APP_PORT"
 RUNTIME
 
+ensure_production_build
+
 (
   cd "$WEB_DIR"
-  PGLITE_DATA_DIR="$PGLITE_DATA_DIR" NEXT_DIST_DIR="$NEXT_DIST_DIR" \
-    bun run dev -- --hostname 0.0.0.0 --port "$APP_PORT" > "$LOG_DIR/web.log" 2>&1 &
+  PGLITE_DATA_DIR="$PGLITE_DATA_DIR" NODE_ENV=production \
+    NEXT_DIST_DIR="$NEXT_DIST_DIR" PORT="$APP_PORT" APP_PORT="$APP_PORT" \
+    node ./node_modules/next/dist/bin/next start --hostname 0.0.0.0 -p "$APP_PORT" > "$LOG_DIR/web.log" 2>&1 &
   echo $! > "$RUNTIME_DIR/web.pid"
 )
 
