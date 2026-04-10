@@ -167,6 +167,8 @@ ensure_production_build
   cd "$WEB_DIR"
   PGLITE_DATA_DIR="$PGLITE_DATA_DIR" NODE_ENV=production \
     NEXT_DIST_DIR="$NEXT_DIST_DIR" PORT="$APP_PORT" APP_PORT="$APP_PORT" \
+    PLATO_JOB_ID="${PLATO_JOB_ID:-}" JOB_ID="${JOB_ID:-}" \
+    PLATO_API_URL="${PLATO_API_URL:-}" PLATO_BASE_URL="${PLATO_BASE_URL:-}" \
     node ./node_modules/next/dist/bin/next start --hostname 0.0.0.0 -p "$APP_PORT" > "$LOG_DIR/web.log" 2>&1 &
   echo $! > "$RUNTIME_DIR/web.pid"
 )

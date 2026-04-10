@@ -9,6 +9,7 @@ _PROTECTED_FILES = (
     "package.json, tsconfig.json, next.config.ts, next.config.js, "
     "postcss.config.mjs, tailwind.config.ts, "
     "db/client.ts, db/bootstrap.ts, db/types.ts, db/index.ts, "
+    "lib/plato-mutation-logger.ts, "
     "components/theme-provider.tsx, app/providers.tsx, app/globals.css"
 )
 
@@ -143,6 +144,13 @@ SCHEMA: pgTable from drizzle-orm/pg-core in db/schema.ts
 SEED: import getDb from './client' (NOT './db'), check existing data before insert
 LAYOUT: <body suppressHydrationWarning>, <Providers> wrapper
 IMPORTS: shadcn from @/components/ui/<name>, schema from @/db/schema
+MUTATION LOGGING: Every write route (PUT/PATCH/POST/DELETE) that modifies
+the DB must call `logMutation` from `@/lib/plato-mutation-logger` after
+the Drizzle write succeeds:
+  import {{ logMutation }} from "@/lib/plato-mutation-logger";
+  await logMutation("table_name", "update", {{ id: numId }}, newValues);
+The row_filter must use the numeric primary key. This is required for
+scoring — if it's missing, mutation tests will always fail.
 
 ## Step 3: Copy fixes back and finalize
 

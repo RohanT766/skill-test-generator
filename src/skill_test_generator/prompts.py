@@ -274,6 +274,20 @@ Other rules:
 - ALWAYS include at least one API route in "app/api/" for data access
 - ALWAYS include "app/api/health/route.ts" unchanged (it uses getDb internally)
 - ALWAYS include at least one write API route (PUT/PATCH) for data mutation
+- EVERY write API route (PUT/PATCH/POST/DELETE that modifies DB) MUST call \
+the Plato mutation logger after a successful write:
+  ```
+  import { logMutation } from "@/lib/plato-mutation-logger";
+  // after db.update(table).set(values).where(eq(table.id, id)):
+  await logMutation("tablename", "update", { id: numericId }, values);
+  // after db.insert(table).values(data):
+  await logMutation("tablename", "insert", { id: newRow.id }, data);
+  // after db.delete(table).where(eq(table.id, id)):
+  await logMutation("tablename", "delete", { id: numericId });
+  ```
+  The first arg is the SQL table name, the second is the action, the third \
+identifies the affected row, and the fourth is the new column values. \
+The row_filter id must be the numeric primary key. Do NOT skip this.
 - Import shadcn components from "@/components/ui/<name>"
 - Import Drizzle schema from "@/db/schema"
 - All components must be properly typed with TypeScript
