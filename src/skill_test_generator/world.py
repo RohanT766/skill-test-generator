@@ -698,6 +698,15 @@ class SkillTestGeneratorWorld(
                     timeout=120,
                 )
 
+                await _exec(
+                    "if ! command -v node >/dev/null 2>&1; then "
+                    "  curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && "
+                    "  apt-get install -y --no-install-recommends nodejs && "
+                    "  rm -rf /var/lib/apt/lists/*; "
+                    "fi",
+                    timeout=120,
+                )
+
                 app_dir = "/tmp/variant/web"
                 preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
 
@@ -819,22 +828,36 @@ else:
                 # ── BUILD ─────────────────────────────────────────────
                 await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 2", timeout=10)
 
-                build_out, _ = await _exec(
+                build_out, build_ok = await _exec(
                     f"{preamble} && cd {app_dir} && "
-                    f"NEXT_DIST_DIR=.next bun run build 2>&1 | tail -20",
+                    "NODE_ENV=production NEXT_DIST_DIR=.next "
+                    "node ./node_modules/next/dist/bin/next build 2>&1 | tail -40",
                     timeout=300,
                 )
                 logger.info("  [%s] Build: %s", vs.slug, build_out[-300:])
 
                 check_out, _ = await _exec(
-                    f"test -d {app_dir}/.next && echo HAS_NEXT || echo NO_NEXT",
+                    f"test -f {app_dir}/.next/BUILD_ID "
+                    "&& echo HAS_PROD_BUILD || echo NO_PROD_BUILD",
                     timeout=10,
                 )
-                use_dev = "NO_NEXT" in check_out
-                if use_dev:
-                    logger.warning(
-                        "  [%s] Build failed, falling back to dev mode", vs.slug
+                has_prod_build = "HAS_PROD_BUILD" in check_out
+                if not build_ok or not has_prod_build:
+                    err = (
+                        f"Production build failed or missing BUILD_ID "
+                        f"(build_ok={build_ok}, check={check_out.strip()}). "
+                        f"Build log tail: {build_out[-1200:]}"
                     )
+                    checks.append(
+                        {
+                            "name": "production_build",
+                            "pass": False,
+                            "error": err[:2000],
+                        }
+                    )
+                    logger.error("  [%s] %s", vs.slug, err)
+                    return {"artifact_id": None, "verified": False, "checks": checks}
+                checks.append({"name": "production_build", "pass": True, "error": ""})
 
                 # ── SERVE (for snapshot) ──────────────────────────────
                 await _exec(
@@ -843,9 +866,8 @@ else:
                     timeout=30,
                 )
                 start_cmd = (
-                    "bun run dev -- --hostname 0.0.0.0 --port 3000"
-                    if use_dev
-                    else "bun --bun ./node_modules/next/dist/bin/next start -p 3000"
+                    "node ./node_modules/next/dist/bin/next start "
+                    "--hostname 0.0.0.0 -p 3000"
                 )
                 await _exec(
                     f"{preamble} && cd {app_dir} && mkdir -p /tmp/pglite-data && "
@@ -899,9 +921,8 @@ else:
 
                 # ── BOOT SERVICE (so app starts on snapshot restore) ──
                 svc_exec = (
-                    f"/root/.bun/bin/bun run dev -- --hostname 0.0.0.0 --port 3000"
-                    if use_dev
-                    else f"/root/.bun/bin/bun --bun ./node_modules/next/dist/bin/next start -p 3000"
+                    "/usr/bin/node ./node_modules/next/dist/bin/next start "
+                    "--hostname 0.0.0.0 -p 3000"
                 )
                 svc_unit = (
                     "[Unit]\n"
@@ -1337,6 +1358,9 @@ else:
                 agent_config["nova_act_api_key"] = config.nova_act_api_key
             else:
                 agent_config["nova_act_workflow_name"] = config.nova_act_workflow_name
+        elif "anthropic" in config.eval_agent_model or "claude" in config.eval_agent_model:
+            if config.anthropic_api_key:
+                agent_config["anthropic_api_key"] = config.anthropic_api_key
 
         if config.aws_access_key_id:
             agent_config["aws_access_key_id"] = config.aws_access_key_id
