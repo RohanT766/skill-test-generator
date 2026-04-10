@@ -107,11 +107,12 @@ NFS source: {variant_dir}/web/
 Spec: {variant_dir}/spec.json
 Your working copy: /tmp/work-{slug}/
 
-{checks_section}{files_section}{issues_section}## Step 1: Start the dev server
+{checks_section}{files_section}{issues_section}## Step 1: Build and start the production server
 
 ```bash
 cd /tmp/work-{slug}
-PGLITE_DATA_DIR=/tmp/pglite-data/{verify_port} PORT={verify_port} bun run dev -- --hostname 0.0.0.0 --port {verify_port} &
+NODE_ENV=production NEXT_DIST_DIR=.next node ./node_modules/next/dist/bin/next build
+PGLITE_DATA_DIR=/tmp/pglite-data/{verify_port} NODE_ENV=production NEXT_DIST_DIR=.next PORT={verify_port} APP_PORT={verify_port} node ./node_modules/next/dist/bin/next start --hostname 0.0.0.0 -p {verify_port} &
 ```
 
 Wait for http://localhost:{verify_port}/api/health to return 200.
@@ -121,8 +122,8 @@ Wait for http://localhost:{verify_port}/api/health to return 200.
 Check ALL API routes return 200 with actual data:
 {verify_cmds}
 
-If anything fails — 500 errors, empty data, missing routes — fix the code
-in /tmp/work-{slug}/ and the dev server will hot-reload.
+If anything fails — 500 errors, empty data, missing routes — kill the server,
+fix the code in /tmp/work-{slug}/, rebuild with `next build`, and restart.
 
 Common issues:
 - db/schema.ts columns don't match drizzle/0000_zippy_changeling.sql

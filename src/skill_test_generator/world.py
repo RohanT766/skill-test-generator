@@ -735,17 +735,53 @@ else:
                     timeout=10,
                 )
 
-                # ── VERIFY (dev server) ───────────────────────────────
+                # ── BUILD (production) ─────────────────────────────────
                 await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
+
+                # Clean any stale dev-mode .next artifacts before building
+                await _exec(f"rm -rf {app_dir}/.next", timeout=10)
+
+                build_out, build_ok = await _exec(
+                    f"{preamble} && cd {app_dir} && "
+                    "NODE_ENV=production NEXT_DIST_DIR=.next "
+                    "node ./node_modules/next/dist/bin/next build 2>&1 | tail -40",
+                    timeout=300,
+                )
+                logger.info("  [%s] Build: %s", vs.slug, build_out[-300:])
+
+                check_out, _ = await _exec(
+                    f"test -f {app_dir}/.next/BUILD_ID "
+                    "&& echo HAS_PROD_BUILD || echo NO_PROD_BUILD",
+                    timeout=10,
+                )
+                has_prod_build = "HAS_PROD_BUILD" in check_out
+                if not build_ok or not has_prod_build:
+                    err = (
+                        f"Production build failed or missing BUILD_ID "
+                        f"(build_ok={build_ok}, check={check_out.strip()}). "
+                        f"Build log tail: {build_out[-1200:]}"
+                    )
+                    checks.append(
+                        {
+                            "name": "production_build",
+                            "pass": False,
+                            "error": err[:2000],
+                        }
+                    )
+                    logger.error("  [%s] %s", vs.slug, err)
+                    return {"artifact_id": None, "verified": False, "checks": checks}
+                checks.append({"name": "production_build", "pass": True, "error": ""})
+
+                # ── VERIFY (production server) ────────────────────────
                 await _exec(
                     f"{preamble} && cd {app_dir} && mkdir -p /tmp/pglite-data && "
-                    f"PORT=3000 APP_PORT=3000 "
-                    f"nohup bun run dev -- --hostname 0.0.0.0 --port 3000 "
-                    f"> /tmp/dev.log 2>&1 &",
+                    f"NEXT_DIST_DIR=.next NODE_ENV=production PORT=3000 APP_PORT=3000 "
+                    f"nohup node ./node_modules/next/dist/bin/next start "
+                    f"--hostname 0.0.0.0 -p 3000 > /tmp/dev.log 2>&1 &",
                     timeout=30,
                 )
 
-                dev_ok = False
+                prod_ok = False
                 for _ in range(40):
                     out, _ = await _exec(
                         "curl -sf http://127.0.0.1:3000/api/health -o /dev/null "
@@ -753,11 +789,11 @@ else:
                         timeout=10,
                     )
                     if "OK" in out:
-                        dev_ok = True
+                        prod_ok = True
                         break
                     await asyncio.sleep(3)
 
-                if not dev_ok:
+                if not prod_ok:
                     log_tail, _ = await _exec(
                         "tail -50 /tmp/dev.log 2>/dev/null", timeout=10
                     )
@@ -765,7 +801,7 @@ else:
                         {
                             "name": "server_startup",
                             "pass": False,
-                            "error": f"Dev server never healthy. Log: {log_tail[-500:]}",
+                            "error": f"Production server never healthy. Log: {log_tail[-500:]}",
                         }
                     )
                     return {"artifact_id": None, "verified": False, "checks": checks}
@@ -825,41 +861,8 @@ else:
                 if not all(c["pass"] for c in checks):
                     return {"artifact_id": None, "verified": False, "checks": checks}
 
-                # ── BUILD ─────────────────────────────────────────────
-                await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 2", timeout=10)
-
-                build_out, build_ok = await _exec(
-                    f"{preamble} && cd {app_dir} && "
-                    "NODE_ENV=production NEXT_DIST_DIR=.next "
-                    "node ./node_modules/next/dist/bin/next build 2>&1 | tail -40",
-                    timeout=300,
-                )
-                logger.info("  [%s] Build: %s", vs.slug, build_out[-300:])
-
-                check_out, _ = await _exec(
-                    f"test -f {app_dir}/.next/BUILD_ID "
-                    "&& echo HAS_PROD_BUILD || echo NO_PROD_BUILD",
-                    timeout=10,
-                )
-                has_prod_build = "HAS_PROD_BUILD" in check_out
-                if not build_ok or not has_prod_build:
-                    err = (
-                        f"Production build failed or missing BUILD_ID "
-                        f"(build_ok={build_ok}, check={check_out.strip()}). "
-                        f"Build log tail: {build_out[-1200:]}"
-                    )
-                    checks.append(
-                        {
-                            "name": "production_build",
-                            "pass": False,
-                            "error": err[:2000],
-                        }
-                    )
-                    logger.error("  [%s] %s", vs.slug, err)
-                    return {"artifact_id": None, "verified": False, "checks": checks}
-                checks.append({"name": "production_build", "pass": True, "error": ""})
-
                 # ── SERVE (for snapshot) ──────────────────────────────
+                # Kill verify server and restart cleanly for snapshot
                 await _exec(
                     "fuser -k 3000/tcp 2>/dev/null; "
                     "docker stop $(docker ps -q) 2>/dev/null; sleep 2",
