@@ -22,6 +22,10 @@ THINK FIRST — before writing any task, reason through these questions:
 1. What does a naive agent (one lacking this skill) get wrong?
 2. What single data point, if returned correctly, proves the skill was used?
 3. What is the minimum information the agent needs to attempt the task?
+4. Is there ANY alternative path to the answer that bypasses the skill \
+entirely (e.g. the value is also visible on the default view, or reachable \
+via a different page/route that doesn't require the skill)? If yes, pick a \
+different data point.
 
 THEN write each task following these principles:
 - Ask for exactly ONE value. Never ask for two pieces of information.
@@ -30,12 +34,15 @@ the skill. Include only what the agent strictly needs to identify the task.
 - Do not add clarifying details, parenthetical hints, or extra context \
 beyond what is necessary to specify the question.
 - Do not mention, describe, or allude to the skill, the UI mechanism, or \
-the challenge the agent will face. The agent must discover it.
+the challenge the agent will face — e.g. never mention pagination, \
+scrolling, hidden content, tabs, dropdowns, expanding sections, truncation, \
+or similar mechanisms. The agent must discover these on its own.
 - State what to find, not how to find it. Never reference UI elements, \
 navigation, or workflow steps.
 - The correct answer must only be reachable by exercising the skill. A \
 naive approach (e.g. looking only at initially visible data) must give a \
-WRONG answer.
+WRONG answer. Verify there is no workaround — no other page, shortcut, \
+or surface in the app that leaks the answer without the skill.
 - Compute the expected answer from the seed data AND the live API data \
 provided. If both are available and they disagree, use the live API data.
 
@@ -61,6 +68,9 @@ THINK FIRST — before writing any task, reason through these questions:
 2. What single mutation, if performed correctly, proves the skill was used?
 3. What is the minimum information the agent needs to identify the record \
 and the change?
+4. Is there ANY alternative way to perform this mutation that bypasses the \
+skill entirely (e.g. the record is editable from a different view that \
+doesn't require the skill)? If yes, pick a different record or mutation.
 
 THEN write each task following these principles:
 - Each task has exactly one deterministic set of mutations.
@@ -69,9 +79,14 @@ the skill. Include only what the agent strictly needs to identify the task.
 - Do not add clarifying details, parenthetical hints, or extra context \
 beyond what is necessary.
 - Do not mention, describe, or allude to the skill, the UI mechanism, or \
-the challenge. The agent must discover it.
+the challenge — e.g. never mention pagination, scrolling, hidden content, \
+tabs, dropdowns, expanding sections, truncation, or similar mechanisms. \
+The agent must discover these on its own.
 - State the desired outcome, not the method. Never reference UI elements, \
 navigation, or workflow steps.
+- The target record must only be reachable by exercising the skill. Verify \
+there is no workaround — no other page, shortcut, or surface in the app \
+that exposes the record without the skill.
 - Only generate mutation tasks for resources that have write API endpoints.
 
 Respond with a JSON object (no markdown fencing):
@@ -99,6 +114,9 @@ THINK FIRST — before writing any task, reason through these questions:
 2. For output tasks: what single data point proves the skill was used?
 3. For mutation tasks: what single mutation proves the skill was used?
 4. What is the minimum information the agent needs to attempt the task?
+5. Is there ANY alternative path to the answer or record that bypasses the \
+skill entirely (e.g. visible on the default view, reachable via a different \
+page that doesn't require the skill)? If yes, pick a different target.
 
 THEN write each task following these principles:
 - Output tasks ask for exactly ONE value. Never ask for two pieces of info.
@@ -108,10 +126,14 @@ the skill. Include only what the agent strictly needs to identify the task.
 - Do not add clarifying details, parenthetical hints, or extra context \
 beyond what is necessary.
 - Do not mention, describe, or allude to the skill, the UI mechanism, or \
-the challenge. The agent must discover it.
+the challenge — e.g. never mention pagination, scrolling, hidden content, \
+tabs, dropdowns, expanding sections, truncation, or similar mechanisms. \
+The agent must discover these on its own.
 - State what to find or achieve, not how. Never reference UI elements, \
 navigation, or workflow steps.
-- The correct answer must only be reachable by exercising the skill.
+- The correct answer must only be reachable by exercising the skill. Verify \
+there is no workaround — no other page, shortcut, or surface in the app \
+that leaks the answer without the skill.
 - Only generate mutation tasks for resources that have write API endpoints.
 - Compute expected answers from the seed data AND the live API data \
 provided. If both are available and they disagree, use the live API data.
