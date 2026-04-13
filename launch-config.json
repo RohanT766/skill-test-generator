@@ -1,6 +1,6 @@
 {
   "world": {
-    "package": "plato-world-skill-test-generator:0.3.23",
+    "package": "plato-world-skill-test-generator:0.3.40",
     "runtime": {
       "type": "vm",
       "vm": {
@@ -12,20 +12,22 @@
     },
     "config": {
       "s3_skills": [
+        "Exhaustively paginate list before identifying extremum record",
         "Resolve truncated text in data grid cells before using value",
-        "Exhaustively paginate list before identifying extremum record"
+        "Aggregate values across data grid rows before selecting maximum",
+        "Account for pagination when counting rows in data grid"
       ],
-      "specs_per_skill": 2,
+      "specs_per_skill": 3,
       "concurrency": 6,
-      "max_skills": 2,
-      "output_tasks_per_variant": 1,
-      "mutation_tasks_per_variant": 1,
-      "sessions_per_testcase": 2,
-      "run_concurrency": 4,
+      "max_skills": 4,
+      "output_tasks_per_variant": 3,
+      "mutation_tasks_per_variant": 0,
+      "sessions_per_testcase": 3,
+      "run_concurrency": 30,
       "max_parallel_pipelines": 10,
       "pipeline_vm_cpus": 2,
       "pipeline_vm_memory": 4096,
-      "eval_agent_model": "anthropic/claude-opus-4-6",
+      "eval_agent_model": "amazon/nova-act",
       "cua_world_package": "plato-world-cua-benchmark:3.3.22",
       "cua_agent_package": "computer-use-agent:3.2.48",
       "coder_agent": {
