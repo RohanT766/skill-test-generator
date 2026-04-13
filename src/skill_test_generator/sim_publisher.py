@@ -187,7 +187,6 @@ async def publish_variant_to_plato(
                 "name": task.get("task_name", task.get("name", "")),
                 "prompt": task.get("instruction", ""),
                 "start_url": task.get("start_url", "/"),
-                "difficulty": task.get("difficulty", "medium"),
                 "metadata": task.get("metadata", {}),
             }
 

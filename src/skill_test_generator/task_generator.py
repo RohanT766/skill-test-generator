@@ -14,80 +14,71 @@ from .json_utils import extract_json as _extract_json
 logger = logging.getLogger(__name__)
 
 _OUTPUT_ONLY_SYSTEM_PROMPT = """\
-You are an expert test designer for AI web agent evaluation. You are given \
-a web application spec, its database schema, its seed data, and the SKILL \
-the app is designed to test. Your job is to write retrieval TASKS — \
-questions an AI agent must answer by reading data from the application.
+You design retrieval tasks that test whether an AI web agent can exercise \
+a specific SKILL. The agent must read data from the application and return \
+a single value.
 
-CRITICAL RULES:
+THINK FIRST — before writing any task, reason through these questions:
+1. What does a naive agent (one lacking this skill) get wrong?
+2. What single data point, if returned correctly, proves the skill was used?
+3. What is the minimum information the agent needs to attempt the task?
 
-1. SINGLE DETERMINISTIC ANSWER. Every task MUST have exactly ONE correct \
-answer with NO ambiguity. Compute the answer from the seed data.
-   - NEVER ask the agent to "list" or enumerate multiple items.
-   - NEVER ask two separate questions in one task.
-
-2. RETRIEVAL ONLY. Tasks ask the agent to FIND and REPORT a value. \
-Never ask the agent to update, create, delete, reassign, or modify \
-any data. The agent only reads.
-
-3. OBJECTIVE ONLY, NEVER METHOD. State the desired outcome. Never mention \
-UI elements, forms, buttons, dropdowns, pages, dialogs, or workflow steps.
-
-4. NEVER HINT AT THE SKILL. Do not mention pagination, truncation, \
-dropdowns, scrolling, expanding, hidden content, tabs, collapsing, or \
-any UI mechanism. The agent must discover these on its own.
-
-5. EVERY TASK REQUIRES THE SKILL. An agent that lacks this skill MUST \
-fail or get the wrong answer. The correct answer should only be reachable \
-by exercising the tested skill. Design tasks where the naive approach \
-(e.g. only looking at visible data) gives a WRONG answer, but applying \
-the skill gives the RIGHT answer.
+THEN write each task following these principles:
+- Ask for exactly ONE value. Never ask for two pieces of information.
+- The instruction should be the shortest unambiguous sentence that requires \
+the skill. Include only what the agent strictly needs to identify the task.
+- Do not add clarifying details, parenthetical hints, or extra context \
+beyond what is necessary to specify the question.
+- Do not mention, describe, or allude to the skill, the UI mechanism, or \
+the challenge the agent will face. The agent must discover it.
+- State what to find, not how to find it. Never reference UI elements, \
+navigation, or workflow steps.
+- The correct answer must only be reachable by exercising the skill. A \
+naive approach (e.g. looking only at initially visible data) must give a \
+WRONG answer.
+- Compute the expected answer from the seed data AND the live API data \
+provided. If both are available and they disagree, use the live API data.
 
 Respond with a JSON object (no markdown fencing):
 - "tasks": array of task objects, each with:
   - "name": short kebab-case identifier
   - "title": human-readable title
-  - "instruction": 1-3 sentence retrieval question.
+  - "instruction": 1-2 sentence retrieval question
   - "start_url": URL path where the agent starts (e.g. "/")
   - "scoring_type": always "output"
-  - "output_schema": JSON Schema for the answer. Must request exactly ONE value.
-  - "expected_output": the single correct answer matching output_schema, \
-computed from the seed data.
+  - "output_schema": JSON Schema requesting exactly ONE value
+  - "expected_output": the correct answer matching output_schema
   - "scoring_hint": what to verify
   - "skill_required": why this task needs the tested skill (internal)\
 """
 
 _MUTATION_ONLY_SYSTEM_PROMPT = """\
-You are an expert test designer for AI web agent evaluation. You are given \
-a web application spec, its database schema, its seed data, and the SKILL \
-the app is designed to test. Your job is to write mutation TASKS — actions \
-an AI agent must perform to change data in the application.
+You design mutation tasks that test whether an AI web agent can exercise \
+a specific SKILL. The agent must change data in the application.
 
-CRITICAL RULES:
+THINK FIRST — before writing any task, reason through these questions:
+1. What does a naive agent (one lacking this skill) get wrong?
+2. What single mutation, if performed correctly, proves the skill was used?
+3. What is the minimum information the agent needs to identify the record \
+and the change?
 
-1. SINGLE DETERMINISTIC OUTCOME. Every task MUST have exactly ONE correct \
-set of database mutations with NO ambiguity.
-   - NEVER ask two separate mutations in one task.
-
-2. OBJECTIVE ONLY, NEVER METHOD. State the desired outcome. Never mention \
-UI elements, forms, buttons, dropdowns, pages, dialogs, or workflow steps.
-   - The agent must determine WHICH record and WHAT to change by reasoning.
-
-3. NEVER HINT AT THE SKILL. Do not mention pagination, truncation, \
-dropdowns, scrolling, expanding, hidden content, tabs, collapsing, or \
-any UI mechanism. The agent must discover these on its own.
-
-4. EVERY TASK REQUIRES THE SKILL. An agent that lacks this skill MUST \
-fail or get the wrong answer.
-
-5. ONLY FEASIBLE TASKS. Check the API routes — if there are no write \
-endpoints for a resource, do NOT generate mutation tasks for it.
+THEN write each task following these principles:
+- Each task has exactly one deterministic set of mutations.
+- The instruction should be the shortest unambiguous sentence that requires \
+the skill. Include only what the agent strictly needs to identify the task.
+- Do not add clarifying details, parenthetical hints, or extra context \
+beyond what is necessary.
+- Do not mention, describe, or allude to the skill, the UI mechanism, or \
+the challenge. The agent must discover it.
+- State the desired outcome, not the method. Never reference UI elements, \
+navigation, or workflow steps.
+- Only generate mutation tasks for resources that have write API endpoints.
 
 Respond with a JSON object (no markdown fencing):
 - "tasks": array of task objects, each with:
   - "name": short kebab-case identifier
   - "title": human-readable title
-  - "instruction": 1-3 sentence objective.
+  - "instruction": 1-2 sentence objective
   - "start_url": URL path where the agent starts (e.g. "/")
   - "scoring_type": always "mutations"
   - "expected_mutations": array of DB changes:
@@ -100,40 +91,40 @@ Respond with a JSON object (no markdown fencing):
 """
 
 _MIXED_SYSTEM_PROMPT = """\
-You are an expert test designer for AI web agent evaluation. You are given \
-a web application spec, its database schema, its seed data, and the SKILL \
-the app is designed to test. Your job is to write TASKS — goals an AI \
-agent must achieve in the application.
+You design tasks that test whether an AI web agent can exercise a specific \
+SKILL. Tasks are either retrieval (return a value) or mutation (change data).
 
-CRITICAL RULES:
+THINK FIRST — before writing any task, reason through these questions:
+1. What does a naive agent (one lacking this skill) get wrong?
+2. For output tasks: what single data point proves the skill was used?
+3. For mutation tasks: what single mutation proves the skill was used?
+4. What is the minimum information the agent needs to attempt the task?
 
-1. SINGLE DETERMINISTIC ANSWER. Every task MUST have exactly ONE correct \
-answer with NO ambiguity. Compute the answer from the seed data.
-   - NEVER ask the agent to "list" or enumerate multiple items.
-   - NEVER ask two separate questions in one task.
-
-2. OBJECTIVE ONLY, NEVER METHOD. State the desired outcome. Never mention \
-UI elements, forms, buttons, dropdowns, pages, dialogs, or workflow steps.
-
-3. NEVER HINT AT THE SKILL. Do not mention pagination, truncation, \
-dropdowns, scrolling, expanding, hidden content, tabs, collapsing, or \
-any UI mechanism. The agent must discover these on its own.
-
-4. EVERY TASK REQUIRES THE SKILL. An agent that lacks this skill MUST \
-fail or get the wrong answer.
-
-5. ONLY FEASIBLE TASKS. Check the API routes — if there are no write \
-endpoints for a resource, do NOT generate mutation tasks for it.
+THEN write each task following these principles:
+- Output tasks ask for exactly ONE value. Never ask for two pieces of info.
+- Mutation tasks have exactly one deterministic set of mutations.
+- The instruction should be the shortest unambiguous sentence that requires \
+the skill. Include only what the agent strictly needs to identify the task.
+- Do not add clarifying details, parenthetical hints, or extra context \
+beyond what is necessary.
+- Do not mention, describe, or allude to the skill, the UI mechanism, or \
+the challenge. The agent must discover it.
+- State what to find or achieve, not how. Never reference UI elements, \
+navigation, or workflow steps.
+- The correct answer must only be reachable by exercising the skill.
+- Only generate mutation tasks for resources that have write API endpoints.
+- Compute expected answers from the seed data AND the live API data \
+provided. If both are available and they disagree, use the live API data.
 
 Respond with a JSON object (no markdown fencing):
 - "tasks": array of task objects, each with:
   - "name": short kebab-case identifier
   - "title": human-readable title
-  - "instruction": 1-3 sentence objective.
+  - "instruction": 1-2 sentence objective
   - "start_url": URL path where the agent starts (e.g. "/")
   - "scoring_type": "output" or "mutations"
-  - "output_schema": (REQUIRED for output tasks) JSON Schema for the answer.
-  - "expected_output": (REQUIRED for output tasks) the correct answer.
+  - "output_schema": (REQUIRED for output tasks) JSON Schema for ONE value
+  - "expected_output": (REQUIRED for output tasks) the correct answer
   - "expected_mutations": (REQUIRED for mutation tasks) array of DB changes:
     - "table": table name
     - "action": "insert" | "update" | "delete"
@@ -150,8 +141,16 @@ async def generate_tasks_for_variant(
     model: str,
     output_tasks: int = 3,
     mutation_tasks: int = 3,
+    live_api_data: dict[str, str] | None = None,
 ) -> list[dict]:
-    """Generate evaluation tasks for a single variant spec."""
+    """Generate evaluation tasks for a single variant spec.
+
+    Args:
+        live_api_data: Optional mapping of API route path to JSON response
+            body fetched from the running app (e.g. {"/api/shipments": "..."}).
+            When provided, the LLM uses this ground-truth data to compute
+            expected_output instead of relying solely on seed data text.
+    """
     user_prompt = (
         f"## Application\n\n"
         f"**Name:** {spec.get('title', spec.get('app_name', 'Unknown'))}\n\n"
@@ -166,6 +165,12 @@ async def generate_tasks_for_variant(
     seed_data = spec.get("seed_data", "")
     if seed_data:
         user_prompt += f"## Seed Data\n\n```typescript\n{seed_data}\n```\n\n"
+
+    if live_api_data:
+        user_prompt += "## Live API Data (ground truth — use this over seed data if they disagree)\n\n"
+        for route, body in live_api_data.items():
+            truncated = body[:20000] if len(body) > 20000 else body
+            user_prompt += f"### `GET {route}`\n\n```json\n{truncated}\n```\n\n"
 
     user_prompt += "## Pages\n\n"
     for page in spec.get("pages", []):
@@ -204,22 +209,21 @@ async def generate_tasks_for_variant(
         user_prompt += (
             f"Generate exactly {total_tasks} tasks: "
             f"{output_tasks} output task(s) and {mutation_tasks} mutation task(s). "
-            f"Use the seed data above to compute the EXACT correct "
-            f"expected_output or expected_mutations for each task."
+            f"Compute the EXACT correct expected_output or expected_mutations "
+            f"for each task from the data above."
         )
     elif mutation_tasks > 0:
         system_prompt = _MUTATION_ONLY_SYSTEM_PROMPT
         user_prompt += (
             f"Generate exactly {mutation_tasks} mutation tasks. "
-            f"Use the seed data above to compute the EXACT correct "
-            f"expected_mutations for each task."
+            f"Compute the EXACT correct expected_mutations for each task."
         )
     else:
         system_prompt = _OUTPUT_ONLY_SYSTEM_PROMPT
         user_prompt += (
             f"Generate exactly {output_tasks} retrieval tasks. "
-            f"Use the seed data above to compute the EXACT correct "
-            f"expected_output for each task."
+            f"Compute the EXACT correct expected_output for each task "
+            f"from the data above."
         )
 
     async with client.messages.stream(
@@ -283,6 +287,48 @@ async def generate_all_tasks(
     total = sum(len(t) for t in results.values())
     logger.info("Generated %d total tasks across %d variants", total, len(results))
     return results
+
+
+def validate_expected_outputs(
+    tasks: list[dict],
+    live_api_data: dict[str, str],
+) -> list[dict]:
+    """Check each output task's expected_output against live API data.
+
+    For each output task, verify that every value in expected_output appears
+    somewhere in the live API responses. Tasks that fail validation get an
+    ``_invalid`` flag and a ``_validation_error`` message.
+
+    Returns the (possibly mutated) task list.
+    """
+    if not live_api_data:
+        return tasks
+
+    all_api_text = " ".join(live_api_data.values())
+
+    for task in tasks:
+        if task.get("scoring_type") != "output":
+            continue
+        expected = task.get("expected_output")
+        if not expected or not isinstance(expected, dict):
+            continue
+
+        for key, value in expected.items():
+            needle = str(value)
+            if needle and needle not in all_api_text:
+                task["_invalid"] = True
+                task["_validation_error"] = (
+                    f"expected_output[{key!r}] = {value!r} not found in "
+                    f"any live API response"
+                )
+                logger.warning(
+                    "Task %s failed validation: %s",
+                    task.get("name", "?"),
+                    task["_validation_error"],
+                )
+                break
+
+    return tasks
 
 
 def _build_v2_scoring_config(task: dict, sim_name: str) -> dict | None:
@@ -356,7 +402,6 @@ def build_plato_task_configs(
                 "sim": sim_name,
                 "task_name": f"{slug}--{task.get('name', 'unnamed')}",
                 "title": task.get("title", ""),
-                "difficulty": task.get("difficulty", "medium"),
                 "instruction": task.get("instruction", ""),
                 "start_url": task.get("start_url", "/"),
                 "scoring_type": scoring_type,

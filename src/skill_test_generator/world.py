@@ -454,7 +454,7 @@ class SkillTestGeneratorWorld(
                     "  [%s] Validation warnings: %s", vs.slug, validation_errors
                 )
 
-            # ── Phase 2: Pipeline VM (verify → build → snapshot) ──────
+            # ── Phase 2: Pipeline VM (verify → build → task gen → snapshot) ──
             artifact_id: str | None = None
             last_checks: list[dict] = []
 
@@ -473,6 +473,8 @@ class SkillTestGeneratorWorld(
                             sim_name=sim_name,
                             spec=spec,
                             presigned_url=url,
+                            llm_client=llm_client,
+                            llm_sem=llm_sem,
                         )
                     except Exception as e:
                         logger.error("  [%s] Pipeline VM error: %s", vs.slug, e)
@@ -482,6 +484,16 @@ class SkillTestGeneratorWorld(
 
                 if result.get("artifact_id"):
                     artifact_id = result["artifact_id"]
+                    # Collect tasks generated inside the VM phase
+                    vm_tasks = result.get("tasks", [])
+                    if vm_tasks:
+                        self._all_tasks[vs.slug] = vm_tasks
+                        vs.task_count = len(vm_tasks)
+                        tasks_dir = config.output / vs.slug
+                        tasks_dir.mkdir(parents=True, exist_ok=True)
+                        (tasks_dir / "tasks.json").write_text(
+                            json.dumps({"tasks": vm_tasks}, indent=2),
+                        )
                     break
 
                 if attempt == 0 and config.coder_agent and not result.get("verified"):
@@ -518,31 +530,7 @@ class SkillTestGeneratorWorld(
             vs.artifact_id = artifact_id
             logger.info("  [%s] Artifact: %s", vs.slug, artifact_id)
 
-            # ── Phase 3: Generate tasks ───────────────────────────────
-            async with llm_sem:
-                try:
-                    logger.info("  [%s] Generating tasks …", vs.slug)
-                    tasks = await generate_tasks_for_variant(
-                        llm_client,
-                        spec,
-                        config.design_model,
-                        output_tasks=config.output_tasks_per_variant,
-                        mutation_tasks=config.mutation_tasks_per_variant,
-                    )
-                    self._all_tasks[vs.slug] = tasks
-                    vs.task_count = len(tasks)
-
-                    tasks_dir = config.output / vs.slug
-                    tasks_dir.mkdir(parents=True, exist_ok=True)
-                    (tasks_dir / "tasks.json").write_text(
-                        json.dumps({"tasks": tasks}, indent=2),
-                    )
-                    logger.info("  [%s] Generated %d tasks", vs.slug, len(tasks))
-                except Exception as e:
-                    logger.error("  [%s] Task gen failed: %s", vs.slug, e)
-                    vs.error = f"task gen: {e}"
-
-            # ── Phase 4: Create testcases ─────────────────────────────
+            # ── Phase 3: Create testcases ─────────────────────────────
             tasks = self._all_tasks.get(vs.slug, [])
             if tasks and artifact_id:
                 try:
@@ -602,10 +590,17 @@ class SkillTestGeneratorWorld(
         sim_name: str,
         spec: dict,
         presigned_url: str,
+        llm_client: object | None = None,
+        llm_sem: asyncio.Semaphore | None = None,
     ) -> dict:
-        """Run verify + build + snapshot on an isolated pipeline VM.
+        """Run verify + build + task gen + validation + snapshot on a pipeline VM.
 
-        Returns ``{"artifact_id": str|None, "verified": bool, "checks": [...]}``.
+        Task generation now runs while the app is live on localhost so we can
+        feed real API response data into the LLM prompt and validate expected
+        outputs against the running app before snapshotting.
+
+        Returns ``{"artifact_id": str|None, "verified": bool, "checks": [...],
+        "tasks": [...]}``.
         The VM is always closed in the ``finally`` block.
         """
         from plato._generated.api.v2.sessions import (
@@ -861,6 +856,95 @@ else:
                 if not all(c["pass"] for c in checks):
                     return {"artifact_id": None, "verified": False, "checks": checks}
 
+                # ── TASK GEN + VALIDATION (app is live on localhost) ──
+                generated_tasks: list[dict] = []
+                if llm_client is not None:
+                    from .task_generator import (
+                        generate_tasks_for_variant,
+                        validate_expected_outputs,
+                    )
+
+                    live_api_data: dict[str, str] = {}
+                    for r in spec.get("api_routes", []):
+                        route = r.get("route", "")
+                        if not route or "[" in route or "/health" in route:
+                            continue
+                        methods = r.get("methods", [r.get("method", "GET")])
+                        if isinstance(methods, str):
+                            methods = [methods]
+                        if "GET" not in methods:
+                            continue
+                        # Fetch all pages of data for paginated endpoints
+                        all_data = ""
+                        page = 1
+                        while page <= 20:
+                            url_with_page = f"http://127.0.0.1:3000{route}?page={page}&pageSize=100"
+                            out, ok = await _exec(
+                                f"curl -s '{url_with_page}' 2>&1",
+                                timeout=15,
+                            )
+                            if not ok or not out or len(out) < 5:
+                                break
+                            if page == 1:
+                                all_data = out
+                            else:
+                                all_data += "\n" + out
+                            try:
+                                resp_json = json.loads(out)
+                                tp = (resp_json.get("totalPages")
+                                      or resp_json.get("total_pages")
+                                      or resp_json.get("pagination", {}).get("totalPages")
+                                      or resp_json.get("pagination", {}).get("total_pages"))
+                                if tp and page >= int(tp):
+                                    break
+                                rows = resp_json.get("data", resp_json.get("items", []))
+                                if not rows:
+                                    break
+                            except (json.JSONDecodeError, ValueError):
+                                break
+                            page += 1
+                        if all_data:
+                            live_api_data[route] = all_data
+
+                    if live_api_data:
+                        logger.info(
+                            "  [%s] Fetched live API data from %d route(s)",
+                            vs.slug,
+                            len(live_api_data),
+                        )
+
+                    gen_coro = generate_tasks_for_variant(
+                        llm_client,
+                        spec,
+                        config.design_model,
+                        output_tasks=config.output_tasks_per_variant,
+                        mutation_tasks=config.mutation_tasks_per_variant,
+                        live_api_data=live_api_data or None,
+                    )
+                    if llm_sem is not None:
+                        async with llm_sem:
+                            generated_tasks = await gen_coro
+                    else:
+                        generated_tasks = await gen_coro
+
+                    logger.info(
+                        "  [%s] Generated %d tasks (in VM phase)",
+                        vs.slug,
+                        len(generated_tasks),
+                    )
+
+                    if live_api_data and generated_tasks:
+                        validate_expected_outputs(generated_tasks, live_api_data)
+                        valid = [t for t in generated_tasks if not t.get("_invalid")]
+                        dropped = len(generated_tasks) - len(valid)
+                        if dropped:
+                            logger.warning(
+                                "  [%s] Dropped %d task(s) with invalid expected_output",
+                                vs.slug,
+                                dropped,
+                            )
+                        generated_tasks = valid
+
                 # ── SERVE (for snapshot) ──────────────────────────────
                 # Kill verify server and restart cleanly for snapshot
                 await _exec(
@@ -1056,7 +1140,12 @@ else:
                 except Exception:
                     pass
 
-                return {"artifact_id": artifact_id, "verified": True, "checks": checks}
+                return {
+                    "artifact_id": artifact_id,
+                    "verified": True,
+                    "checks": checks,
+                    "tasks": generated_tasks,
+                }
 
             finally:
                 if session_id:

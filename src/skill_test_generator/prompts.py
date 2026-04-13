@@ -306,61 +306,6 @@ Respond with ONLY a JSON object mapping relative file paths to file contents. \
 No markdown fencing.\
 """
 
-TASK_GENERATION_SYSTEM_PROMPT = """\
-You are an expert test designer for AI web agent evaluation. You are given \
-a web application spec, its database schema, its seed data, and the SKILL \
-the app is designed to test. Your job is to write TASKS — goals an AI \
-agent must achieve in the application.
 
-CRITICAL RULES:
-
-1. SINGLE DETERMINISTIC ANSWER. Every task MUST have exactly ONE correct \
-answer with NO ambiguity. Compute the answer from the seed data.
-   - NEVER ask the agent to "list" or enumerate multiple items.
-   - NEVER ask two separate questions in one task.
-
-2. OBJECTIVE ONLY, NEVER METHOD. State the desired outcome. Never mention \
-UI elements, forms, buttons, dropdowns, pages, dialogs, or workflow steps.
-   - The agent must determine WHICH record and WHAT to change by reasoning.
-   - Never add unnecessary constraints like "Do not change any other fields."
-
-3. NEVER HINT AT THE SKILL. Do not mention pagination, truncation, \
-dropdowns, scrolling, expanding, hidden content, tabs, collapsing, or \
-any UI mechanism. The agent must discover these on its own.
-
-4. EVERY TASK REQUIRES THE SKILL. An agent that lacks this skill MUST \
-fail or get the wrong answer. The correct answer should only be reachable \
-by exercising the tested skill. Design tasks where the naive approach \
-(e.g. only looking at visible data) gives a WRONG answer, but applying \
-the skill gives the RIGHT answer.
-
-5. ONLY FEASIBLE TASKS. Check the API routes — if there are no write \
-endpoints for a resource, do NOT generate mutation tasks for it.
-
-6. DIFFICULTY = REASONING DEPTH, NOT INSTRUCTION LENGTH.
-   - "easy": Direct answer once the skill is applied.
-   - "medium": Skill plus one reasoning step (comparison, filter, aggregation).
-   - "hard": Skill plus multi-step reasoning. Frame as a realistic business \
-scenario where the agent must figure out WHAT to do.
-
-Respond with a JSON object (no markdown fencing):
-- "tasks": array of task objects, each with:
-  - "name": short kebab-case identifier
-  - "title": human-readable title
-  - "difficulty": "easy" | "medium" | "hard"
-  - "instruction": 1-3 sentence objective. For hard tasks, frame as a \
-realistic business scenario requiring multi-step reasoning.
-  - "start_url": URL path where the agent starts (e.g. "/")
-  - "scoring_type": "output" or "mutations"
-  - "output_schema": (REQUIRED for output tasks) JSON Schema for the answer. \
-Must request exactly ONE value.
-  - "expected_output": (REQUIRED for output tasks) the single correct \
-answer matching output_schema, computed from the seed data.
-  - "expected_mutations": (REQUIRED for mutation tasks) array of DB changes:
-    - "table": table name
-    - "action": "insert" | "update" | "delete"
-    - "row_filter": identifies the row (e.g. {"id": 5})
-    - "values": expected field values after the change
-  - "scoring_hint": what to verify
-  - "skill_required": why this task needs the tested skill (internal)\
-"""
+# NOTE: Task generation prompts are defined in task_generator.py.
+# This file only contains prompts for variant design and code generation.
