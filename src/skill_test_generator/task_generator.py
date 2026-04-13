@@ -16,11 +16,12 @@ logger = logging.getLogger(__name__)
 _OUTPUT_ONLY_SYSTEM_PROMPT = """\
 You design retrieval tasks that test whether an AI web agent can exercise \
 a specific SKILL. The agent must read data from the application and return \
-a single value.
+an answer.
 
 THINK FIRST — before writing any task, reason through these questions:
 1. What does a naive agent (one lacking this skill) get wrong?
-2. What single data point, if returned correctly, proves the skill was used?
+2. What is the minimum output that, if returned correctly, proves the \
+skill was used?
 3. What is the minimum information the agent needs to attempt the task?
 4. Is there ANY alternative path to the answer that bypasses the skill \
 entirely (e.g. the value is also visible on the default view, or reachable \
@@ -28,7 +29,9 @@ via a different page/route that doesn't require the skill)? If yes, pick a \
 different data point.
 
 THEN write each task following these principles:
-- Ask for exactly ONE value. Never ask for two pieces of information.
+- Ask for the minimum number of values needed to prove the skill was used. \
+Usually this is ONE value. Only ask for multiple values when the skill \
+itself is about extracting or correlating multiple pieces of information.
 - The instruction should be the shortest unambiguous sentence that requires \
 the skill. Include only what the agent strictly needs to identify the task.
 - Do not add clarifying details, parenthetical hints, or extra context \
@@ -53,7 +56,7 @@ Respond with a JSON object (no markdown fencing):
   - "instruction": 1-2 sentence retrieval question
   - "start_url": URL path where the agent starts (e.g. "/")
   - "scoring_type": always "output"
-  - "output_schema": JSON Schema requesting exactly ONE value
+  - "output_schema": JSON Schema for the answer (minimal keys needed)
   - "expected_output": the correct answer matching output_schema
   - "scoring_hint": what to verify
   - "skill_required": why this task needs the tested skill (internal)\
@@ -111,7 +114,7 @@ SKILL. Tasks are either retrieval (return a value) or mutation (change data).
 
 THINK FIRST — before writing any task, reason through these questions:
 1. What does a naive agent (one lacking this skill) get wrong?
-2. For output tasks: what single data point proves the skill was used?
+2. For output tasks: what is the minimum output that proves the skill was used?
 3. For mutation tasks: what single mutation proves the skill was used?
 4. What is the minimum information the agent needs to attempt the task?
 5. Is there ANY alternative path to the answer or record that bypasses the \
@@ -119,7 +122,10 @@ skill entirely (e.g. visible on the default view, reachable via a different \
 page that doesn't require the skill)? If yes, pick a different target.
 
 THEN write each task following these principles:
-- Output tasks ask for exactly ONE value. Never ask for two pieces of info.
+- Output tasks ask for the minimum number of values needed to prove the \
+skill was used. Usually this is ONE value. Only ask for multiple values \
+when the skill itself is about extracting or correlating multiple pieces \
+of information.
 - Mutation tasks have exactly one deterministic set of mutations.
 - The instruction should be the shortest unambiguous sentence that requires \
 the skill. Include only what the agent strictly needs to identify the task.
@@ -145,7 +151,7 @@ Respond with a JSON object (no markdown fencing):
   - "instruction": 1-2 sentence objective
   - "start_url": URL path where the agent starts (e.g. "/")
   - "scoring_type": "output" or "mutations"
-  - "output_schema": (REQUIRED for output tasks) JSON Schema for ONE value
+  - "output_schema": (REQUIRED for output tasks) JSON Schema (minimal keys)
   - "expected_output": (REQUIRED for output tasks) the correct answer
   - "expected_mutations": (REQUIRED for mutation tasks) array of DB changes:
     - "table": table name
