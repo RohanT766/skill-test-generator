@@ -68,15 +68,10 @@ ADVERSARIAL DATA DESIGN — THE SIM MUST ACTIVELY STRAIN THE SKILL:
 The seed data is not just test data — it is a trap. Design it so that an \
 agent lacking the skill will confidently return a WRONG answer. Think about \
 what a naive agent does and engineer the data to punish that exact shortcut.
-- Create confusing near-matches: values that share long prefixes or look \
-similar at a glance but differ in critical ways.
-- Place the correct answer where the skill demands the agent look — not \
-where a shortcut would find it. If the skill is about pagination, bury the \
-answer deep in the later pages. If the skill is about truncated text, make \
-several records share the same visible truncated prefix so the agent cannot \
-guess which one is correct without resolving the full value.
 - Include decoy records that a naive agent would confidently pick as the \
 answer. The decoy should be plausible and visible on the default view.
+- Place the correct answer where the skill demands the agent look — not \
+where a shortcut would find it.
 - The gap between the decoy answer and the real answer should be small \
 enough that an agent cannot reason its way out without exercising the skill.
 
