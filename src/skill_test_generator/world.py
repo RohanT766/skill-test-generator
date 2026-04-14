@@ -883,10 +883,7 @@ else:
                 # ── TASK GEN + VALIDATION (app is live on localhost) ──
                 generated_tasks: list[dict] = []
                 if llm_client is not None:
-                    from .task_generator import (
-                        generate_tasks_for_variant,
-                        validate_expected_outputs,
-                    )
+                    from .task_generator import generate_tasks_for_variant
 
                     live_api_data: dict[str, str] = {}
                     for r in api_routes:
@@ -964,17 +961,9 @@ else:
                         len(generated_tasks),
                     )
 
-                    if live_api_data and generated_tasks:
-                        validate_expected_outputs(generated_tasks, live_api_data)
-                        valid = [t for t in generated_tasks if not t.get("_invalid")]
-                        dropped = len(generated_tasks) - len(valid)
-                        if dropped:
-                            logger.warning(
-                                "  [%s] Dropped %d task(s) with invalid expected_output",
-                                vs.slug,
-                                dropped,
-                            )
-                        generated_tasks = valid
+                    # Validation removed — string-match validation incorrectly
+                    # dropped tasks whose expected_output required aggregation
+                    # or computation across rows (sums, maxes, etc.).
 
                 # ── SERVE (for snapshot) ──────────────────────────────
                 # Kill verify server and restart cleanly for snapshot
