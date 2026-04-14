@@ -320,14 +320,15 @@ async def design_variant(
         content_blocks.append({
             "type": "text",
             "text": (
-                "## Visual Reference (ROUGH INSPIRATION)\n\n"
-                "The image above is a screenshot from a real website. Use it as rough "
-                "inspiration for your design — color palette, typography, spacing, "
-                "navigation style (sidebar vs top nav vs other), component styling, "
-                "and overall visual feel. The screenshot's industry is a strong hint — "
-                "use the same or a closely related industry for your app. "
+                "## Visual Reference (MATCH THIS CLOSELY)\n\n"
+                "The image above is a screenshot from a real website. Your app must "
+                "closely match its visual design — replicate the layout structure "
+                "(sidebar vs top nav, positioning, proportions), color scheme, "
+                "typography density, and spacing. The screenshot's industry is a "
+                "strong hint — use the same or a closely related industry. "
                 "Generate your own product name, data values, and entities — do NOT "
-                "copy specific text from the screenshot.\n\n"
+                "copy specific text — but the visual shell must look like it belongs "
+                "to the same product family as the screenshot.\n\n"
                 f"**Page type:** {ref_ct}\n"
                 f"**Industry:** {ref_industry}\n"
                 f"**UI patterns:** {ref_patterns}\n"
@@ -399,7 +400,7 @@ async def generate_variant_code(
     """Use LLM to generate complete code files from a variant spec.
 
     If reference_screenshot is provided, the image is sent alongside the spec
-    as rough visual inspiration for stylistic choices.
+    as the visual target for layout, colors, and styling.
     """
     content_blocks: list[dict] = []
 
@@ -422,12 +423,14 @@ async def generate_variant_code(
         content_blocks.append({
             "type": "text",
             "text": (
-                "## Visual Reference (ROUGH INSPIRATION)\n\n"
+                "## Visual Reference (MATCH THIS CLOSELY)\n\n"
                 "The image above is the same reference screenshot used during the "
-                "design phase. Use it for visual style inspiration — color palette, "
-                "typography, spacing, component styling. The spec already defines "
-                "the industry, data, and layout — follow the spec. Do NOT copy "
-                "specific text or data values from the screenshot.\n\n"
+                "design phase. Your generated code must closely replicate its "
+                "visual design — layout structure, color scheme, nav pattern, "
+                "typography density, and spacing. The spec defines the industry, "
+                "data, and skill-specific UI — follow the spec for those. The "
+                "screenshot governs the visual shell. Do NOT copy specific text "
+                "or data values from the screenshot.\n\n"
                 f"**Reference info:** {ref_ct} | {ref_industry}\n"
                 f"**UI patterns:** {ref_patterns}\n"
                 f"**Description:** {ref_desc}\n\n"

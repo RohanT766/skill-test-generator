@@ -39,23 +39,33 @@ proper column widths, status badges, action buttons — but never sprawl \
 into unrelated pages.
 
 VISUAL REFERENCE (if provided):
-If a reference screenshot is included in the message, use it as ROUGH \
-INSPIRATION for your design choices. Draw from its color palette, \
-layout structure (sidebar vs top nav vs other), typography, spacing, \
-component styling, and industry/domain. The screenshot's industry is a \
-strong hint — use the same or a closely related industry for your app. \
-Generate your own product name, data values, and entities — do NOT copy \
-specific text or data from the screenshot — but let the industry and \
-visual style carry over.
+If a reference screenshot is included in the message, it is your VISUAL \
+TARGET. Your generated app should closely match the screenshot's visual \
+design:
+- REPLICATE the layout structure: if the screenshot has a left sidebar with \
+icon nav, your app must have a left sidebar with icon nav. If it has a top \
+navbar with tabs, use a top navbar with tabs. Do NOT default to a generic \
+sidebar when the reference shows something different.
+- MATCH the color scheme closely: extract the primary, accent, and \
+background colors from the screenshot and use them. If the screenshot uses \
+a dark sidebar with purple accents, your app uses a dark sidebar with \
+purple accents.
+- MATCH the typography density and spacing: if the screenshot is dense with \
+small text and tight rows, do that. If it is airy with large headers, do that.
+- The screenshot's industry is a strong hint — use the same or a closely \
+related industry for your app.
+- Generate your own product name, data values, and entities — do NOT copy \
+specific text or data from the screenshot — but the visual design (layout, \
+colors, nav pattern, spacing) must closely follow the reference.
+- Your creative freedom is in the DATA and SKILL-SPECIFIC UI ELEMENTS \
+(the table columns, the form fields, the trap setup) — NOT in the overall \
+visual shell. The shell should look like it came from the same product as \
+the screenshot.
 
-VISUAL IDENTITY — EVERY APP MUST LOOK DISTINCT:
-Each app needs its own visual personality. If a reference screenshot is \
-provided, let it guide your color palette and style direction. Otherwise, \
-specify a unique color palette. \
-CRITICAL: do NOT always use dark navy/slate. Use genuinely different hues. \
-The primary_color must be visibly different from every other variant in the batch. The accent \
-colors should go well with the primary. No two apps for the same skill \
-should share a color scheme.
+VISUAL IDENTITY:
+If a reference screenshot is provided, derive your color palette from it — \
+do NOT invent a different scheme. If no reference is provided, specify a \
+unique color palette and do NOT default to dark navy/slate.
 
 VISUAL QUALITY:
 - Fill the viewport. Data tables should have many visible columns with \
@@ -168,13 +178,17 @@ pointer-events-none) — they are purely decorative.
 - The product name must be prominent in the chrome.
 
 CRITICAL #1b — VISUAL REFERENCE (if provided):
-If a reference screenshot is included in the message, use it as ROUGH \
-INSPIRATION for the visual style of your generated app. Draw from its \
-color palette, typography choices, spacing patterns, component styling, \
-and overall visual feel. The spec already defines the industry and data \
-— follow the spec. The reference image is for visual style only at this \
-stage. Do NOT copy specific text, data values, or UI content from the \
-screenshot.
+If a reference screenshot is included in the message, it is your VISUAL \
+TARGET for the app's look and feel. Your generated code must closely \
+match the screenshot's visual design:
+- REPLICATE the layout structure from the screenshot: sidebar position, \
+nav style, header placement, content area proportions.
+- MATCH the color scheme: extract and use the same primary, accent, and \
+background colors visible in the screenshot.
+- MATCH the typography density, spacing, and component styling.
+- The spec defines the industry, data, and skill-specific UI — follow the \
+spec for those. The reference image governs the visual shell, colors, and \
+layout structure. Do NOT copy specific text or data values from the image.
 
 CRITICAL #2 — Design quality and layout variety:
 - Apply accent_color for buttons, badges, links, and highlights.
