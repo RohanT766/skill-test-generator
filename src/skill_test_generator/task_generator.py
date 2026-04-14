@@ -55,6 +55,12 @@ WRONG answer. Verify there is no workaround — no other page, shortcut, \
 or surface in the app that leaks the answer without the skill.
 - Compute the expected answer from the seed data AND the live API data \
 provided. If both are available and they disagree, use the live API data.
+- CRITICAL — expected_output values must match how the data appears in the \
+UI, not how it is stored in the database. If the UI displays "1,234.56" or \
+"$1,234.56", the expected value is the string "1,234.56" or "$1,234.56". \
+If a number is displayed with decimals (e.g. 99.00), use a float (99.0), \
+not an int (99). If the UI shows a formatted string, use that exact string. \
+When in doubt, prefer strings over numbers in expected_output.
 
 Respond with a JSON object (no markdown fencing):
 - "tasks": array of task objects, each with:
@@ -162,6 +168,12 @@ that leaks the answer without the skill.
 - Only generate mutation tasks for resources that have write API endpoints.
 - Compute expected answers from the seed data AND the live API data \
 provided. If both are available and they disagree, use the live API data.
+- CRITICAL — expected_output values must match how the data appears in the \
+UI, not how it is stored in the database. If the UI displays "1,234.56" or \
+"$1,234.56", the expected value is the string "1,234.56" or "$1,234.56". \
+If a number is displayed with decimals (e.g. 99.00), use a float (99.0), \
+not an int (99). If the UI shows a formatted string, use that exact string. \
+When in doubt, prefer strings over numbers in expected_output.
 
 Respond with a JSON object (no markdown fencing):
 - "tasks": array of task objects, each with:

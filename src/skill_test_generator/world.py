@@ -1377,6 +1377,8 @@ else:
             base_url=config.chronos_url, timeout=httpx.Timeout(120.0)
         ) as http:
 
+            max_retries = 3
+
             async def _run_one(
                 idx: int,
                 vs: VariantStatus,
@@ -1392,45 +1394,70 @@ else:
                     session_label = (
                         f"{task_name} [{session_num}/{n_sessions}] (testcase {tc_id})"
                     )
-                    logger.info("  Launching: %s", session_label)
-                    try:
-                        result = await self._launch_and_wait(
-                            http,
-                            config,
-                            tc_id,
-                            task_name,
-                            launch_job,
-                            get_session_status,
-                            get_session,
-                            LaunchJobRequest,
-                            WorldConfigInput,
-                            WorldRuntimeConfig,
-                            VMResources,
-                        )
-                        result["session_num"] = session_num
-                        vs.chronos_session_ids.append(result.get("chronos_id", ""))
-                        vs.plato_session_ids.append(result.get("plato_id", ""))
-                        vs.task_results.append(result)
 
-                        status_str = "PASS" if result.get("score", 0) > 0 else "FAIL"
+                    for attempt in range(1, max_retries + 1):
                         logger.info(
-                            "    %s | score=%.2f | chronos=%s | plato=%s",
-                            status_str,
-                            result.get("score", 0),
-                            result.get("chronos_url", ""),
-                            result.get("plato_url", ""),
+                            "  Launching: %s (attempt %d/%d)",
+                            session_label, attempt, max_retries,
                         )
-                    except Exception as e:
-                        logger.error("    Failed to run testcase %s: %s", tc_id, e)
-                        vs.task_results.append(
-                            {
-                                "testcase_id": tc_id,
-                                "task_name": task_name,
-                                "session_num": session_num,
-                                "status": "error",
-                                "error": str(e),
-                            }
-                        )
+                        try:
+                            result = await self._launch_and_wait(
+                                http,
+                                config,
+                                tc_id,
+                                task_name,
+                                launch_job,
+                                get_session_status,
+                                get_session,
+                                LaunchJobRequest,
+                                WorldConfigInput,
+                                WorldRuntimeConfig,
+                                VMResources,
+                            )
+                            result["session_num"] = session_num
+                            result["attempt"] = attempt
+
+                            status_str = "PASS" if result.get("score", 0) > 0 else "FAIL"
+                            logger.info(
+                                "    %s | score=%.2f | chronos=%s | plato=%s",
+                                status_str,
+                                result.get("score", 0),
+                                result.get("chronos_url", ""),
+                                result.get("plato_url", ""),
+                            )
+
+                            session_status = result.get("status", "")
+                            is_infra_failure = session_status in (
+                                "failed", "error", "cancelled",
+                            )
+                            if is_infra_failure and attempt < max_retries:
+                                logger.warning(
+                                    "    Session %s ended with status=%s, retrying…",
+                                    result.get("chronos_id", "?"), session_status,
+                                )
+                                continue
+
+                            vs.chronos_session_ids.append(result.get("chronos_id", ""))
+                            vs.plato_session_ids.append(result.get("plato_id", ""))
+                            vs.task_results.append(result)
+                            break
+
+                        except Exception as e:
+                            logger.error(
+                                "    Failed to run testcase %s (attempt %d): %s",
+                                tc_id, attempt, e,
+                            )
+                            if attempt >= max_retries:
+                                vs.task_results.append(
+                                    {
+                                        "testcase_id": tc_id,
+                                        "task_name": task_name,
+                                        "session_num": session_num,
+                                        "attempt": attempt,
+                                        "status": "error",
+                                        "error": str(e),
+                                    }
+                                )
 
             await asyncio.gather(
                 *[
