@@ -647,6 +647,7 @@ class SkillTestGeneratorWorld(
         api_url = config.plato_api_url
         session_id: str | None = None
         checks: list[dict] = []
+        api_routes = [r for r in spec.get("api_routes", []) if isinstance(r, dict)]
 
         async with httpx.AsyncClient(
             base_url=api_url,
@@ -827,9 +828,7 @@ else:
                 checks.append({"name": "server_startup", "pass": True, "error": ""})
                 checks.append({"name": "GET /api/health", "pass": True, "error": ""})
 
-                for r in spec.get("api_routes", []):
-                    if not isinstance(r, dict):
-                        continue
+                for r in api_routes:
                     route = r.get("route", "")
                     if not route or "[" in route or "/health" in route:
                         continue
@@ -890,9 +889,7 @@ else:
                     )
 
                     live_api_data: dict[str, str] = {}
-                    for r in spec.get("api_routes", []):
-                        if not isinstance(r, dict):
-                            continue
+                    for r in api_routes:
                         route = r.get("route", "")
                         if not route or "[" in route or "/health" in route:
                             continue
@@ -1011,7 +1008,7 @@ else:
                 # Seed API routes before snapshot
                 seed_routes = [
                     r.get("route", "")
-                    for r in spec.get("api_routes", [])
+                    for r in api_routes
                     if r.get("route")
                     and "/health" not in r.get("route", "")
                     and "[" not in r.get("route", "")
