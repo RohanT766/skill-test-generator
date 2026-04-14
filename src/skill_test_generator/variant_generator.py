@@ -91,6 +91,17 @@ async def select_reference_screenshot(
     if not ref_dir:
         return None
 
+    _UNUSABLE_CONTENT_TYPES = {
+        "modal dialog", "login page", "error page", "footer",
+        "help page", "terms page", "sitemap page",
+    }
+    manifest = [
+        e for e in manifest
+        if e.get("content_type", "").lower() not in _UNUSABLE_CONTENT_TYPES
+    ]
+    if not manifest:
+        return None
+
     content_types = sorted(set(e.get("content_type", "") for e in manifest))
     industries = sorted(set(e.get("industry", "") for e in manifest))
 

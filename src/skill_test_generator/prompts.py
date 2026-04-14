@@ -61,6 +61,11 @@ colors, nav pattern, spacing) must closely follow the reference.
 (the table columns, the form fields, the trap setup) — NOT in the overall \
 visual shell. The shell should look like it came from the same product as \
 the screenshot.
+- IDENTIFY which real-world website or product the screenshot most likely \
+comes from (e.g. "Stripe Dashboard", "Shopify Admin", "HubSpot CRM", \
+"Salesforce", "Booking.com"). State this in your spec as "clone_target". \
+Then design your app as if it were a product built by the same company — \
+same visual language, same layout conventions, same color palette.
 
 VISUAL IDENTITY:
 If a reference screenshot is provided, derive your color palette from it — \
@@ -189,6 +194,9 @@ background colors visible in the screenshot.
 - The spec defines the industry, data, and skill-specific UI — follow the \
 spec for those. The reference image governs the visual shell, colors, and \
 layout structure. Do NOT copy specific text or data values from the image.
+- If the spec includes a "clone_target" (e.g. "Stripe Dashboard"), use your \
+knowledge of that product's visual design to fill in details the screenshot \
+alone cannot convey — interaction patterns, button styles, spacing conventions.
 
 CRITICAL #2 — Design quality and layout variety:
 - Apply accent_color for buttons, badges, links, and highlights.
