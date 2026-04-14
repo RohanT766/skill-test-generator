@@ -42,9 +42,11 @@ VISUAL REFERENCE (if provided):
 If a reference screenshot is included in the message, use it as ROUGH \
 INSPIRATION for your design choices. Draw from its color palette, \
 layout structure (sidebar vs top nav vs other), typography, spacing, \
-and component styling. Do NOT copy the industry, content, or data from \
-the reference — your app has its own industry and purpose based on the \
-skill. The reference is purely for visual/stylistic influence.
+component styling, and industry/domain. The screenshot's industry is a \
+strong hint — use the same or a closely related industry for your app. \
+Generate your own product name, data values, and entities — do NOT copy \
+specific text or data from the screenshot — but let the industry and \
+visual style carry over.
 
 VISUAL IDENTITY — EVERY APP MUST LOOK DISTINCT:
 Each app needs its own visual personality. If a reference screenshot is \
@@ -158,9 +160,10 @@ CRITICAL #1b — VISUAL REFERENCE (if provided):
 If a reference screenshot is included in the message, use it as ROUGH \
 INSPIRATION for the visual style of your generated app. Draw from its \
 color palette, typography choices, spacing patterns, component styling, \
-and overall visual feel. Do NOT copy the layout, content, or structure \
-directly — your app has its own spec and purpose. The reference is only \
-for stylistic influence.
+and overall visual feel. The spec already defines the industry and data \
+— follow the spec. The reference image is for visual style only at this \
+stage. Do NOT copy specific text, data values, or UI content from the \
+screenshot.
 
 CRITICAL #2 — Design quality and layout variety:
 - Apply accent_color for buttons, badges, links, and highlights.

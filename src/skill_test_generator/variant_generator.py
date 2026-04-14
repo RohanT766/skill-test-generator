@@ -273,18 +273,20 @@ async def design_variant(
         ref_ct = ref_meta.get("content_type", "")
         ref_patterns = ", ".join(ref_meta.get("ui_patterns", []))
         ref_desc = ref_meta.get("description", "")
+        ref_industry = ref_meta.get("industry", "")
         content_blocks.append({
             "type": "text",
             "text": (
-                "## Visual Reference (ROUGH INSPIRATION ONLY)\n\n"
+                "## Visual Reference (ROUGH INSPIRATION)\n\n"
                 "The image above is a screenshot from a real website. Use it as rough "
-                "inspiration for your visual and layout choices — color palette, "
-                "typography, spacing, navigation style (sidebar vs top nav vs other), "
-                "component styling, and overall visual feel. "
-                "Do NOT copy the content, industry, or data. Your app has its own "
-                "industry and purpose based on the skill. The reference is purely "
-                "for visual/stylistic influence.\n\n"
+                "inspiration for your design — color palette, typography, spacing, "
+                "navigation style (sidebar vs top nav vs other), component styling, "
+                "and overall visual feel. The screenshot's industry is a strong hint — "
+                "use the same or a closely related industry for your app. "
+                "Generate your own product name, data values, and entities — do NOT "
+                "copy specific text from the screenshot.\n\n"
                 f"**Page type:** {ref_ct}\n"
+                f"**Industry:** {ref_industry}\n"
                 f"**UI patterns:** {ref_patterns}\n"
                 f"**Description:** {ref_desc}\n\n"
             ),
@@ -377,12 +379,12 @@ async def generate_variant_code(
         content_blocks.append({
             "type": "text",
             "text": (
-                "## Visual Reference (ROUGH INSPIRATION ONLY)\n\n"
-                "The image above is a reference screenshot from a real website. "
-                "Use it as rough inspiration for your stylistic choices — color palette, "
-                "typography, spacing, component styling, and overall visual feel. "
-                "Do NOT copy the layout or content directly. Your app has its own spec, "
-                "data, and purpose. Just let this reference influence the visual polish.\n\n"
+                "## Visual Reference (ROUGH INSPIRATION)\n\n"
+                "The image above is the same reference screenshot used during the "
+                "design phase. Use it for visual style inspiration — color palette, "
+                "typography, spacing, component styling. The spec already defines "
+                "the industry, data, and layout — follow the spec. Do NOT copy "
+                "specific text or data values from the screenshot.\n\n"
                 f"**Reference info:** {ref_ct} | {ref_industry}\n"
                 f"**UI patterns:** {ref_patterns}\n"
                 f"**Description:** {ref_desc}\n\n"
