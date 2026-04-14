@@ -64,6 +64,22 @@ realistic widths.
 - The page should look busy with real data — not sparse placeholder content.
 - Rows should have hover states. Status columns should use colored badges.
 
+ADVERSARIAL DATA DESIGN — THE SIM MUST ACTIVELY STRAIN THE SKILL:
+The seed data is not just test data — it is a trap. Design it so that an \
+agent lacking the skill will confidently return a WRONG answer. Think about \
+what a naive agent does and engineer the data to punish that exact shortcut.
+- Create confusing near-matches: values that share long prefixes or look \
+similar at a glance but differ in critical ways.
+- Place the correct answer where the skill demands the agent look — not \
+where a shortcut would find it. If the skill is about pagination, bury the \
+answer deep in the later pages. If the skill is about truncated text, make \
+several records share the same visible truncated prefix so the agent cannot \
+guess which one is correct without resolving the full value.
+- Include decoy records that a naive agent would confidently pick as the \
+answer. The decoy should be plausible and visible on the default view.
+- The gap between the decoy answer and the real answer should be small \
+enough that an agent cannot reason its way out without exercising the skill.
+
 Design principles:
 - The UI must contain the EXACT pattern that triggers the reasoning failure \
 described in the skill.
@@ -331,6 +347,12 @@ CRITICAL — no skill bypasses: The app must FORCE the user through the \
 exact interaction pattern the skill describes. There must be no alternative \
 path to the correct answer that avoids exercising the skill. Audit every \
 component you generate and remove anything that provides a workaround.
+
+CRITICAL — adversarial data fidelity: The spec's seed data is carefully \
+engineered with decoys and near-matches to strain the skill. Implement it \
+EXACTLY as specified. Do not reorder, rename, simplify, or "clean up" the \
+seed data values. The confusing similarities and specific placements are \
+intentional — they are the test.
 
 Respond with ONLY a JSON object mapping relative file paths to file contents. \
 No markdown fencing.\

@@ -49,29 +49,39 @@ def _load_reference_manifest() -> list[dict]:
         return []
 
 
-_CONTENT_TYPE_KEYWORDS: dict[str, list[str]] = {
-    "dashboard": ["dashboard", "analytics"],
-    "data table": ["data table", "table"],
-    "form": ["form", "settings page"],
-    "product grid": ["product grid", "product catalog", "category page"],
-    "detail page": ["detail page", "product detail"],
-    "search": ["search page", "search results", "search interface", "search form"],
-    "settings": ["settings page"],
-    "messaging": ["messaging interface"],
-    "modal": ["modal dialog"],
-    "homepage": ["homepage", "landing page"],
-}
+_FILTER_SYSTEM_PROMPT = """\
+You select which reference screenshot categories are relevant for a given \
+skill definition. You will be given a skill name and description, plus the \
+full list of available content_type and industry labels.
+
+Pick 1-4 content_type values that would make good visual inspiration for an \
+app testing this skill. Choose types where the skill would naturally occur — \
+e.g. a pagination skill fits "data table", "product grid", "listing page"; \
+a truncation skill fits "data table", "detail page".
+
+Optionally pick 0-2 industry values if the skill strongly implies a domain. \
+If any industry could work, return an empty array for industries.
+
+Respond with a JSON object (no markdown fencing):
+{
+  "content_types": ["type1", "type2"],
+  "industries": []
+}\
+"""
 
 
-def select_reference_screenshot(
+async def select_reference_screenshot(
+    client: anthropic.AsyncAnthropic,
+    model: str,
     skill_name: str = "",
     skill_description: str = "",
 ) -> tuple[dict, bytes] | None:
-    """Pick a reference screenshot filtered by skill relevance.
+    """Pick a reference screenshot using an LLM to choose relevant filters.
 
-    Scans the skill name and description for keywords that match content_type
-    and ui_patterns in the manifest. Falls back to the full set if no match.
-    Returns (manifest_entry, image_bytes) or None if unavailable.
+    A small LLM call selects which content_types (and optionally industries)
+    are relevant for the skill. Then we filter the manifest by union of
+    content_types and randomly pick one image from the filtered set.
+    Falls back to the full set if no match.
     """
     manifest = _load_reference_manifest()
     if not manifest:
@@ -81,25 +91,56 @@ def select_reference_screenshot(
     if not ref_dir:
         return None
 
-    skill_text = f"{skill_name} {skill_description}".lower()
+    content_types = sorted(set(e.get("content_type", "") for e in manifest))
+    industries = sorted(set(e.get("industry", "") for e in manifest))
 
-    matched_content_types: set[str] = set()
-    for keyword_group, content_types in _CONTENT_TYPE_KEYWORDS.items():
-        if keyword_group in skill_text:
-            matched_content_types.update(content_types)
+    filter_prompt = (
+        f"## Skill\n"
+        f"**Name:** {skill_name}\n"
+        f"**Description:** {skill_description}\n\n"
+        f"## Available content_types\n{json.dumps(content_types)}\n\n"
+        f"## Available industries\n{json.dumps(industries)}\n"
+    )
+
+    try:
+        resp = await client.messages.create(
+            model=model,
+            max_tokens=256,
+            system=_FILTER_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": filter_prompt}],
+        )
+        filters = _extract_json(resp.content[0].text)
+        wanted_types = {t.lower() for t in filters.get("content_types", [])}
+        wanted_industries = {i.lower() for i in filters.get("industries", [])}
+        logger.info(
+            "LLM filter for '%s': types=%s, industries=%s",
+            skill_name,
+            wanted_types,
+            wanted_industries,
+        )
+    except Exception as e:
+        logger.warning("LLM filter call failed, using full manifest: %s", e)
+        wanted_types = set()
+        wanted_industries = set()
 
     candidates = manifest
-    if matched_content_types:
+    if wanted_types:
         filtered = [
             e for e in manifest
-            if e.get("content_type", "").lower() in matched_content_types
+            if e.get("content_type", "").lower() in wanted_types
         ]
+        if wanted_industries and filtered:
+            narrowed = [
+                e for e in filtered
+                if e.get("industry", "").lower() in wanted_industries
+            ]
+            if narrowed:
+                filtered = narrowed
         if filtered:
             candidates = filtered
             logger.info(
-                "Filtered screenshots to %d candidates (types: %s)",
+                "Filtered screenshots to %d candidates",
                 len(filtered),
-                matched_content_types,
             )
 
     random.shuffle(candidates)
@@ -251,7 +292,9 @@ async def design_variant(
     design LLM as visual inspiration, and stores the reference metadata
     in the returned spec under `_reference_screenshot`.
     """
-    ref = select_reference_screenshot(
+    ref = await select_reference_screenshot(
+        client=client,
+        model=model,
         skill_name=skill.name,
         skill_description=skill.description,
     )

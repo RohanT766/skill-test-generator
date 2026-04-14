@@ -27,8 +27,15 @@ skill was used?
 entirely (e.g. the value is also visible on the default view, or reachable \
 via a different page/route that doesn't require the skill)? If yes, pick a \
 different data point.
+5. Would a naive agent confidently return a WRONG answer for this task? \
+The best tasks are ones where skipping the skill gives a plausible but \
+incorrect result — not ones where the agent would simply fail or be unsure.
 
 THEN write each task following these principles:
+- Pick data points that MAXIMALLY exploit the skill gap. Choose records \
+where the naive shortcut gives a confident wrong answer. If the data \
+contains decoys or near-matches designed to trip up agents, target those \
+specific records.
 - Ask for the minimum number of values needed to prove the skill was used. \
 Usually this is ONE value. Only ask for multiple values when the skill \
 itself is about extracting or correlating multiple pieces of information.
@@ -74,8 +81,14 @@ and the change?
 4. Is there ANY alternative way to perform this mutation that bypasses the \
 skill entirely (e.g. the record is editable from a different view that \
 doesn't require the skill)? If yes, pick a different record or mutation.
+5. Would a naive agent confidently mutate the WRONG record? The best tasks \
+target records where the skill gap causes the agent to act on a decoy \
+instead of the correct target.
 
 THEN write each task following these principles:
+- Pick records that MAXIMALLY exploit the skill gap. Target records where \
+a naive agent would confidently find and modify the wrong one.
+- If the data contains near-matches or decoys, target those specific records.
 - Each task has exactly one deterministic set of mutations.
 - The instruction should be the shortest unambiguous sentence that requires \
 the skill. Include only what the agent strictly needs to identify the task.
@@ -120,8 +133,14 @@ THINK FIRST — before writing any task, reason through these questions:
 5. Is there ANY alternative path to the answer or record that bypasses the \
 skill entirely (e.g. visible on the default view, reachable via a different \
 page that doesn't require the skill)? If yes, pick a different target.
+6. Would a naive agent confidently return a WRONG answer or mutate the WRONG \
+record? The best tasks are ones where skipping the skill gives a plausible \
+but incorrect result.
 
 THEN write each task following these principles:
+- Pick data points that MAXIMALLY exploit the skill gap. Choose records \
+where the naive shortcut gives a confident wrong answer. If the data \
+contains decoys or near-matches designed to trip up agents, target those.
 - Output tasks ask for the minimum number of values needed to prove the \
 skill was used. Usually this is ONE value. Only ask for multiple values \
 when the skill itself is about extracting or correlating multiple pieces \
