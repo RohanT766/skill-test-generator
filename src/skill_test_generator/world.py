@@ -915,6 +915,10 @@ else:
                                 all_data += "\n" + out
                             try:
                                 resp_json = json.loads(out)
+                                if isinstance(resp_json, list):
+                                    resp_json = {"data": resp_json}
+                                if not isinstance(resp_json, dict):
+                                    break
                                 pagination = resp_json.get("pagination")
                                 if not isinstance(pagination, dict):
                                     pagination = {}

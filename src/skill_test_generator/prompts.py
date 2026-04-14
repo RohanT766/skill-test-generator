@@ -273,6 +273,10 @@ at localhost. Client-side fetch calls to http://localhost:3000 WILL FAIL \
 URLs only: `fetch("/api/incidents")`, NEVER `fetch("http://localhost:3000/api/incidents")`.
 - Use the provided helpers from `@/lib/api`: \
 `import { apiGet, apiPost } from "@/lib/api"` then `apiGet<T>("/api/...")`.
+- CRITICAL: NEVER redefine apiGet, apiPost, apiPut, or apiDelete in your \
+code. These functions are already provided by `@/lib/api`. If you define \
+your own versions, the build WILL FAIL with "name defined multiple times". \
+Always import them: `import { apiGet, apiPost, apiPut } from "@/lib/api"`.
 - Use TanStack Query for all data fetching in client components:
   ```
   import { useQuery } from "@tanstack/react-query";
