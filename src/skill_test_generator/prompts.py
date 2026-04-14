@@ -39,13 +39,18 @@ proper column widths, status badges, action buttons — but never sprawl \
 into unrelated pages.
 
 VISUAL REFERENCE (if provided):
-If a reference screenshot is included in the message, it is your VISUAL \
-TARGET. Your generated app should closely match the screenshot's visual \
-design:
-- REPLICATE the layout structure: if the screenshot has a left sidebar with \
-icon nav, your app must have a left sidebar with icon nav. If it has a top \
-navbar with tabs, use a top navbar with tabs. Do NOT default to a generic \
-sidebar when the reference shows something different.
+If a reference screenshot is included in the message, treat it as your \
+PRIMARY VISUAL BLUEPRINT. The generated app should look like it belongs \
+to the same product family as the screenshot:
+- LAYOUT SHELL IS SACRED: study the screenshot's navigation chrome — is it \
+a left sidebar? A top navbar? A slim icon rail? A header bar with tabs? \
+Whatever it is, replicate that structure, its approximate dimensions, and \
+its position. If the screenshot has a 240px dark sidebar on the left, your \
+app has a ~240px dark sidebar on the left. If it has a 56px top header bar, \
+yours has a similar height top header bar. Do NOT invent a sidebar when the \
+reference shows a top navbar, and vice versa. The navigation chrome is the \
+single most recognizable element — getting it wrong makes the app look \
+nothing like the reference.
 - MATCH the color scheme closely: extract the primary, accent, and \
 background colors from the screenshot and use them. If the screenshot uses \
 a dark sidebar with purple accents, your app uses a dark sidebar with \
@@ -56,7 +61,7 @@ small text and tight rows, do that. If it is airy with large headers, do that.
 related industry for your app.
 - Generate your own product name, data values, and entities — do NOT copy \
 specific text or data from the screenshot — but the visual design (layout, \
-colors, nav pattern, spacing) must closely follow the reference.
+colors, nav pattern, spacing) should closely follow the reference.
 - Your creative freedom is in the DATA and SKILL-SPECIFIC UI ELEMENTS \
 (the table columns, the form fields, the trap setup) — NOT in the overall \
 visual shell. The shell should look like it came from the same product as \
@@ -66,27 +71,34 @@ comes from (e.g. "Stripe Dashboard", "Shopify Admin", "HubSpot CRM", \
 "Salesforce", "Booking.com"). State this in your spec as "clone_target". \
 Then design your app as if it were a product built by the same company — \
 same visual language, same layout conventions, same color palette.
+- You have discretion to deviate when the skill genuinely requires it \
+(e.g. adding a sidebar filter panel the reference doesn't have), but the \
+default should be to match the reference's chrome, not to improvise.
 
 VISUAL IDENTITY:
 If a reference screenshot is provided, derive your color palette from it — \
 do NOT invent a different scheme. If no reference is provided, specify a \
 unique color palette and do NOT default to dark navy/slate.
 
-DATA DISPLAY — BE CREATIVE, NOT JUST DATA TABLES:
-Do NOT default to a plain data table unless the skill specifically requires \
-tabular display. Match how the reference screenshot displays data, and think \
-about what display format fits the industry and scenario:
-- Product catalogs → card grids with images/prices/ratings (like Amazon, \
-Costco, Shopify storefronts)
+DATA DISPLAY — FOLLOW THE REFERENCE, AVOID DEFAULTING TO DATA TABLES:
+Your first instinct should be to match how the reference screenshot \
+displays its content. If the reference shows cards, use cards. If it shows \
+a kanban board, use a kanban board. If it shows a chart dashboard, use charts.
+Data tables are appropriate ONLY when:
+  (a) the reference screenshot itself prominently features a data table, OR
+  (b) the skill explicitly requires row-based tabular interaction \
+(e.g. "aggregate across data grid rows").
+Otherwise, prefer richer display formats that fit the industry:
+- Product catalogs → card grids with images/prices/ratings
 - Inventory/warehouse → product cards with stock badges, category filters
 - Project management → kanban boards, timeline views
 - CRM contacts → card lists with avatars and quick-action buttons
 - Analytics → chart dashboards with summary cards
 - Real estate / listings → gallery cards with photos, map views
-- Only use a data table when the skill explicitly requires row-based \
-tabular interaction (e.g. aggregating across table rows).
-The reference screenshot should be your primary guide for display format. \
-If it shows cards, use cards. If it shows a grid, use a grid.
+- Messaging → conversation threads, inbox panels
+Even when a data table IS appropriate, consider whether the reference \
+screenshot suggests a styled/decorated table (with row actions, status \
+badges, expandable rows) rather than a plain grid.
 
 VISUAL QUALITY:
 - Fill the viewport with rich, realistic content — not sparse placeholders.
@@ -142,6 +154,10 @@ Respond with a JSON object (no markdown fencing):
   - "accent_color": for interactive elements and highlights
   - "style_direction": 1 sentence describing the visual feel
 - "app_chrome": REQUIRED object describing the layout shell. Fields:
+  - "layout_type": the navigation structure — e.g. "left_sidebar", \
+"top_navbar", "top_header_with_tabs", "icon_rail", "header_and_sidebar". \
+If a reference screenshot is provided, this MUST match what the screenshot \
+shows. Do not default to "left_sidebar" unless the reference has one.
   - "product_name": display name shown in the chrome
   - "subtitle": optional section label or tagline
   - "nav_items": array of 2-5 navigation labels. Only one is active \
@@ -188,9 +204,9 @@ CRITICAL #1 — APP CHROME AND LAYOUT (most important visual requirement):
 The spec includes an "app_chrome" field describing the layout shell. You \
 MUST generate app/layout.tsx with branded chrome — the structural UI that \
 makes the app look like a real product, NOT a bare data table on a white page.
-- Design your own layout shell: sidebars, top navigation bars, branded \
-headers, split panels, or any combination. Be creative — do not default \
-to the same layout every time.
+- If a reference screenshot is provided, base your layout shell on it \
+(see #1b below). Otherwise, design your own layout shell — sidebars, top \
+navigation bars, branded headers, split panels, or any combination.
 - The chrome uses the primary_color from visual_identity as its background.
 - Non-active nav items are visible but greyed out (opacity-50, \
 pointer-events-none) — they are purely decorative.
@@ -198,10 +214,14 @@ pointer-events-none) — they are purely decorative.
 
 CRITICAL #1b — VISUAL REFERENCE (if provided):
 If a reference screenshot is included in the message, it is your VISUAL \
-TARGET for the app's look and feel. Your generated code must closely \
-match the screenshot's visual design:
-- REPLICATE the layout structure from the screenshot: sidebar position, \
-nav style, header placement, content area proportions.
+BLUEPRINT for the app's chrome and layout. Your generated code should \
+look like it belongs to the same product as the screenshot:
+- LAYOUT CHROME FIRST: before writing any content, study the screenshot's \
+navigation structure. Replicate the sidebar/navbar/header dimensions, \
+position, and styling. A ~240px left sidebar stays a ~240px left sidebar. \
+A slim top header bar stays a slim top header bar. Do NOT swap a top \
+navbar for a sidebar or vice versa — the navigation chrome is the most \
+visually distinctive element.
 - MATCH the color scheme: extract and use the same primary, accent, and \
 background colors visible in the screenshot.
 - MATCH the typography density, spacing, and component styling.
@@ -211,18 +231,15 @@ layout structure. Do NOT copy specific text or data values from the image.
 - If the spec includes a "clone_target" (e.g. "Stripe Dashboard"), use your \
 knowledge of that product's visual design to fill in details the screenshot \
 alone cannot convey — interaction patterns, button styles, spacing conventions.
+- You may deviate from the reference when the skill demands it, but the \
+default posture is to match the reference's chrome faithfully.
 
 CRITICAL #2 — Data display format and layout:
-- Do NOT default to a plain data table. Follow the spec's display format \
-and the reference screenshot. If the spec describes card grids, build card \
-grids. If it describes a kanban board, build a kanban board.
-- Product catalogs → card grids with prices, ratings, badges, "Add to Cart" \
-buttons. Think Amazon, Costco, Shopify storefronts.
-- Inventory/warehouse → product cards with stock indicators, category filters.
-- Project management → kanban columns, timeline rows.
-- CRM contacts → avatar card lists with inline actions.
-- Analytics → chart panels (use recharts) with summary stat cards.
-- Only use a data table when the spec explicitly calls for tabular display.
+- Follow the spec's display format and the reference screenshot. If the \
+spec describes card grids, build card grids. If it describes a kanban \
+board, build a kanban board.
+- Avoid data tables unless the spec or reference screenshot specifically \
+calls for one. Prefer the display format the reference image uses.
 - If the spec includes a "clone_target", use your knowledge of that product \
 to match its exact display conventions.
 - Apply accent_color for buttons, badges, links, and highlights.
