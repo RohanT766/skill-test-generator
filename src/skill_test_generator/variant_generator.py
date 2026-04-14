@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 import logging
+import random
 import re
 import shutil
 from pathlib import Path
@@ -19,12 +21,103 @@ from .skill_ingestion import _slugify
 logger = logging.getLogger(__name__)
 
 
+def _resolve_reference_screenshots_dir() -> Path | None:
+    """Find the reference-screenshots directory (bundled in container or local dev)."""
+    bundled = Path("/world/templates/reference-screenshots")
+    if bundled.is_dir():
+        return bundled
+
+    local = Path(__file__).resolve().parents[3] / "templates" / "reference-screenshots"
+    if local.is_dir():
+        return local
+
+    return None
+
+
+def _load_reference_manifest() -> list[dict]:
+    """Load the reference screenshots manifest.json."""
+    ref_dir = _resolve_reference_screenshots_dir()
+    if not ref_dir:
+        return []
+    manifest_path = ref_dir / "manifest.json"
+    if not manifest_path.exists():
+        return []
+    try:
+        return json.loads(manifest_path.read_text())
+    except Exception as e:
+        logger.warning("Failed to load reference manifest: %s", e)
+        return []
+
+
+_CONTENT_TYPE_KEYWORDS: dict[str, list[str]] = {
+    "dashboard": ["dashboard", "analytics"],
+    "data table": ["data table", "table"],
+    "form": ["form", "settings page"],
+    "product grid": ["product grid", "product catalog", "category page"],
+    "detail page": ["detail page", "product detail"],
+    "search": ["search page", "search results", "search interface", "search form"],
+    "settings": ["settings page"],
+    "messaging": ["messaging interface"],
+    "modal": ["modal dialog"],
+    "homepage": ["homepage", "landing page"],
+}
+
+
+def select_reference_screenshot(
+    skill_name: str = "",
+    skill_description: str = "",
+) -> tuple[dict, bytes] | None:
+    """Pick a reference screenshot filtered by skill relevance.
+
+    Scans the skill name and description for keywords that match content_type
+    and ui_patterns in the manifest. Falls back to the full set if no match.
+    Returns (manifest_entry, image_bytes) or None if unavailable.
+    """
+    manifest = _load_reference_manifest()
+    if not manifest:
+        return None
+
+    ref_dir = _resolve_reference_screenshots_dir()
+    if not ref_dir:
+        return None
+
+    skill_text = f"{skill_name} {skill_description}".lower()
+
+    matched_content_types: set[str] = set()
+    for keyword_group, content_types in _CONTENT_TYPE_KEYWORDS.items():
+        if keyword_group in skill_text:
+            matched_content_types.update(content_types)
+
+    candidates = manifest
+    if matched_content_types:
+        filtered = [
+            e for e in manifest
+            if e.get("content_type", "").lower() in matched_content_types
+        ]
+        if filtered:
+            candidates = filtered
+            logger.info(
+                "Filtered screenshots to %d candidates (types: %s)",
+                len(filtered),
+                matched_content_types,
+            )
+
+    random.shuffle(candidates)
+    for entry in candidates:
+        img_path = ref_dir / entry["filename"]
+        if img_path.exists():
+            return entry, img_path.read_bytes()
+
+    return None
+
+
 def _validate_code_files(code_files: dict[str, str]) -> list[str]:
     """Check generated code for structural issues. Returns list of errors."""
     errors: list[str] = []
     required = {
         "db/schema.ts": "Drizzle schema definition",
         "db/seed.ts": "Seed data function",
+        "app/layout.tsx": "Root layout with branded chrome",
         "app/page.tsx": "Main page component",
         "drizzle/0000_zippy_changeling.sql": "SQL migration",
     }
@@ -152,8 +245,58 @@ async def design_variant(
     total_variants: int = 1,
     prior_scenarios: list[str] | None = None,
 ) -> dict:
-    """Use LLM to design a variant app specification for a skill."""
-    user_prompt = (
+    """Use LLM to design a variant app specification for a skill.
+
+    Selects a reference screenshot based on the skill, passes it to the
+    design LLM as visual inspiration, and stores the reference metadata
+    in the returned spec under `_reference_screenshot`.
+    """
+    ref = select_reference_screenshot(
+        skill_name=skill.name,
+        skill_description=skill.description,
+    )
+
+    content_blocks: list[dict] = []
+
+    if ref:
+        ref_meta, ref_bytes = ref
+        ext = ref_meta.get("filename", "ref.png").rsplit(".", 1)[-1]
+        media_type = "image/jpeg" if ext in ("jpg", "jpeg") else "image/png"
+        content_blocks.append({
+            "type": "image",
+            "source": {
+                "type": "base64",
+                "media_type": media_type,
+                "data": base64.b64encode(ref_bytes).decode(),
+            },
+        })
+        ref_ct = ref_meta.get("content_type", "")
+        ref_patterns = ", ".join(ref_meta.get("ui_patterns", []))
+        ref_desc = ref_meta.get("description", "")
+        content_blocks.append({
+            "type": "text",
+            "text": (
+                "## Visual Reference (ROUGH INSPIRATION ONLY)\n\n"
+                "The image above is a screenshot from a real website. Use it as rough "
+                "inspiration for your visual and layout choices — color palette, "
+                "typography, spacing, navigation style (sidebar vs top nav vs other), "
+                "component styling, and overall visual feel. "
+                "Do NOT copy the content, industry, or data. Your app has its own "
+                "industry and purpose based on the skill. The reference is purely "
+                "for visual/stylistic influence.\n\n"
+                f"**Page type:** {ref_ct}\n"
+                f"**UI patterns:** {ref_patterns}\n"
+                f"**Description:** {ref_desc}\n\n"
+            ),
+        })
+        logger.info(
+            "Design ref for '%s': %s (%s)",
+            skill.name,
+            ref_meta.get("filename"),
+            ref_ct,
+        )
+
+    user_text = (
         f"## Skill to Test\n\n"
         f"**Name:** {skill.name}\n\n"
         f"**Description:** {skill.description}\n\n"
@@ -162,37 +305,43 @@ async def design_variant(
     )
 
     if total_variants > 1:
-        user_prompt += (
+        user_text += (
             f"This is variant {variant_index} of {total_variants} for this skill. "
             f"Each variant MUST use a COMPLETELY DIFFERENT industry, product name, "
-            f"layout type (vary between top_nav, sidebar, header_strip), and color "
-            f"scheme. Pick an industry that hasn't been used yet.\n\n"
+            f"layout style, and color scheme. Pick an industry that hasn't been used yet.\n\n"
         )
         if prior_scenarios:
-            user_prompt += (
+            user_text += (
                 "Products already designed (DO NOT reuse these industries):\n"
             )
             for ps in prior_scenarios:
-                user_prompt += f"- {ps}\n"
-            user_prompt += "\n"
+                user_text += f"- {ps}\n"
+            user_text += "\n"
 
-    user_prompt += (
+    user_text += (
         "Design a focused, polished snippet of a realistic product that "
         "isolates and tests this exact skill. Give it a real company name "
         "and domain-specific data. Remember: include app_chrome with the "
         "layout shell description."
     )
+    content_blocks.append({"type": "text", "text": user_text})
 
     async with client.messages.stream(
         model=model,
         max_tokens=16384,
         system=VARIANT_DESIGN_SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_prompt}],
+        messages=[{"role": "user", "content": content_blocks}],
     ) as stream:
         response = await stream.get_final_message()
     if response.stop_reason == "max_tokens":
         logger.warning("Design LLM hit max_tokens — output may be truncated")
-    return _extract_json(response.content[0].text)
+
+    spec = _extract_json(response.content[0].text)
+
+    if ref:
+        spec["_reference_screenshot"] = ref_meta.get("filename", "")
+
+    return spec
 
 
 async def generate_variant_code(
@@ -200,29 +349,66 @@ async def generate_variant_code(
     spec: dict,
     model: str,
     fix_context: str | None = None,
+    reference_screenshot: tuple[dict, bytes] | None = None,
 ) -> dict[str, str]:
-    """Use LLM to generate complete code files from a variant spec."""
-    user_prompt = (
-        f"## App Specification\n\n```json\n{json.dumps(spec, indent=2)}\n```\n\n"
-    )
+    """Use LLM to generate complete code files from a variant spec.
+
+    If reference_screenshot is provided, the image is sent alongside the spec
+    as rough visual inspiration for stylistic choices.
+    """
+    content_blocks: list[dict] = []
+
+    if reference_screenshot:
+        ref_meta, ref_bytes = reference_screenshot
+        ext = ref_meta.get("filename", "ref.png").rsplit(".", 1)[-1]
+        media_type = "image/jpeg" if ext in ("jpg", "jpeg") else "image/png"
+        content_blocks.append({
+            "type": "image",
+            "source": {
+                "type": "base64",
+                "media_type": media_type,
+                "data": base64.b64encode(ref_bytes).decode(),
+            },
+        })
+        ref_desc = ref_meta.get("description", "")
+        ref_ct = ref_meta.get("content_type", "")
+        ref_industry = ref_meta.get("industry", "")
+        ref_patterns = ", ".join(ref_meta.get("ui_patterns", []))
+        content_blocks.append({
+            "type": "text",
+            "text": (
+                "## Visual Reference (ROUGH INSPIRATION ONLY)\n\n"
+                "The image above is a reference screenshot from a real website. "
+                "Use it as rough inspiration for your stylistic choices — color palette, "
+                "typography, spacing, component styling, and overall visual feel. "
+                "Do NOT copy the layout or content directly. Your app has its own spec, "
+                "data, and purpose. Just let this reference influence the visual polish.\n\n"
+                f"**Reference info:** {ref_ct} | {ref_industry}\n"
+                f"**UI patterns:** {ref_patterns}\n"
+                f"**Description:** {ref_desc}\n\n"
+            ),
+        })
+
+    user_text = f"## App Specification\n\n```json\n{json.dumps(spec, indent=2)}\n```\n\n"
     if fix_context:
-        user_prompt += (
+        user_text += (
             f"## CRITICAL: Previous Code Had Errors — Fix Them\n\n"
             f"{fix_context}\n\n"
             f"Regenerate ALL code files, fixing every issue above. "
             f"Ensure db/seed.ts inserts 20+ realistic records and "
             f"every data API route calls seedDatabase().\n\n"
         )
-    user_prompt += (
+    user_text += (
         "Generate the complete code for this application. Output a JSON object "
         "mapping file paths (relative to web/) to their complete file contents."
     )
+    content_blocks.append({"type": "text", "text": user_text})
 
     async with client.messages.stream(
         model=model,
         max_tokens=32768,
         system=VARIANT_CODE_SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_prompt}],
+        messages=[{"role": "user", "content": content_blocks}],
     ) as stream:
         response = await stream.get_final_message()
     return _extract_json(response.content[0].text)
@@ -462,167 +648,6 @@ _TEMPLATE_PROTECTED = frozenset(
 )
 
 
-_LAYOUT_ROTATION = ["top_nav", "sidebar", "header_strip"]
-
-
-def _build_layout_tsx(spec: dict) -> str | None:
-    """Build a layout.tsx with branded chrome from the spec's app_chrome field.
-
-    Uses inline styles for background colors (Tailwind arbitrary classes like
-    bg-#hex are invalid and silently produce no CSS).  Deterministically rotates
-    the layout type based on a hash of the product name so that variants within
-    the same run get different layouts.
-    """
-    chrome = spec.get("app_chrome", {})
-    if not chrome:
-        return None
-
-    product_name = chrome.get("product_name", spec.get("title", "App"))
-    subtitle = chrome.get("subtitle", "")
-    nav_items = chrome.get("nav_items", [])
-    active_nav = chrome.get("active_nav", nav_items[0] if nav_items else "")
-
-    # Force variety — ignore what the LLM picked, rotate deterministically
-    layout_type = _LAYOUT_ROTATION[hash(product_name) % len(_LAYOUT_ROTATION)]
-
-    vi = spec.get("visual_identity", {})
-    primary = vi.get("primary_color", "#334155")
-    if not primary.startswith("#"):
-        primary = "#334155"
-
-    pages = spec.get("pages", [])
-    active_route = pages[0]["route"] if pages else "/"
-
-    _COMMON_HEAD = f'''import type {{ Metadata }} from "next";
-import {{ Inter }} from "next/font/google";
-import "./globals.css";
-import {{ Providers }} from "./providers";
-
-const inter = Inter({{ subsets: ["latin"] }});
-export const dynamic = "force-dynamic";
-
-export const metadata: Metadata = {{
-  title: "{product_name}",
-  description: "{subtitle or product_name}",
-}};
-
-'''
-
-    if layout_type == "sidebar":
-        nav_lines = []
-        for item in nav_items:
-            if item == active_nav:
-                nav_lines.append(
-                    f'              <a href="{active_route}" className="block px-3 py-2 text-sm rounded font-medium" style={{{{ backgroundColor: "rgba(255,255,255,0.12)" }}}}>{item}</a>'
-                )
-            else:
-                nav_lines.append(
-                    f'              <span className="block px-3 py-2 text-sm rounded cursor-default" style={{{{ color: "rgba(255,255,255,0.4)" }}}}>{item}</span>'
-                )
-        nav_jsx = "\n".join(nav_lines)
-        sub_jsx = (
-            f'\n              <p className="text-xs mt-1" style={{{{ color: "rgba(255,255,255,0.5)" }}}}>{subtitle}</p>'
-            if subtitle
-            else ""
-        )
-
-        return (
-            _COMMON_HEAD
-            + f'''export default function RootLayout({{ children }}: Readonly<{{ children: React.ReactNode }}>) {{
-  return (
-    <html lang="en">
-      <body className={{inter.className}} suppressHydrationWarning>
-        <Providers>
-          <div className="flex min-h-screen">
-            <aside className="text-white w-56 flex-shrink-0 flex flex-col" style={{{{ backgroundColor: "{primary}" }}}}>
-              <div className="p-4 pb-2">
-                <h1 className="font-bold text-lg tracking-tight">{product_name}</h1>{sub_jsx}
-              </div>
-              <nav className="flex flex-col gap-0.5 px-2 mt-2 flex-1">
-{nav_jsx}
-              </nav>
-              <div className="p-4 text-xs" style={{{{ color: "rgba(255,255,255,0.3)" }}}}>v1.0</div>
-            </aside>
-            <main className="flex-1 overflow-auto bg-gray-50 p-6">{"{children}"}</main>
-          </div>
-        </Providers>
-      </body>
-    </html>
-  );
-}}
-'''
-        )
-
-    elif layout_type == "top_nav":
-        tab_parts = []
-        for item in nav_items:
-            if item == active_nav:
-                tab_parts.append(
-                    f'<a href="{active_route}" className="px-3 py-1.5 text-sm rounded font-medium" style={{{{ backgroundColor: "rgba(255,255,255,0.15)" }}}}>{item}</a>'
-                )
-            else:
-                tab_parts.append(
-                    f'<span className="px-3 py-1.5 text-sm cursor-default" style={{{{ color: "rgba(255,255,255,0.4)" }}}}>{item}</span>'
-                )
-        tabs_jsx = "\n                  ".join(tab_parts)
-        sub_jsx = (
-            f'\n                <span className="text-sm" style={{{{ color: "rgba(255,255,255,0.6)" }}}}>{subtitle}</span>'
-            if subtitle
-            else ""
-        )
-
-        return (
-            _COMMON_HEAD
-            + f'''export default function RootLayout({{ children }}: Readonly<{{ children: React.ReactNode }}>) {{
-  return (
-    <html lang="en">
-      <body className={{inter.className}} suppressHydrationWarning>
-        <Providers>
-          <header className="text-white shadow-md" style={{{{ backgroundColor: "{primary}" }}}}>
-            <div className="flex items-center px-6 h-14 gap-4">
-              <span className="font-bold text-lg tracking-tight">{product_name}</span>{sub_jsx}
-              <nav className="flex items-center gap-1 ml-auto">
-                  {tabs_jsx}
-              </nav>
-            </div>
-          </header>
-          <main className="bg-gray-50 min-h-[calc(100vh-3.5rem)] p-6">{"{children}"}</main>
-        </Providers>
-      </body>
-    </html>
-  );
-}}
-'''
-        )
-
-    else:
-        # header_strip — simple branded bar, no nav tabs
-        sub_jsx = (
-            f' <span className="mx-2 opacity-30">|</span> <span className="text-sm font-normal" style={{{{ color: "rgba(255,255,255,0.7)" }}}}>{subtitle}</span>'
-            if subtitle
-            else ""
-        )
-
-        return (
-            _COMMON_HEAD
-            + f'''export default function RootLayout({{ children }}: Readonly<{{ children: React.ReactNode }}>) {{
-  return (
-    <html lang="en">
-      <body className={{inter.className}} suppressHydrationWarning>
-        <Providers>
-          <header className="text-white" style={{{{ backgroundColor: "{primary}" }}}}>
-            <div className="flex items-center px-6 h-12">
-              <span className="font-semibold tracking-tight">{product_name}</span>{sub_jsx}
-            </div>
-          </header>
-          <main className="bg-gray-50 min-h-[calc(100vh-3rem)] p-6">{"{children}"}</main>
-        </Providers>
-      </body>
-    </html>
-  );
-}}
-'''
-        )
 
 
 def apply_variant_code(
@@ -652,13 +677,6 @@ def apply_variant_code(
             if entry.is_dir() and entry.name not in generated_api_dirs:
                 shutil.rmtree(entry)
                 logger.debug("Removed stale template API route: %s", entry.name)
-
-    # Build branded layout.tsx from spec if available
-    if spec:
-        layout_content = _build_layout_tsx(spec)
-        if layout_content:
-            code_files["app/layout.tsx"] = layout_content
-            logger.info("Built branded layout.tsx from spec app_chrome")
 
     for rel_path, content in code_files.items():
         if rel_path in _TEMPLATE_PROTECTED:

@@ -368,6 +368,8 @@ class SkillTestGeneratorWorld(
         from .task_generator import build_plato_task_configs, generate_tasks_for_variant
         from .variant_generator import (
             _copy_sohan_template,
+            _load_reference_manifest,
+            _resolve_reference_screenshots_dir,
             _validate_code_files,
             apply_variant_code,
             generate_variant_code,
@@ -431,10 +433,31 @@ class SkillTestGeneratorWorld(
             async with llm_sem:
                 try:
                     logger.info("  [%s] One-shot codegen …", vs.slug)
+                    ref_screenshot: tuple[dict, bytes] | None = None
+                    ref_filename = spec.get("_reference_screenshot", "")
+                    if ref_filename:
+                        ref_dir = _resolve_reference_screenshots_dir()
+                        if ref_dir:
+                            ref_path = ref_dir / ref_filename
+                            if ref_path.exists():
+                                manifest = _load_reference_manifest()
+                                ref_entry = next(
+                                    (e for e in manifest if e["filename"] == ref_filename),
+                                    None,
+                                )
+                                if ref_entry:
+                                    ref_screenshot = (ref_entry, ref_path.read_bytes())
+                                    logger.info(
+                                        "  [%s] Codegen using same ref: %s (%s)",
+                                        vs.slug,
+                                        ref_filename,
+                                        ref_entry.get("content_type"),
+                                    )
                     code_files = await generate_variant_code(
                         llm_client,
                         spec,
                         config.design_model,
+                        reference_screenshot=ref_screenshot,
                     )
                     validation_errors = _validate_code_files(code_files)
                     files_written = apply_variant_code(

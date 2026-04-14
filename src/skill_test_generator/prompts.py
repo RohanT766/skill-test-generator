@@ -24,15 +24,9 @@ The app should feel like you opened one tab of a real polished SaaS product.
 APP CHROME — EVERY APP NEEDS A REALISTIC LAYOUT SHELL:
 The generated app must NOT be a bare data table on a white page. It must \
 have application chrome — the structural UI elements that make it look \
-like a real product. Choose ONE of these layout patterns (vary across \
-variants — do not always pick the same one):
-- Top navigation bar: a horizontal bar at the top with the product name/logo \
-on the left, 2-4 navigation tab labels, and optionally a user avatar or \
-role label on the right. Non-active tabs should be visible but disabled.
-- Sidebar + header: a narrow sidebar with navigation items and the product \
-name at the top, plus a content area with a breadcrumb or page title.
-- Simple branded header: a colored strip at the top with the product name, \
-an optional subtitle describing the current section, and no navigation tabs.
+like a real product. Design your own layout shell — sidebars, top navbars, \
+branded headers, split panels, or any combination that fits the product. \
+Be creative and vary across variants. \
 Non-active navigation links do NOT need to go anywhere — they exist only \
 for visual realism. They should look clickable but be inactive/greyed. \
 The chrome MUST use the primary brand color. It must be defined in the \
@@ -44,9 +38,19 @@ should be detailed and polished within that scope — dense with real data, \
 proper column widths, status badges, action buttons — but never sprawl \
 into unrelated pages.
 
+VISUAL REFERENCE (if provided):
+If a reference screenshot is included in the message, use it as ROUGH \
+INSPIRATION for your design choices. Draw from its color palette, \
+layout structure (sidebar vs top nav vs other), typography, spacing, \
+and component styling. Do NOT copy the industry, content, or data from \
+the reference — your app has its own industry and purpose based on the \
+skill. The reference is purely for visual/stylistic influence.
+
 VISUAL IDENTITY — EVERY APP MUST LOOK DISTINCT:
-Each app needs its own visual personality. Specify a unique color palette. \
-CRITICAL: do NOT always use dark navy/slate Use genuinely different hues. \
+Each app needs its own visual personality. If a reference screenshot is \
+provided, let it guide your color palette and style direction. Otherwise, \
+specify a unique color palette. \
+CRITICAL: do NOT always use dark navy/slate. Use genuinely different hues. \
 The primary_color must be visibly different from every other variant in the batch. The accent \
 colors should go well with the primary. No two apps for the same skill \
 should share a color scheme.
@@ -96,7 +100,6 @@ Respond with a JSON object (no markdown fencing):
   - "accent_color": for interactive elements and highlights
   - "style_direction": 1 sentence describing the visual feel
 - "app_chrome": REQUIRED object describing the layout shell. Fields:
-  - "layout_type": one of "top_nav", "sidebar", or "header_strip"
   - "product_name": display name shown in the chrome
   - "subtitle": optional section label or tagline
   - "nav_items": array of 2-5 navigation labels. Only one is active \
@@ -139,17 +142,25 @@ You must output a JSON object mapping file paths to their complete contents. \
 Each key is a path relative to the `web/` directory (e.g. "db/schema.ts", \
 "app/page.tsx", "app/projects/page.tsx").
 
-CRITICAL #1 — APP CHROME IN LAYOUT (most important visual requirement):
-The spec includes an "app_chrome" field describing the layout shell. The \
-layout.tsx file MUST render this chrome — a branded header bar, top navbar, \
-or sidebar — so the app looks like a real product, NOT a bare data table \
-on a white page.
-- Read "app_chrome.layout_type" to decide the structure.
+CRITICAL #1 — APP CHROME AND LAYOUT (most important visual requirement):
+The spec includes an "app_chrome" field describing the layout shell. You \
+MUST generate app/layout.tsx with branded chrome — the structural UI that \
+makes the app look like a real product, NOT a bare data table on a white page.
+- Design your own layout shell: sidebars, top navigation bars, branded \
+headers, split panels, or any combination. Be creative — do not default \
+to the same layout every time.
 - The chrome uses the primary_color from visual_identity as its background.
 - Non-active nav items are visible but greyed out (opacity-50, \
 pointer-events-none) — they are purely decorative.
 - The product name must be prominent in the chrome.
-- See "Layout rules" below for the required layout.tsx pattern.
+
+CRITICAL #1b — VISUAL REFERENCE (if provided):
+If a reference screenshot is included in the message, use it as ROUGH \
+INSPIRATION for the visual style of your generated app. Draw from its \
+color palette, typography choices, spacing patterns, component styling, \
+and overall visual feel. Do NOT copy the layout, content, or structure \
+directly — your app has its own spec and purpose. The reference is only \
+for stylistic influence.
 
 CRITICAL #2 — Design quality and layout variety:
 - Apply accent_color for buttons, badges, links, and highlights.
@@ -158,7 +169,7 @@ CRITICAL #2 — Design quality and layout variety:
 - Hover states on clickable rows. Colored status badges. Proper typography.
 - CRITICAL — FULL WIDTH: Page content MUST span the full available width. \
 Do NOT wrap content in a narrow centered container (no mx-auto max-w-*, no \
-container class). The layout already provides padding on <main>. Content \
+container class). The layout provides padding on <main>. Content \
 should use the full width of its parent.
 - CRITICAL — VISUAL VARIETY: Do NOT always generate the same page structure \
 of "row of summary stat cards at top, then a data table below." That pattern \
@@ -232,12 +243,24 @@ CSS rules:
 correct Tailwind CSS 4 imports. If you include it, it will be ignored.
 
 Layout rules:
-- The app/layout.tsx is generated AUTOMATICALLY from the spec. You do NOT \
-need to include it in your output — it will be overwritten. Focus your \
-effort on page content (app/page.tsx and any sub-pages).
-- Your page components receive the full content area AFTER the branded \
-chrome (header/sidebar/strip). Do NOT add your own header or sidebar — \
-it is already provided by the layout.
+- You MUST include app/layout.tsx with branded chrome (sidebar, top navbar, \
+header strip, or any creative layout shell). This is where the product \
+name, navigation items, and brand colors go.
+- The layout MUST import and use these template-provided modules:
+  ```
+  import type { Metadata } from "next";
+  import { Inter } from "next/font/google";
+  import "./globals.css";
+  import { Providers } from "./providers";
+  const inter = Inter({ subsets: ["latin"] });
+  export const dynamic = "force-dynamic";
+  ```
+  Wrap {children} in <Providers>. Apply inter.className to <body>. \
+  Add suppressHydrationWarning to <body>.
+- Use inline styles for brand colors (e.g. style={{ backgroundColor: "#hex" }}) \
+rather than Tailwind arbitrary values like bg-[#hex] which can fail.
+- Your page components (app/page.tsx etc.) render INSIDE the layout's \
+{children} slot. Do NOT duplicate the chrome in page components.
 
 CRITICAL #5 — Client-side data fetching (THIS MAKES OR BREAKS THE APP):
 The app is served behind a reverse proxy at https://<id>.sims.plato.so — NOT \
@@ -270,7 +293,7 @@ Other rules:
 - ALWAYS include "db/seed.ts" with deterministic seed data insertion
 - ALWAYS include "drizzle/0000_zippy_changeling.sql" with CREATE TABLE SQL
 - ALWAYS include "app/page.tsx" as the main entry page
-- Do NOT include "app/layout.tsx" — it is auto-generated from the spec
+- ALWAYS include "app/layout.tsx" with branded chrome (see CRITICAL #1)
 - ALWAYS include at least one API route in "app/api/" for data access
 - ALWAYS include "app/api/health/route.ts" unchanged (it uses getDb internally)
 - ALWAYS include at least one write API route (PUT/PATCH) for data mutation

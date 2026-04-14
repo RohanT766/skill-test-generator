@@ -11,8 +11,9 @@ RUN curl -fsSL https://bun.sh/install | bash && \
     ln -sf /root/.bun/bin/bun /usr/local/bin/bun && \
     ln -sf /root/.bun/bin/bunx /usr/local/bin/bunx
 
-# Bundle the sohan template
+# Bundle the sohan template and reference screenshots
 COPY templates/sohan /world/templates/sohan
+COPY templates/reference-screenshots /world/templates/reference-screenshots
 
 # Install world package + deps into the venv
 COPY pyproject.toml hatch_build.py /world/

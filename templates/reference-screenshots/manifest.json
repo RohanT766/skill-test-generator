@@ -1,0 +1,2664 @@
+[
+  {
+    "filename": "ref_000.png",
+    "site": "booking",
+    "original_name": "booking_000.png",
+    "content_type": "product grid",
+    "industry": "Travel",
+    "ui_patterns": [
+      "card layout",
+      "image carousel",
+      "rating system",
+      "pricing display",
+      "filtering",
+      "promotional banners",
+      "heart/favorite icons"
+    ],
+    "description": "This is a Booking.com homepage displaying accommodation listings in a card-based grid layout. Each property card shows photos, ratings, reviews, distance from center, and pricing in CAD. The page includes promotional banners at the top offering credit card deals and early booking discounts. Users can browse different types of accommodations like bed & breakfasts and guesthouses with heart icons to save favorites."
+  },
+  {
+    "filename": "ref_001.png",
+    "site": "booking",
+    "original_name": "booking_001.png",
+    "content_type": "footer",
+    "industry": "Travel",
+    "ui_patterns": [
+      "multi-column footer",
+      "hierarchical navigation",
+      "grouped links",
+      "corporate branding",
+      "partner logos",
+      "breadcrumb navigation"
+    ],
+    "description": "This is the footer section of a Booking.com flight booking page, specifically for San Francisco to New York flights. The footer contains organized link groups for Support, Discover, Terms and settings, Partners, and About sections. It includes corporate information, partner company logos, and various navigation options typical of a comprehensive travel booking website footer."
+  },
+  {
+    "filename": "ref_002.png",
+    "site": "booking",
+    "original_name": "booking_002.png",
+    "content_type": "sitemap page",
+    "industry": "Travel",
+    "ui_patterns": [
+      "hierarchical navigation",
+      "grouped links",
+      "breadcrumb navigation",
+      "footer links",
+      "categorized content"
+    ],
+    "description": "This is a comprehensive sitemap page for a travel booking website showing flight destinations organized by geographic regions. The page displays destinations grouped into sections like Oceania and Caribbean, with links to various countries, islands, and territories. At the bottom, there are footer links for different services and resources including accommodations, customer service, and business tools. The layout uses a simple hierarchical structure to help users navigate to specific flight destinations across the platform."
+  },
+  {
+    "filename": "ref_003.png",
+    "site": "booking",
+    "original_name": "booking_003.png",
+    "content_type": "detail page",
+    "industry": "Travel",
+    "ui_patterns": [
+      "breadcrumb navigation",
+      "tabbed interface",
+      "image gallery",
+      "rating display",
+      "reservation widget",
+      "guest reviews",
+      "location mapping",
+      "price matching",
+      "search filters",
+      "hero banner"
+    ],
+    "description": "This is a hotel booking detail page on Booking.com showing The Cumberland hotel in London. The page displays hotel information including location, amenities, guest reviews (8.1 rating from 14,252 reviews), and reservation options for March 27-28. The interface includes tabbed navigation for different sections like Overview, Info & prices, Amenities, and Guest reviews, along with prominent Reserve and Search buttons for booking functionality."
+  },
+  {
+    "filename": "ref_004.png",
+    "site": "booking",
+    "original_name": "booking_004.png",
+    "content_type": "search interface",
+    "industry": "Travel",
+    "ui_patterns": [
+      "search form",
+      "tabbed navigation",
+      "promotional banners",
+      "radio button selection",
+      "date picker",
+      "dropdown menus",
+      "hero section",
+      "offers section"
+    ],
+    "description": "This is Booking.com's flight search interface featuring a prominent search form with options for round-trip, one-way, and multi-city flights. The page includes input fields for departure/arrival locations, travel dates, and passenger count, along with flight type preferences. Below the main search area, there's an offers section highlighting exclusive deals and partner airlines, with the overall design emphasizing ease of flight comparison and booking."
+  },
+  {
+    "filename": "ref_005.png",
+    "site": "booking",
+    "original_name": "booking_005.png",
+    "content_type": "help page",
+    "industry": "Travel",
+    "ui_patterns": [
+      "expandable sections",
+      "accordion interface",
+      "footer navigation",
+      "breadcrumb navigation",
+      "categorized content"
+    ],
+    "description": "This is a hotel booking website's FAQ page specifically for the New Yorker by Lotte Hotels property. The page features expandable accordion sections covering common guest questions about breakfast, room types, check-in/check-out times, pricing, amenities, and location. At the bottom, there's a comprehensive footer with links organized into categories like Support, Discover, Terms and settings, Partners, and About, providing easy access to various booking platform features and information."
+  },
+  {
+    "filename": "ref_006.png",
+    "site": "booking",
+    "original_name": "booking_006.png",
+    "content_type": "listing page",
+    "industry": "Travel",
+    "ui_patterns": [
+      "article cards",
+      "pagination",
+      "author bylines",
+      "featured images",
+      "content grid",
+      "editorial team section"
+    ],
+    "description": "This is a travel blog or content section on Booking.com showing articles written by Ben Taylor. The page displays travel-related articles with featured images, publication dates, and brief descriptions. Articles focus on vacation destinations in the USA, including romantic getaways and dog-friendly locations. The layout includes pagination controls and an editorial team section at the bottom."
+  },
+  {
+    "filename": "ref_007.png",
+    "site": "booking",
+    "original_name": "booking_007.png",
+    "content_type": "homepage",
+    "industry": "Travel",
+    "ui_patterns": [
+      "recent searches",
+      "product cards",
+      "horizontal carousel",
+      "hero sections",
+      "ratings and reviews",
+      "image thumbnails",
+      "call-to-action buttons"
+    ],
+    "description": "This is a hotel booking website homepage displaying the user's recent search history for destinations like Paris, Hell's Kitchen, and New York State. The main content area features a section for last-minute hotel deals near the user's location, showcasing various hotels with images, names, ratings, and brief descriptions. The layout uses a card-based design with hotel images and key information to facilitate easy browsing and booking decisions."
+  },
+  {
+    "filename": "ref_008.png",
+    "site": "booking",
+    "original_name": "booking_008.png",
+    "content_type": "product grid",
+    "industry": "Travel",
+    "ui_patterns": [
+      "product cards",
+      "grid layout",
+      "pricing display",
+      "rating/review system",
+      "image thumbnails",
+      "call-to-action buttons",
+      "search results",
+      "location tags"
+    ],
+    "description": "This is a hotel booking website showing search results in a grid layout. Each hotel is displayed as a card with an image, name, location, rating, brief description, and pricing starting from a nightly rate. The interface includes standard booking site elements like ratings, review counts, and 'Show more' buttons for additional details. There's also a section for 'Last minute hotels near you this weekend' at the bottom, suggesting personalized recommendations."
+  },
+  {
+    "filename": "ref_009.png",
+    "site": "booking",
+    "original_name": "booking_009.png",
+    "content_type": "search page",
+    "industry": "Travel",
+    "ui_patterns": [
+      "search form",
+      "autocomplete dropdown",
+      "date picker",
+      "guest selector",
+      "navigation tabs",
+      "user account indicator",
+      "destination suggestions"
+    ],
+    "description": "This is a hotel booking search page on Booking.com specifically for hotels near San Francisco International Airport. The page features a search form with location autocomplete showing New York-related suggestions, date selection fields, and guest/room options. The interface includes navigation tabs for different travel services like flights, car rental, and attractions, along with a prominent search functionality for finding accommodations."
+  },
+  {
+    "filename": "ref_010.png",
+    "site": "booking",
+    "original_name": "booking_010.png",
+    "content_type": "form",
+    "industry": "Travel",
+    "ui_patterns": [
+      "form sections",
+      "dropdown selectors",
+      "checkboxes",
+      "conditional options",
+      "step-by-step wizard",
+      "progress indicators",
+      "policy disclosures"
+    ],
+    "description": "This is a hotel booking form page on Booking.com where users can specify additional requirements for their reservation. The form includes sections for estimated arrival time selection and crib/extra bed requests for an Executive Twin room. It displays clear policy information about extra bed availability and charges, with options to add a free crib or extra bed with age selection. The page includes navigation buttons to proceed to final booking details."
+  },
+  {
+    "filename": "ref_011.png",
+    "site": "booking",
+    "original_name": "booking_011.png",
+    "content_type": "search results",
+    "industry": "Travel",
+    "ui_patterns": [
+      "card grid",
+      "destination suggestions",
+      "image thumbnails",
+      "call-to-action buttons",
+      "navigation breadcrumbs",
+      "footer links",
+      "related content sidebar"
+    ],
+    "description": "This is a Booking.com search results page specifically focused on pet-friendly hotels. The page displays various destination options in a card-based grid layout, featuring images of different locations like Mexico, Spain, and the United States. Each card contains destination images, titles, and brief descriptions to help users plan their pet-friendly travel. The layout includes a sidebar with additional related suggestions and a comprehensive footer with various travel-related links and options."
+  },
+  {
+    "filename": "ref_012.png",
+    "site": "booking",
+    "original_name": "booking_012.png",
+    "content_type": "search results",
+    "industry": "Travel",
+    "ui_patterns": [
+      "filter sidebar",
+      "card-based results",
+      "star ratings",
+      "pricing display",
+      "best seller badges",
+      "image thumbnails",
+      "call-to-action buttons"
+    ],
+    "description": "This is a search results page for New York attractions and activities on Booking.com. The interface features a filter sidebar on the left with location and category options, while the main content area displays attraction listings in a card format. Each result card includes an image, title, description, rating, price, and availability information with prominent 'See availability' buttons."
+  },
+  {
+    "filename": "ref_013.png",
+    "site": "booking",
+    "original_name": "booking_013.png",
+    "content_type": "terms page",
+    "industry": "Travel",
+    "ui_patterns": [
+      "sidebar navigation",
+      "hierarchical content structure",
+      "table of contents",
+      "print functionality",
+      "breadcrumb navigation",
+      "sectioned content"
+    ],
+    "description": "This is Booking.com's customer terms of service page, displaying legal information and agreements for users of the travel booking platform. The page features a sidebar navigation menu with various legal and informational sections, and the main content area shows detailed terms with a table of contents linking to different service categories like accommodations, flights, and car rentals. The layout includes standard website header elements with user account information and service navigation tabs."
+  },
+  {
+    "filename": "ref_014.png",
+    "site": "booking",
+    "original_name": "booking_014.png",
+    "content_type": "search page",
+    "industry": "Travel",
+    "ui_patterns": [
+      "search form",
+      "navigation tabs",
+      "breadcrumb navigation",
+      "recent searches section",
+      "hero image background",
+      "user account dropdown"
+    ],
+    "description": "This is Booking.com's apartment search page featuring a prominent search form overlaid on a background image of apartment interiors. The page includes navigation tabs for different accommodation types, location and date input fields, guest selection options, and a section for recent searches. The interface uses a blue color scheme with clear call-to-action buttons and maintains the typical booking platform layout with user account access in the top right corner."
+  },
+  {
+    "filename": "ref_015.png",
+    "site": "booking",
+    "original_name": "booking_015.png",
+    "content_type": "help page",
+    "industry": "Travel",
+    "ui_patterns": [
+      "expandable sections",
+      "accordion interface",
+      "tabbed navigation",
+      "grid layout",
+      "card-based design",
+      "destination browsing"
+    ],
+    "description": "This is a car rental FAQ page from Booking.com focused on New York rentals. The page features an accordion-style interface with expandable questions about costs, car types, and rental policies. Below the FAQ section is a destination browsing area showing popular car rental cities with pricing information and location counts. The layout combines informational content with promotional elements to help users understand rental options and explore alternatives."
+  },
+  {
+    "filename": "ref_016.png",
+    "site": "booking",
+    "original_name": "booking_016.png",
+    "content_type": "landing page",
+    "industry": "Travel",
+    "ui_patterns": [
+      "hero section",
+      "promotional banners",
+      "feature cards",
+      "call-to-action buttons",
+      "benefits grid",
+      "rewards program promotion"
+    ],
+    "description": "This is a travel booking website's landing page featuring flight search functionality. The page prominently displays a credit card rewards promotion for earning travel credits on flights, followed by a section showcasing various travel benefits like discounts on stays and rental cars. The bottom section highlights key selling points including wide selection, transparent pricing, and flexible booking options with accompanying icons and descriptive text."
+  },
+  {
+    "filename": "ref_017.png",
+    "site": "booking",
+    "original_name": "booking_017.png",
+    "content_type": "search form",
+    "industry": "Travel",
+    "ui_patterns": [
+      "search form",
+      "tabbed navigation",
+      "radio button selection",
+      "date picker",
+      "dropdown menus",
+      "call-to-action button",
+      "notification banner",
+      "user account indicator"
+    ],
+    "description": "This is Booking.com's flight search interface featuring a prominent search form for finding flights. The page includes options for round-trip, one-way, and multi-city trips, with fields for departure/arrival locations, travel dates, and passenger count. There's an important travel update notification about Middle East flight disruptions and longer wait times for customer service."
+  },
+  {
+    "filename": "ref_018.png",
+    "site": "booking",
+    "original_name": "booking_018.png",
+    "content_type": "search interface",
+    "industry": "Travel",
+    "ui_patterns": [
+      "search form",
+      "date picker",
+      "dropdown selector",
+      "card grid",
+      "promotional banner",
+      "image carousel",
+      "call-to-action button",
+      "price display",
+      "rating system"
+    ],
+    "description": "This is a travel booking website showing a search interface for New York vacations. The page features a prominent search form at the top with destination, date, and guest selection fields, followed by promotional content including vacation packages. Below are travel offer cards displaying flights from Los Angeles to New York and hotel accommodations with pricing, ratings, and imagery. The layout uses a card-based design to showcase different travel options with clear pricing and booking information."
+  },
+  {
+    "filename": "ref_019.png",
+    "site": "booking",
+    "original_name": "booking_019.png",
+    "content_type": "search form",
+    "industry": "Travel",
+    "ui_patterns": [
+      "date picker calendar",
+      "search form",
+      "tabbed navigation",
+      "location input",
+      "filter options",
+      "product carousel",
+      "responsive grid layout"
+    ],
+    "description": "This is a car rental booking page on Booking.com's Avis section. The interface features a prominent search form with pickup location, date selection using a dual-month calendar picker showing April and May 2026, and time selection. Below the search area is a carousel displaying available vehicle options including premium, medium, large, and small car categories. The page uses Booking.com's characteristic blue branding with a clean, travel-focused design optimized for rental car bookings."
+  },
+  {
+    "filename": "ref_020.png",
+    "site": "costco",
+    "original_name": "costco_020.png",
+    "content_type": "homepage",
+    "industry": "Retail",
+    "ui_patterns": [
+      "horizontal navigation",
+      "sidebar navigation",
+      "search bar",
+      "promotional banner",
+      "category grid",
+      "delivery options",
+      "multi-column layout",
+      "branded header"
+    ],
+    "description": "This is Costco's website homepage featuring their typical warehouse club retail layout. The page displays a prominent promotional banner for furniture, main navigation categories like Grocery, Pharmacy, and Photo, and a sidebar showing grocery subcategories. The layout includes delivery method options and promotional tiles highlighting different shopping features. The interface uses Costco's signature red and blue branding with a clean, organized structure typical of large retail websites."
+  },
+  {
+    "filename": "ref_021.png",
+    "site": "costco",
+    "original_name": "costco_021.png",
+    "content_type": "error page",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "error message",
+      "reference number display",
+      "minimal layout"
+    ],
+    "description": "This is an access denied error page that appears when a user attempts to visit a restricted Costco webpage for grocery and household items. The page displays a clear error message stating the user lacks permission to access the requested resource. It includes a reference number for troubleshooting purposes and follows a standard, minimal error page layout with basic text information."
+  },
+  {
+    "filename": "ref_022.png",
+    "site": "costco",
+    "original_name": "costco_022.png",
+    "content_type": "homepage",
+    "industry": "Retail",
+    "ui_patterns": [
+      "hero carousel",
+      "promotional banners",
+      "member benefits section",
+      "call-to-action buttons",
+      "navigation dots",
+      "branded content"
+    ],
+    "description": "This is Costco's homepage featuring a prominent carousel with promotional content, including a Bridgestone tire discount offer and member-only savings section. The page uses large hero banners to showcase deals and benefits, with navigation elements and branding throughout. The layout emphasizes promotional content and membership value propositions typical of a wholesale retailer's main landing page."
+  },
+  {
+    "filename": "ref_023.png",
+    "site": "etsy",
+    "original_name": "etsy_023.png",
+    "content_type": "product grid",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "product cards",
+      "price display",
+      "image gallery",
+      "personalized recommendations",
+      "horizontal scroll",
+      "favoriting/wishlist",
+      "product thumbnails"
+    ],
+    "description": "This is an Etsy product browsing page showing a grid layout of handmade jewelry and accessories. The page displays product cards with images, titles, and pricing information, featuring items like pearl necklaces, bracelets, and evening bags. There's a 'Picks inspired by your shopping' section with personalized product recommendations displayed in a horizontal scrollable format."
+  },
+  {
+    "filename": "ref_024.png",
+    "site": "hubspot",
+    "original_name": "hubspot_043.png",
+    "content_type": "dashboard",
+    "industry": "Web Analytics",
+    "ui_patterns": [
+      "bar chart",
+      "statistical summary",
+      "data visualization",
+      "outlier identification"
+    ],
+    "description": "This is a performance monitoring dashboard displaying a bar chart comparing Molmo versus actual distance measurements. The chart shows statistical data with a mean of 155px, median of 29px, and 14 outliers identified. Red bars indicate significant deviations from expected values, while green bars show measurements within normal ranges. The visualization helps identify performance discrepancies and outliers in the measurement system."
+  },
+  {
+    "filename": "ref_025.png",
+    "site": "hubspot",
+    "original_name": "hubspot_044.png",
+    "content_type": "settings page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "tabbed navigation",
+      "data table",
+      "search and filter",
+      "sidebar navigation",
+      "dropdown selectors",
+      "property management interface"
+    ],
+    "description": "This is a property settings page within HubSpot's CRM platform, specifically showing company properties configuration. The interface allows users to manage, create, and configure data properties that collect information about companies in their database. The page features a comprehensive data table with filtering options, search functionality, and tabs for organizing different types of properties and settings. Users can view property details like name, group, creator, and usage, with options to create new properties and manage data quality monitoring."
+  },
+  {
+    "filename": "ref_026.jpg",
+    "site": "hubspot",
+    "original_name": "hubspot_045.jpg",
+    "content_type": "login page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "authentication form",
+      "error message display",
+      "remember me checkbox",
+      "forgot password link",
+      "alternative sign-in options",
+      "call-to-action",
+      "branding placement"
+    ],
+    "description": "This is a HubSpot login page displaying an authentication expiration notice. The page features a centered login form with email and password fields, a 'Remember me' checkbox, and forgot password option. A prominent error message indicates the user's authentication has expired due to inactivity and they need to log in again to continue. The page includes HubSpot branding and offers alternative sign-in methods along with a demo request option at the bottom."
+  },
+  {
+    "filename": "ref_027.png",
+    "site": "hubspot",
+    "original_name": "hubspot_046.png",
+    "content_type": "data table",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "data table",
+      "filtering",
+      "search bar",
+      "dropdown menu",
+      "right-click context menu",
+      "status indicators",
+      "bulk actions",
+      "toolbar"
+    ],
+    "description": "This is a HubSpot landing pages management interface showing a data table of draft landing pages. The interface includes filtering options, search functionality, and a right-click context menu with various page actions like saving, printing, and translating. Users can manage multiple landing pages with status tracking and bulk operations available through the interface."
+  },
+  {
+    "filename": "ref_028.jpg",
+    "site": "hubspot",
+    "original_name": "hubspot_047.jpg",
+    "content_type": "template gallery",
+    "industry": "CRM",
+    "ui_patterns": [
+      "template gallery",
+      "search functionality",
+      "card-based layout",
+      "preview thumbnails",
+      "descriptive metadata",
+      "create from scratch option"
+    ],
+    "description": "This is a dashboard creation interface within HubSpot that allows users to either create dashboards from scratch or select from pre-built templates. The page displays suggested templates like 'Marketing Channel Performance' and 'Website Visits & Engagements' with preview images, descriptions, and metadata about included reports. Users can search through available templates or start with a blank dashboard using the 'New dashboard' option at the top."
+  },
+  {
+    "filename": "ref_029.png",
+    "site": "hubspot",
+    "original_name": "hubspot_048.png",
+    "content_type": "settings page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "sidebar navigation",
+      "form fields",
+      "dropdown menus",
+      "tabbed sections",
+      "user profile",
+      "account management"
+    ],
+    "description": "This is a user preferences settings page for HubSpot, a marketing automation and CRM platform. The interface shows various account settings including language preferences, date/time format, phone number configuration, and general working hours. The left sidebar provides navigation to different account management sections like integrations, security, and privacy settings, while the main content area displays form fields for personalizing the user experience."
+  },
+  {
+    "filename": "ref_030.png",
+    "site": "hubspot",
+    "original_name": "hubspot_049.png",
+    "content_type": "settings page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "sidebar navigation",
+      "breadcrumb navigation",
+      "dropdown selection",
+      "content editing interface",
+      "multi-language support",
+      "collapsible sections"
+    ],
+    "description": "This is a consent options configuration page within HubSpot's settings interface. The page allows users to edit external-facing content for consent options by language, currently showing German content. It includes sections for legitimate interest and privacy policy with editable text content in German, demonstrating GDPR compliance features for managing contact data processing consent."
+  },
+  {
+    "filename": "ref_031.png",
+    "site": "hubspot",
+    "original_name": "hubspot_050.png",
+    "content_type": "modal dialog",
+    "industry": "CRM",
+    "ui_patterns": [
+      "form inputs",
+      "dropdown menus",
+      "date picker",
+      "modal overlay",
+      "action buttons",
+      "kanban board background",
+      "data visualization"
+    ],
+    "description": "A CRM deal creation modal overlaying a sales pipeline kanban board. The form contains fields for deal name, pipeline selection, deal stage, amount, and close date. The background shows a deal management interface with pipeline stages like 'Appointment Scheduled' and 'Decision Maker Bought-In', along with deal metrics and filtering options."
+  },
+  {
+    "filename": "ref_032.png",
+    "site": "hubspot",
+    "original_name": "hubspot_051.png",
+    "content_type": "login page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "authentication form",
+      "session expiration notice",
+      "alternative sign-in options",
+      "remember me checkbox",
+      "password visibility toggle",
+      "forgot password link"
+    ],
+    "description": "This is a HubSpot login page showing a session expiration notice that requires the user to re-authenticate. The page displays a standard login form with email and password fields, along with options to remember the user and reset their password. Additional sign-in methods are available through alternative authentication options."
+  },
+  {
+    "filename": "ref_033.jpg",
+    "site": "hubspot",
+    "original_name": "hubspot_052.jpg",
+    "content_type": "settings page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "tabbed navigation",
+      "sidebar navigation",
+      "form fields",
+      "profile management",
+      "hierarchical settings organization",
+      "breadcrumb navigation"
+    ],
+    "description": "This is a user preferences settings page within HubSpot's CRM platform. The interface shows a two-level navigation structure with a sidebar containing grouped settings categories and a main content area with tabbed navigation for different preference types. The user is currently viewing their profile settings under the 'General' section, where they can edit personal information like name, profile image, and language preferences. The layout follows typical enterprise software patterns with clear visual hierarchy and organized information architecture."
+  },
+  {
+    "filename": "ref_034.png",
+    "site": "hubspot",
+    "original_name": "hubspot_053.png",
+    "content_type": "modal dialog",
+    "industry": "CRM",
+    "ui_patterns": [
+      "conditional logic",
+      "form controls",
+      "dropdown menus",
+      "live preview",
+      "property configuration",
+      "add/remove items"
+    ],
+    "description": "This is a property logic configuration modal for a CRM system, specifically for editing Deal object properties. The interface allows users to set up conditional logic where properties are shown or hidden based on values in other properties. It features a controlling property selector on the left (Deal Priority Level) with conditional operators and values, while the right side shows a live preview of how the form will appear to users when the conditions are met."
+  },
+  {
+    "filename": "ref_035.png",
+    "site": "hubspot",
+    "original_name": "hubspot_054.png",
+    "ui_elements": [
+      "sidebar_navigation",
+      "settings_menu",
+      "property_configuration",
+      "search_functionality"
+    ],
+    "ui_elements_visible": [
+      "sidebar menu",
+      "main content panel",
+      "browser tabs",
+      "navigation breadcrumbs",
+      "form controls"
+    ],
+    "content_type": "settings page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "sidebar navigation",
+      "two-column layout",
+      "tabbed interface",
+      "form fields",
+      "hierarchical menu"
+    ],
+    "description": "This is a HubSpot property settings configuration page where users can manage contact and company properties. The interface shows a left sidebar with various settings categories and a main content area displaying property groups and configuration options. The page appears to be part of HubSpot's CRM system, allowing administrators to customize data fields and organize them into logical groups for better data management."
+  },
+  {
+    "filename": "ref_036.jpg",
+    "site": "hubspot",
+    "original_name": "hubspot_055.jpg",
+    "content_type": "settings page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "sidebar navigation",
+      "tabbed interface",
+      "data table",
+      "grouped content",
+      "property management",
+      "breadcrumb navigation",
+      "action buttons"
+    ],
+    "description": "This is a property settings page within HubSpot's CRM platform, specifically showing deal property configuration. The interface displays a sidebar navigation for account management options and a main content area with tabs for Properties, Conditional logic, Groups, and Archived items. The current view shows property groups for deals, including Deal information, Deal Stage Properties, Deal activity, Analytics history, and Deal revenue, with the number of properties in each group displayed in a table format."
+  },
+  {
+    "filename": "ref_037.jpg",
+    "site": "hubspot",
+    "original_name": "hubspot_056.jpg",
+    "content_type": "form wizard",
+    "industry": "CRM",
+    "ui_patterns": [
+      "wizard flow",
+      "card-based options",
+      "progressive disclosure",
+      "template selection",
+      "step indicator",
+      "action buttons",
+      "help text",
+      "categorized options"
+    ],
+    "description": "This is a HubSpot report creation interface that guides users through building reports. The page presents multiple pathways for report creation including template library, AI-generated reports, and custom reports. It uses a card-based layout to organize different options and includes helpful descriptions for each choice. The interface follows a wizard pattern with clear navigation and next steps to streamline the report building process."
+  },
+  {
+    "filename": "ref_038.jpg",
+    "site": "hubspot",
+    "original_name": "hubspot_057.jpg",
+    "content_type": "dashboard",
+    "industry": "CRM",
+    "ui_patterns": [
+      "sidebar navigation",
+      "chart widget",
+      "filter controls",
+      "modal overlay",
+      "search interface",
+      "tabbed content",
+      "report library",
+      "drag and drop interface"
+    ],
+    "description": "This is a sales performance dashboard interface showing closed deals vs target metrics with a chart widget. The main dashboard area displays performance data while a modal overlay on the right allows users to add additional reports from a searchable library. The interface includes filtering options, quick filters, and advanced filters for data manipulation. Various AI-generated and custom reports are available for selection, indicating this is a comprehensive analytics platform for tracking sales and marketing performance."
+  },
+  {
+    "filename": "ref_039.jpg",
+    "site": "hubspot",
+    "original_name": "hubspot_058.jpg",
+    "content_type": "modal dialog",
+    "industry": "CRM",
+    "ui_patterns": [
+      "modal dialog",
+      "form input",
+      "action buttons",
+      "overlay",
+      "text input field"
+    ],
+    "description": "A modal dialog for creating a new property group within what appears to be a CRM or business analytics platform. The dialog contains a text input field pre-filled with 'Company Financial Insights' as the group name, along with Save and Cancel action buttons. This interface allows users to organize custom properties for better data management and categorization of business objects."
+  },
+  {
+    "filename": "ref_040.png",
+    "site": "hubspot",
+    "original_name": "hubspot_059.png",
+    "content_type": "dashboard",
+    "industry": "CRM",
+    "ui_patterns": [
+      "empty state",
+      "call-to-action buttons",
+      "sidebar navigation",
+      "header with user controls",
+      "breadcrumb navigation",
+      "help text with links"
+    ],
+    "description": "This is a HubSpot sales performance dashboard for Q2 2024 in an empty state. The main content area displays an illustration of a chart icon with instructional text encouraging users to add reports and share data with their team. The interface includes standard dashboard controls like 'Manage dashboards' and 'Create dashboard' buttons, along with a link to educational resources about dashboards.",
+    "ui_elements": [
+      "navigation sidebar",
+      "dashboard header",
+      "empty state illustration",
+      "action buttons",
+      "help link"
+    ]
+  },
+  {
+    "filename": "ref_041.jpg",
+    "site": "hubspot",
+    "original_name": "hubspot_060.jpg",
+    "content_type": "settings page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "sidebar navigation",
+      "tabbed interface",
+      "data table",
+      "property management",
+      "grouped settings",
+      "action buttons"
+    ],
+    "description": "This is a property settings page within HubSpot's CRM platform. The interface shows a two-level navigation structure with account management options in the left sidebar and property configuration in the main content area. Users can manage different types of properties (subscription properties shown here) organized in groups, with options to view, edit, and delete property groups. The page displays property groups in a table format showing names and property counts, with tabs for different property categories like Properties, Conditional logic, Groups, and Archived items."
+  },
+  {
+    "filename": "ref_042.png",
+    "site": "hubspot",
+    "original_name": "hubspot_061.png",
+    "content_type": "settings page",
+    "industry": "Web Development",
+    "ui_patterns": [
+      "sidebar navigation",
+      "hierarchical menu",
+      "form sections",
+      "toggle controls",
+      "warning notifications",
+      "expandable sections"
+    ],
+    "description": "This is a website settings configuration page within HubSpot's content management system. The interface shows CSS & Stylesheets settings with options to add style sheets, and jQuery configuration options. The left sidebar contains a hierarchical navigation menu for various website management functions including Data Management, Tools, and other administrative sections. A prominent warning notification explains that HubSpot will no longer add new jQuery versions and recommends upgrading to the latest version."
+  },
+  {
+    "filename": "ref_043.jpg",
+    "site": "hubspot",
+    "original_name": "hubspot_062.jpg",
+    "ui_elements": [
+      "heading_editor",
+      "content_tabs",
+      "style_tabs",
+      "semantic_level_selector",
+      "preview_mode",
+      "publish_button",
+      "upgrade_banner"
+    ],
+    "content_type": "editor",
+    "industry": "Web Development",
+    "ui_patterns": [
+      "WYSIWYG editor",
+      "sidebar navigation",
+      "property panel",
+      "preview mode",
+      "drag and drop interface",
+      "toolbar",
+      "content blocks"
+    ],
+    "description": "This is a web page editor interface for creating landing pages, specifically showing the HubSpot page editor. The user is editing a summer sale promotional page with a large heading that reads 'Exclusive Summer Sale 2025. Save Big'. The interface includes editing tools in the left sidebar for modifying content and styling, with options for heading text, semantic heading levels, and other page properties. The main content area shows the live preview of the landing page being created."
+  },
+  {
+    "filename": "ref_044.png",
+    "site": "salesforce",
+    "original_name": "salesforce_063.png",
+    "content_type": "data table",
+    "industry": "CRM",
+    "ui_patterns": [
+      "data table",
+      "navigation sidebar",
+      "search bar",
+      "action buttons",
+      "column headers",
+      "list filtering",
+      "bulk actions",
+      "breadcrumb navigation"
+    ],
+    "description": "This is a Salesforce CRM interface showing a contacts data table with recently viewed contacts. The page displays contact information in a structured table format with columns for name, account, phone, email, and contact owner. The interface includes typical CRM functionality like bulk actions (Import, Add to Campaign, Send Email), search capabilities, and a navigation sidebar with sections for different CRM modules like Sales, Marketing, and Service. The layout represents a standard contact management view within a business CRM system."
+  },
+  {
+    "filename": "ref_045.png",
+    "site": "salesforce",
+    "original_name": "salesforce_064.png",
+    "content_type": "modal dialog",
+    "industry": "CRM",
+    "ui_patterns": [
+      "modal dialog",
+      "drag and drop interface",
+      "sortable list",
+      "action buttons",
+      "close button"
+    ],
+    "description": "This is a modal dialog within a Salesforce CRM interface for sorting products in a price book. The modal allows users to drag and drop items to reorder them, with a single product 'DataVault Pro Analytics Suite' currently visible. The interface includes cancel and save buttons at the bottom, with instructions to drag items into the desired order before saving."
+  },
+  {
+    "filename": "ref_046.png",
+    "site": "salesforce",
+    "original_name": "salesforce_065.png",
+    "content_type": "modal dialog",
+    "industry": "CRM",
+    "ui_patterns": [
+      "form",
+      "dropdown",
+      "modal overlay",
+      "input fields",
+      "dropdown menu",
+      "user avatar",
+      "status indicators"
+    ],
+    "description": "This is a modal dialog for creating a new opportunity in a CRM system. The form contains fields for opportunity details including amount, description, owner assignment, and sales pipeline status. It features dropdown menus for stage selection and forecast category with options like Pipeline, Best Case, Commit, and Closed. The interface shows typical CRM workflow elements with probability percentages and sales stage management."
+  },
+  {
+    "filename": "ref_047.png",
+    "site": "salesforce",
+    "original_name": "salesforce_066.png",
+    "content_type": "modal dialog",
+    "industry": "CRM",
+    "ui_patterns": [
+      "modal overlay",
+      "form fields",
+      "search functionality",
+      "contact management",
+      "user profile display",
+      "action buttons"
+    ],
+    "description": "This is a contact editing modal within a CRM system, showing form fields for managing contact information including account details, title, reporting structure, and contact information. The modal appears to be for editing a VP of Engineering contact at Acme Technologies Inc, with sections for basic info, description, and contact details like phone and email. The interface includes standard form elements and action buttons for saving or canceling changes."
+  },
+  {
+    "filename": "ref_048.png",
+    "site": "salesforce",
+    "original_name": "salesforce_067.png",
+    "content_type": "data table",
+    "industry": "CRM",
+    "ui_patterns": [
+      "tabbed navigation",
+      "search bar",
+      "sortable columns",
+      "radio button selection",
+      "action button",
+      "workspace/folder organization"
+    ],
+    "description": "This is an email template selection interface within a marketing automation platform. The page displays a Content Workspace containing email templates and marketing content in a tabular format with sortable columns for title, status, modification date, and last modified by. Users can select email templates using radio buttons and search through available content to choose layouts for their marketing campaigns."
+  },
+  {
+    "filename": "ref_049.png",
+    "site": "salesforce",
+    "original_name": "salesforce_068.png",
+    "content_type": "detail page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "sidebar navigation",
+      "tabbed interface",
+      "collapsible sections",
+      "inline editing",
+      "calendar widget",
+      "task creation modal",
+      "activity timeline",
+      "profile avatar",
+      "breadcrumb navigation",
+      "search bar"
+    ],
+    "description": "This is a CRM account detail page for Acme Technologies Inc, showing comprehensive account information in collapsible sections including contact details, description, and ownership. The interface features a sidebar navigation menu, activity timeline with upcoming tasks and calls, and a new task creation modal with calendar date picker. The layout supports inline editing of account fields and displays related activities in an organized timeline format."
+  },
+  {
+    "filename": "ref_050.png",
+    "site": "salesforce",
+    "original_name": "salesforce_069.png",
+    "content_type": "modal dialog",
+    "industry": "CRM",
+    "ui_patterns": [
+      "modal overlay",
+      "form fields",
+      "dropdown menus",
+      "action buttons",
+      "grouped sections",
+      "checkbox input",
+      "validation icons"
+    ],
+    "description": "This is a contact creation modal dialog in a Salesforce CRM system. The form contains fields for basic contact information including phone, email, and a complete mailing address section with street, city, state/province, and postal code fields. The interface includes dropdown menus for location selection, an email opt-out checkbox, and standard form action buttons (Cancel, Save & New, Save) at the bottom."
+  },
+  {
+    "filename": "ref_051.png",
+    "site": "salesforce",
+    "original_name": "salesforce_070.png",
+    "content_type": "data table",
+    "industry": "CRM",
+    "ui_patterns": [
+      "data table",
+      "sidebar navigation",
+      "modal overlay",
+      "email composer",
+      "search functionality",
+      "action buttons",
+      "recipient selection",
+      "rich text editor"
+    ],
+    "description": "This is a Salesforce CRM interface showing a leads data table with recently viewed contacts. The main table displays lead information including names, titles, companies, and phone numbers. An email composition modal is overlaid on top, allowing the user to send emails to selected leads with features like recipient management, subject line, and a rich text editor for the email body."
+  },
+  {
+    "filename": "ref_052.png",
+    "site": "salesforce",
+    "original_name": "salesforce_071.png",
+    "content_type": "detail page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "sidebar navigation",
+      "success notification",
+      "expandable sections",
+      "contact cards",
+      "file upload area",
+      "role-based information display"
+    ],
+    "description": "This is a Salesforce CRM opportunity detail page showing various sections including contact roles, files, and products. The interface displays a success message indicating an opportunity product record was updated. The page features expandable sections for different data types, a contact card for James Anderson with VP of Sales title, and a file upload area for document management."
+  },
+  {
+    "filename": "ref_053.png",
+    "site": "salesforce",
+    "original_name": "salesforce_072.png",
+    "content_type": "modal dialog",
+    "industry": "CRM",
+    "ui_patterns": [
+      "modal dialog",
+      "tabbed interface",
+      "data table",
+      "search functionality",
+      "dropdown filters",
+      "template selection"
+    ],
+    "description": "This is an email template selection modal within a CRM system. The interface allows users to choose between contacts and leads, browse available email templates through a searchable table format, and filter by template folders. The modal displays template names, descriptions, and folder locations, with options for both public and private email templates specifically designed for customer onboarding and other business communications."
+  },
+  {
+    "filename": "ref_054.png",
+    "site": "salesforce",
+    "original_name": "salesforce_073.png",
+    "content_type": "modal dialog",
+    "industry": "CRM",
+    "ui_patterns": [
+      "modal overlay",
+      "form fields",
+      "required field indicators",
+      "action buttons",
+      "cancel/save pattern",
+      "input validation"
+    ],
+    "description": "A folder creation dialog within a CRM system, specifically for organizing leads. The modal contains form fields for folder label and unique name, with required field indicators marked by red asterisks. The interface includes standard cancel and save buttons at the bottom, with the folder label field already containing 'Exp' as partial input."
+  },
+  {
+    "filename": "ref_055.png",
+    "site": "salesforce",
+    "original_name": "salesforce_074.png",
+    "content_type": "data table",
+    "industry": "CRM",
+    "ui_patterns": [
+      "data table",
+      "sidebar navigation",
+      "search bar",
+      "action buttons",
+      "breadcrumb navigation",
+      "filter controls",
+      "sort controls",
+      "notification banner",
+      "global header"
+    ],
+    "description": "This is a Salesforce CRM interface showing a cases management page for Acme Technologies Inc. The page displays a data table with one case entry containing details like case number, subject, priority, date opened, status, and owner. There's a prominent notification banner suggesting to select 2 or 3 cases to try again, indicating some bulk action workflow. The interface includes typical CRM navigation elements and case management tools like merge cases, change owner, and filtering options."
+  },
+  {
+    "filename": "ref_056.png",
+    "site": "salesforce",
+    "original_name": "salesforce_075.png",
+    "content_type": "settings page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "navigation sidebar",
+      "settings form",
+      "checkboxes",
+      "dropdown menus",
+      "success notification",
+      "tabbed navigation",
+      "search bar",
+      "action buttons"
+    ],
+    "description": "This is a Salesforce CRM settings page specifically for configuring Activity Reminders. The page allows users to customize reminder preferences including task and event notifications in Lightning Experience, default reminder times, and email notification settings. A success message indicates that settings have been saved, and the interface provides various configuration options through checkboxes and dropdown menus. The left sidebar shows different settings categories while the main content area focuses on reminder-specific configurations."
+  },
+  {
+    "filename": "ref_057.png",
+    "site": "salesforce",
+    "original_name": "salesforce_076.png",
+    "content_type": "help page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "loading state",
+      "minimal interface",
+      "documentation layout"
+    ],
+    "description": "This appears to be a Salesforce Help article page that is currently loading or experiencing display issues. The page shows a mostly blank white interface with only the browser tab indicating it's a Salesforce Help article about external authentication. The URL suggests this is documentation related to external authentication configuration, but the content is not currently visible, indicating either a loading state or technical issue with the page rendering."
+  },
+  {
+    "filename": "ref_058.png",
+    "site": "salesforce",
+    "original_name": "salesforce_077.png",
+    "content_type": "settings page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "left sidebar navigation",
+      "breadcrumb navigation",
+      "form layout",
+      "radio button selection",
+      "warning notification",
+      "multi-step process",
+      "tabbed interface",
+      "search bar"
+    ],
+    "description": "This is a Salesforce CRM settings page for configuring fiscal year periods. The interface shows a multi-step configuration process where users can change their organization's fiscal year settings, with options for standard or custom fiscal years. The page includes warning notifications about the impact of changes on reporting and forecasting, and provides guidance for archiving current data before making modifications."
+  },
+  {
+    "filename": "ref_059.png",
+    "site": "salesforce",
+    "original_name": "salesforce_078.png",
+    "content_type": "settings page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "sidebar navigation",
+      "hierarchical menu",
+      "form fields",
+      "tabbed interface",
+      "breadcrumbs",
+      "search bar",
+      "settings panels"
+    ],
+    "description": "This is a Salesforce CRM administration settings page showing company information configuration. The interface features a left sidebar with various setup categories, a main content area displaying organization details like address, contact info, and system settings. Users can edit company profile information, manage licenses, and configure organizational preferences through this administrative interface."
+  },
+  {
+    "filename": "ref_060.png",
+    "site": "salesforce",
+    "original_name": "salesforce_079.png",
+    "content_type": "settings page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "sidebar navigation",
+      "breadcrumb navigation",
+      "empty state",
+      "call-to-action button",
+      "search bar",
+      "hierarchical menu"
+    ],
+    "description": "This is a Salesforce setup page for configuring Event Relays, which allows sending platform events and change data capture events to Amazon EventBridge. The page shows an empty state indicating no Event Relays have been created yet, with a prominent 'New Event Relay' button to create one. The interface includes typical Salesforce setup navigation with a collapsible sidebar menu containing various platform tools and configuration options.",
+    "empty_state": true
+  },
+  {
+    "filename": "ref_061.png",
+    "site": "salesforce",
+    "original_name": "salesforce_080.png",
+    "content_type": "settings page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "sidebar navigation",
+      "breadcrumb navigation",
+      "form controls",
+      "radio buttons",
+      "checkboxes",
+      "tabbed interface",
+      "search bar",
+      "hierarchical menu",
+      "save/cancel buttons"
+    ],
+    "description": "This is a Salesforce CRM settings page specifically for configuring domain settings. The interface shows a comprehensive admin panel with a left sidebar containing various configuration options organized under categories like Administration and Platform Tools. The main content area displays routing and policy settings with options for Salesforce Edge Network configuration, login policies, and cookie preferences. The page includes form controls like radio buttons and checkboxes for different configuration options."
+  },
+  {
+    "filename": "ref_062.jpg",
+    "site": "salesforce",
+    "original_name": "salesforce_081.jpg",
+    "content_type": "modal dialog",
+    "industry": "CRM",
+    "ui_patterns": [
+      "confirmation dialog",
+      "destructive action warning",
+      "modal overlay",
+      "binary choice buttons",
+      "action confirmation"
+    ],
+    "description": "This is a delete confirmation modal dialog within a CRM contact management system. The modal appears over a contacts list page and asks for confirmation before deleting a contact record. It features a clear warning message and two action buttons (Cancel and Delete) following standard destructive action confirmation patterns. The underlying page shows a 'Recently Viewed' contacts list with typical CRM navigation and data table structure."
+  },
+  {
+    "filename": "ref_063.jpg",
+    "site": "salesforce",
+    "original_name": "salesforce_082.jpg",
+    "content_type": "detail page",
+    "industry": "CRM",
+    "ui_patterns": [
+      "sidebar navigation",
+      "tabbed interface",
+      "modal dialog",
+      "search functionality",
+      "action buttons",
+      "form fields",
+      "contact picker",
+      "profile header",
+      "expandable sections"
+    ],
+    "description": "This is a CRM account detail page for Acme Technologies Inc, showing company information and account management tools. The page features a sidebar navigation menu, account details in expandable sections, and a prominent 'New Event' modal dialog overlay for scheduling. The interface includes AI-powered features for productivity and customer insights, along with standard CRM functionality for managing business relationships and activities."
+  },
+  {
+    "filename": "ref_064.png",
+    "site": "slack",
+    "original_name": "slack_083.png",
+    "content_type": "messaging interface",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "sidebar navigation",
+      "chat interface",
+      "user profile panel",
+      "direct messaging",
+      "channel organization",
+      "notification system",
+      "status indicators",
+      "profile management"
+    ],
+    "description": "This is a Slack workspace interface showing a user's direct message conversation with themselves. The left sidebar contains navigation for channels, direct messages, and workspace tools, while the center shows the chat interface with a saved message. The right panel displays the user's profile information including contact details and status settings."
+  },
+  {
+    "filename": "ref_065.png",
+    "site": "slack",
+    "original_name": "slack_084.png",
+    "content_type": "messaging interface",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "sidebar navigation",
+      "direct messages list",
+      "conversation view",
+      "search bar",
+      "bookmarks panel",
+      "file sharing options",
+      "notification banner"
+    ],
+    "description": "This is a Slack workspace interface showing the direct messages section. The left sidebar displays navigation options and a list of DM conversations, while the right panel shows a user's bookmarks section with saved links. The interface includes typical messaging app features like search functionality, file sharing options, and notification management. A permission request banner appears at the bottom asking to enable notifications."
+  },
+  {
+    "filename": "ref_066.png",
+    "site": "slack",
+    "original_name": "slack_085.png",
+    "content_type": "modal dialog",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "modal overlay",
+      "tabbed navigation",
+      "file upload",
+      "form input",
+      "image preview",
+      "cancel/save actions"
+    ],
+    "description": "This is a custom emoji creation modal within Slack's messaging interface. Users can upload an image file and assign a name (like ':avocado:') to create custom emojis for their workspace. The modal includes file upload functionality, image preview, and form validation. The interface shows the typical Slack workspace structure in the background with direct messages and navigation sidebar."
+  },
+  {
+    "filename": "ref_067.png",
+    "site": "slack",
+    "original_name": "slack_086.png",
+    "content_type": "modal dialog",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "modal overlay",
+      "sharing controls",
+      "user selection",
+      "permission settings",
+      "search input",
+      "copy link functionality",
+      "dropdown menu"
+    ],
+    "description": "This is a sharing dialog modal within Slack's canvas feature, allowing users to share a canvas document with team members or channels. The modal includes a search field to add people by name or channel, shows the current owner (jim snow), and provides advanced settings for limiting sharing permissions. At the bottom are options to copy a link or set invite-only permissions, with the modal overlaying the main Slack interface showing direct messages and canvas workspace."
+  },
+  {
+    "filename": "ref_068.png",
+    "site": "slack",
+    "original_name": "slack_087.png",
+    "content_type": "messaging interface",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "direct messaging",
+      "sidebar navigation",
+      "search functionality",
+      "message threading",
+      "scheduled messages",
+      "file sharing",
+      "contact list",
+      "notification system"
+    ],
+    "description": "This is a Slack workspace interface showing the direct messages section. The left sidebar contains navigation for different sections like Home, DMs, Activity, Files, and Admin. The main content area displays a conversation thread between users, with options to share canvas documents and schedule messages. There's a search bar at the top filtering for a specific user, and the interface includes typical messaging features like text formatting tools and file attachment options."
+  },
+  {
+    "filename": "ref_069.png",
+    "site": "slack",
+    "original_name": "slack_088.png",
+    "content_type": "settings page",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "modal dialog",
+      "sidebar navigation",
+      "preferences menu",
+      "integration settings",
+      "empty state illustration"
+    ],
+    "description": "This is a settings/preferences modal dialog within a file management application, specifically showing Salesforce integration options. The left sidebar contains various preference categories like Notifications, Navigation, Appearance, etc., while the main content area displays Salesforce org connection settings. The interface shows an empty state with a purple Salesforce logo, indicating no Salesforce organizations are currently connected. The modal appears to be part of a larger workspace or collaboration platform that allows users to integrate with external business applications."
+  },
+  {
+    "filename": "ref_070.png",
+    "site": "slack",
+    "original_name": "slack_089.png",
+    "content_type": "messaging interface",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "modal dialog",
+      "confirmation dialog",
+      "sidebar navigation",
+      "channel-based messaging",
+      "threaded conversations",
+      "user avatars",
+      "search bar",
+      "notification banner"
+    ],
+    "description": "This is a Slack workspace interface showing the main messaging view with a sidebar containing channels, direct messages, and navigation options. A delete confirmation modal is prominently displayed in the center, asking the user to confirm deletion of a message from user 'Jim snow' with the text 'Hello @channel testing activity'. The interface includes typical Slack elements like channel threads, user profiles, and a notification permission request banner at the bottom."
+  },
+  {
+    "filename": "ref_071.png",
+    "site": "slack",
+    "original_name": "slack_090.png",
+    "content_type": "messaging interface",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "sidebar navigation",
+      "channel-based messaging",
+      "threaded conversations",
+      "user mentions",
+      "message timestamps",
+      "reply functionality",
+      "notification banner",
+      "message composer",
+      "user avatars"
+    ],
+    "description": "This is a Slack-like team messaging application showing a social channel conversation. The interface displays a threaded conversation with messages, replies, and user mentions, along with a sidebar containing channels, direct messages, and other organizational features. The layout includes typical messaging app elements like user avatars, timestamps, and a message input area at the bottom."
+  },
+  {
+    "filename": "ref_072.png",
+    "site": "slack",
+    "original_name": "slack_091.png",
+    "content_type": "messaging interface",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "sidebar navigation",
+      "channel organization",
+      "filter dropdown",
+      "search bar",
+      "directory view",
+      "notification banner",
+      "user presence indicators",
+      "quick actions menu"
+    ],
+    "description": "This is a Slack workspace interface showing the Directories section for team collaboration. The left sidebar contains navigation elements including channels, direct messages, and various workspace sections. A filter dropdown is open showing options to sort and filter conversations by activity, mentions, and other criteria. The main content area displays directory tiles and includes options for inviting people and managing workspace settings."
+  },
+  {
+    "filename": "ref_073.png",
+    "site": "slack",
+    "original_name": "slack_092.png",
+    "content_type": "messaging interface",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "sidebar navigation",
+      "threaded conversations",
+      "user profile panel",
+      "channel organization",
+      "direct messaging",
+      "status indicators",
+      "notification settings",
+      "search functionality"
+    ],
+    "description": "This is a Slack workspace interface showing a team communication platform. The left sidebar contains navigation for different channels, direct messages, and organizational features. The center area displays a conversation thread with messages from user 'jim snow', including test messages and canvas content. A user profile panel is open on the right side showing profile information, status settings, and notification preferences."
+  },
+  {
+    "filename": "ref_074.png",
+    "site": "slack",
+    "original_name": "slack_093.png",
+    "content_type": "pricing page",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "pricing tiers",
+      "feature comparison",
+      "call-to-action buttons",
+      "recommended plan highlight",
+      "sidebar navigation",
+      "feature checkmarks"
+    ],
+    "description": "This is a Slack pricing page showing four subscription tiers (Free, Pro, Business+, Enterprise+) with their respective costs and features. The Business+ plan is highlighted as recommended, and each tier displays pricing, key features, and upgrade options. The page uses a clean layout with feature comparisons and clear call-to-action buttons for upgrading or contacting sales."
+  },
+  {
+    "filename": "ref_075.png",
+    "site": "slack",
+    "original_name": "slack_094.png",
+    "ui_elements": [
+      "file browser",
+      "canvas editor",
+      "create menu",
+      "notification prompt",
+      "share button",
+      "star/favorite button"
+    ],
+    "content_type": "file browser",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "sidebar navigation",
+      "file hierarchy",
+      "dropdown menu",
+      "notification bar",
+      "canvas preview",
+      "breadcrumb navigation",
+      "search bar"
+    ],
+    "description": "This is a file management interface for PlatoTest, a collaboration platform. The left sidebar shows file organization with sections for All files, Canvases, Lists, and Starred items, with an 'Untitled' file currently selected. The main content area displays a canvas creation interface with options to create new Canvas or List items, and shows a preview of an existing canvas with nature imagery titled 'Your canvas title'. A notification at the bottom requests permission to enable notifications from Slack integration."
+  },
+  {
+    "filename": "ref_076.jpg",
+    "site": "slack",
+    "original_name": "slack_095.jpg",
+    "content_type": "messaging interface",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "sidebar navigation",
+      "channel-based messaging",
+      "real-time chat",
+      "user presence indicators",
+      "notification system",
+      "starred items",
+      "direct messages",
+      "file sharing capabilities",
+      "message composition area"
+    ],
+    "description": "This is a Slack workspace interface showing the #all-platotest channel for team communication. The left sidebar contains navigation for channels, direct messages, and other workspace features, while the main area displays the chat conversation with timestamps and user messages. The interface includes typical messaging features like message composition, notifications, and the ability to star channels for quick access."
+  },
+  {
+    "filename": "ref_077.jpg",
+    "site": "slack",
+    "original_name": "slack_096.jpg",
+    "content_type": "modal dialog",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "sharing dialog",
+      "permission controls",
+      "user selection",
+      "messaging interface",
+      "file sharing",
+      "notification settings"
+    ],
+    "description": "This is a sharing modal dialog within a collaboration platform that allows users to share a canvas/document with others. The interface shows user selection (Jim Sand), permission controls (Can view dropdown), direct messaging options, and notification settings. It appears to be part of a file management system with canvas/document sharing capabilities similar to Slack or other team collaboration tools."
+  },
+  {
+    "filename": "ref_078.jpg",
+    "site": "slack",
+    "original_name": "slack_097.jpg",
+    "content_type": "modal dialog",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "modal overlay",
+      "feature promotion",
+      "upgrade prompt",
+      "pricing upsell",
+      "feature list with checkmarks",
+      "call-to-action button",
+      "premium badge"
+    ],
+    "description": "This is a promotional modal dialog within Slack encouraging users to upgrade to a paid plan for unlimited canvas creation. The modal highlights premium collaboration tools and features like capturing notes, sharing across channels, and privacy controls. It appears over the main Slack messaging interface, with a clear call-to-action button to view upgrade options."
+  },
+  {
+    "filename": "ref_079.jpg",
+    "site": "slack",
+    "original_name": "slack_098.jpg",
+    "content_type": "file browser",
+    "industry": "Operating System",
+    "ui_patterns": [
+      "file explorer",
+      "hierarchical navigation",
+      "list view",
+      "sidebar navigation",
+      "breadcrumb navigation",
+      "file metadata display"
+    ],
+    "description": "This is a file browser interface showing a temporary directory with various system files and Google Chrome-related files. The interface displays files in a list format with columns for name, size, type, and modification time. A sidebar on the left provides quick access to common locations like Desktop, Documents, Downloads, and other system directories."
+  },
+  {
+    "filename": "ref_080.jpg",
+    "site": "slack",
+    "original_name": "slack_099.jpg",
+    "content_type": "modal dialog",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "modal overlay",
+      "tab navigation",
+      "settings management",
+      "expandable sections",
+      "action buttons",
+      "icon-based navigation"
+    ],
+    "description": "This is a Slackbot configuration modal within the Slack messaging platform. The dialog allows users to manage tabs for the Slackbot channel, including reordering, adding, removing, and hiding tabs like Messages, Files, and Pins. The interface shows typical Slack branding and provides options to add new tabs or canvas elements to customize the bot's functionality."
+  },
+  {
+    "filename": "ref_081.jpg",
+    "site": "slack",
+    "original_name": "slack_100.jpg",
+    "content_type": "messaging interface",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "sidebar navigation",
+      "channel list",
+      "command palette",
+      "autocomplete suggestions",
+      "message composer",
+      "notification banner",
+      "user status indicator",
+      "search bar"
+    ],
+    "description": "This is a Slack workspace interface showing the main messaging view with a purple-themed sidebar containing channels, direct messages, and navigation options. The interface displays command suggestions in a dropdown menu, including options for reminders, expanding/collapsing messages, and other Slack commands. A message composition area is visible at the bottom with formatting tools and a send button, along with a notification permission request banner."
+  },
+  {
+    "filename": "ref_082.jpg",
+    "site": "slack",
+    "original_name": "slack_101.jpg",
+    "content_type": "messaging interface",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "sidebar navigation",
+      "folder organization",
+      "bookmarking",
+      "file sharing",
+      "channel-based messaging",
+      "direct messaging",
+      "search functionality",
+      "notification system"
+    ],
+    "description": "This is a team collaboration platform interface showing a messaging workspace with channel-based communication. The left sidebar contains navigation for different sections like threads, huddles, drafts, directories, and channels including 'all-platotest', 'new-channel', and 'social'. The main content area displays a 'Test Folder' containing bookmarked items including website links and shared files. The interface supports file organization, bookmarking, and team communication features typical of workplace messaging platforms."
+  },
+  {
+    "filename": "ref_083.jpg",
+    "site": "slack",
+    "original_name": "slack_102.jpg",
+    "content_type": "file browser",
+    "industry": "Business Software",
+    "ui_patterns": [
+      "file browser",
+      "modal overlay",
+      "sharing dialog",
+      "permission controls",
+      "dropdown menu",
+      "sidebar navigation",
+      "direct messaging integration"
+    ],
+    "description": "This is a Slack workspace file browser interface showing a sharing modal dialog overlay. The main interface displays a file management system with sidebar navigation for different file categories like All files, Canvases, Deleted, and Starred. The modal dialog allows users to share a canvas with team members, featuring permission settings (Can edit, Can view, Owner), direct messaging options, and a text area for adding messages. The interface demonstrates typical team collaboration features for file sharing within a communication platform."
+  },
+  {
+    "filename": "ref_084.png",
+    "site": "stripe",
+    "original_name": "stripe_103.png",
+    "content_type": "dashboard",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "sidebar navigation",
+      "chart visualization",
+      "date range selector",
+      "metric cards",
+      "loading states",
+      "search bar",
+      "sandbox environment indicator"
+    ],
+    "description": "This is a Stripe payment processing dashboard in sandbox/testing mode. The interface displays financial metrics with a line chart showing transaction amounts over time, along with sections for MRR (Monthly Recurring Revenue) and Net Volume that are currently loading data. The left sidebar provides navigation to various payment-related features including transactions, customers, invoices, and billing management."
+  },
+  {
+    "filename": "ref_085.png",
+    "site": "stripe",
+    "original_name": "stripe_104.png",
+    "content_type": "settings page",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "sidebar navigation",
+      "tabbed interface",
+      "toggle switches",
+      "radio buttons",
+      "resource links panel",
+      "breadcrumb navigation"
+    ],
+    "description": "This is a configuration page for Stripe's revenue recovery features, specifically focused on email automation settings. The page allows users to configure automated emails for failed card payments, bank debit payment failures, and expiring credit cards. It includes toggle switches for enabling/disabling different email types and options for customizing the collection pages that customers are directed to when payment methods need updating."
+  },
+  {
+    "filename": "ref_086.png",
+    "site": "stripe",
+    "original_name": "stripe_105.png",
+    "content_type": "form",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "split-screen layout",
+      "form validation",
+      "live preview",
+      "tabbed interface",
+      "dropdown selection",
+      "calculated totals",
+      "draft auto-save",
+      "sandbox environment"
+    ],
+    "description": "This is an invoice creation and editing interface within Stripe's payment platform. The left side contains form fields for configuring invoice details like currency, items, quantities and pricing, while the right side shows a live preview of how the invoice will appear. The interface includes tabs for different output formats (PDF, Email, Payment page) and indicates this is a sandbox testing environment. Key features include auto-calculated totals, draft saving functionality, and the ability to add products from a catalog."
+  },
+  {
+    "filename": "ref_087.png",
+    "site": "stripe",
+    "original_name": "stripe_106.png",
+    "ui_components": [
+      "modal_dialog",
+      "radio_button_group",
+      "dropdown_select",
+      "data_table",
+      "sidebar_navigation",
+      "tab_navigation",
+      "action_buttons"
+    ],
+    "content_type": "modal dialog",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "export modal",
+      "date range selector",
+      "radio button group",
+      "column configuration",
+      "preview text",
+      "action buttons"
+    ],
+    "description": "This is an export dialog overlay for payment transaction data in a Stripe sandbox environment. The modal allows users to configure export parameters including date range selection (today, current month, last 7 days, etc.) and column specifications. It displays a preview of the data fields that will be included in the export and provides cancel/export action buttons at the bottom."
+  },
+  {
+    "filename": "ref_088.png",
+    "site": "stripe",
+    "original_name": "stripe_107.png",
+    "content_type": "dashboard",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "sidebar navigation",
+      "balance summary with visual indicators",
+      "data table",
+      "action buttons",
+      "status cards",
+      "notification banner",
+      "search functionality"
+    ],
+    "description": "This is a Stripe payment processing dashboard showing account balance overview in a sandbox environment. The interface displays a current balance of $31.57 with breakdown by payment types including incoming payments, available funds, and future refunds. The left sidebar provides navigation to various payment management features, while the main content area shows balance summaries, recent activity, and options to manage payouts and add bank accounts."
+  },
+  {
+    "filename": "ref_089.png",
+    "site": "stripe",
+    "original_name": "stripe_108.png",
+    "content_type": "modal dialog",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "modal overlay",
+      "form fields",
+      "dropdown menu",
+      "country selector",
+      "checkbox",
+      "sidebar navigation",
+      "collapsible sections"
+    ],
+    "description": "This is a customer update modal dialog within a payment processing platform (Stripe). The modal allows editing customer shipping information, including name and country selection from a dropdown list. The interface is overlaid on top of a dashboard showing customer details, payments, and subscription information. The left sidebar provides navigation to various payment management features like customers, transactions, billing, and reporting."
+  },
+  {
+    "filename": "ref_090.png",
+    "site": "stripe",
+    "original_name": "stripe_109.png",
+    "content_type": "dashboard",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "sidebar navigation",
+      "tabbed interface",
+      "loading state",
+      "sandbox mode indicator",
+      "breadcrumb navigation",
+      "search functionality"
+    ],
+    "description": "This is Stripe's Radar fraud prevention dashboard in sandbox mode, currently displaying the Rules tab. The interface features a comprehensive sidebar navigation with sections for core payment functionality, data management, and developer tools. The main content area shows a tabbed interface with sections for Overview, Reviews, Rules, Lists, Risk controls, and Insights, though the content appears to be in a loading state. A prominent banner indicates this is a testing sandbox environment with an option to switch to live account."
+  },
+  {
+    "filename": "ref_091.png",
+    "site": "stripe",
+    "original_name": "stripe_110.png",
+    "content_type": "dashboard",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "sidebar navigation",
+      "code editor",
+      "tabbed interface",
+      "query builder",
+      "search functionality",
+      "collapsible sections",
+      "action buttons"
+    ],
+    "description": "This is a Stripe dashboard showing the Sigma analytics tool in sandbox mode. The interface displays a SQL query editor for analyzing daily balance data, with a left sidebar containing various pre-built report templates organized into categories. The main content area shows a code editor with SQL syntax highlighting for creating custom financial reports and queries. Users can run queries to analyze payment and balance data with results displayed below the editor."
+  },
+  {
+    "filename": "ref_092.png",
+    "site": "stripe",
+    "original_name": "stripe_111.png",
+    "content_type": "settings page",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "sidebar navigation",
+      "form inputs",
+      "dropdown selectors",
+      "checkboxes",
+      "currency selector",
+      "sandbox environment indicator",
+      "guided setup"
+    ],
+    "description": "This is a payment method configuration page within Stripe's sandbox environment. Users can experiment with payment scenarios by entering transaction details, selecting location and currency, and configuring options like manual capture and future usage permissions. The interface includes a clear sidebar navigation and form-based controls for testing payment functionality before going live."
+  },
+  {
+    "filename": "ref_093.png",
+    "site": "stripe",
+    "original_name": "stripe_112.png",
+    "content_type": "data table",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "data table",
+      "tabs",
+      "filters",
+      "search",
+      "status indicators",
+      "action buttons",
+      "sidebar navigation",
+      "bulk actions"
+    ],
+    "description": "This is a Stripe dashboard showing a subscriptions management interface in sandbox mode. The page displays a data table of active subscriptions with customer information, billing modes, and status indicators. Users can filter subscriptions by status (Active, Scheduled, Canceled, etc.), create test subscriptions, and perform bulk operations like export and analysis. The interface includes typical SaaS dashboard elements like sidebar navigation for different business functions and tab-based organization of subscription-related features."
+  },
+  {
+    "filename": "ref_094.png",
+    "site": "stripe",
+    "original_name": "stripe_113.png",
+    "content_type": "detail page",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "product grid",
+      "dropdown menu",
+      "country selector",
+      "product comparison",
+      "feature badges",
+      "notification banner",
+      "cart indicator"
+    ],
+    "description": "This is a Stripe product page showcasing terminal hardware and card readers in a sandbox environment. The page displays different card reader models with feature callouts like 'Does not require programming for operation'. A country selector dropdown is open showing delivery options to various countries. There's a notification about the S710 experiencing high demand and order delays."
+  },
+  {
+    "filename": "ref_095.png",
+    "site": "stripe",
+    "original_name": "stripe_114.png",
+    "ui_elements": [
+      "sidebar_nav",
+      "data_table",
+      "search_bar",
+      "create_button",
+      "status_badge",
+      "filter_tabs",
+      "copy_url_button",
+      "analyze_button",
+      "export_button"
+    ],
+    "content_type": "data table",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "sidebar navigation",
+      "data table",
+      "action buttons",
+      "status indicators",
+      "search functionality",
+      "filter tabs",
+      "breadcrumb navigation"
+    ],
+    "description": "This is a Stripe dashboard showing the Payment Links management interface in sandbox mode. The main content area displays a data table listing payment links with columns for name, price, and creation date. The sidebar provides navigation to various payment and business management features including balances, transactions, customers, and product catalog. The interface includes options to create new payment links, analyze data, and export information."
+  },
+  {
+    "filename": "ref_096.png",
+    "site": "stripe",
+    "original_name": "stripe_115.png",
+    "content_type": "dashboard",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "sidebar navigation",
+      "date range selector",
+      "data table",
+      "search bar",
+      "export functionality",
+      "sandbox environment banner",
+      "report scheduling",
+      "help documentation panel"
+    ],
+    "description": "This is a Stripe payment platform dashboard showing a balance summary report in sandbox/testing mode. The interface displays account balance changes over time with filtering options for date ranges and timezone settings. The left sidebar provides navigation to various financial management features including transactions, customers, billing, and reporting tools. The main content area shows balance data in a tabular format with export and exploration capabilities."
+  },
+  {
+    "filename": "ref_097.png",
+    "site": "stripe",
+    "original_name": "stripe_116.png",
+    "content_type": "data table",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "data table",
+      "column headers",
+      "export functionality",
+      "edit columns",
+      "sidebar navigation",
+      "search",
+      "feedback button"
+    ],
+    "description": "This is a data table interface for viewing financial transactions in what appears to be Stripe's payment platform. The table shows columns for Date, Card ID, Cardholder ID, Dispute ID, and Type, with options to export data and edit columns. The interface is part of an 'Issuing' section within Stripe's dashboard, likely for managing card issuing transactions and disputes."
+  },
+  {
+    "filename": "ref_098.png",
+    "site": "stripe",
+    "original_name": "stripe_117.png",
+    "content_type": "dashboard",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "sidebar navigation",
+      "data tables",
+      "card layouts",
+      "tabular data",
+      "search functionality",
+      "metadata panels",
+      "action buttons",
+      "status indicators"
+    ],
+    "description": "This is a Stripe payment processing dashboard showing customer account details and transaction history. The interface displays recent payment authorizations, connected cards, and dispute information in organized tables. The left sidebar provides navigation to various payment management features like transactions, customers, and billing tools. The right panel shows detailed customer information including billing address, contact details, and custom metadata fields."
+  },
+  {
+    "filename": "ref_099.png",
+    "site": "stripe",
+    "original_name": "stripe_118.png",
+    "content_type": "settings page",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "modal dialog",
+      "sidebar navigation",
+      "confirmation dialog",
+      "toggle switches",
+      "breadcrumb navigation",
+      "sandbox environment banner"
+    ],
+    "description": "This is a payment settings configuration page for Stripe's dashboard, specifically showing payment method settings for connected accounts. The interface displays various payment options like Cards, Cartes Bancaires, and Korean cards with their respective configurations. A modal dialog is overlaying the main content warning about unsaved changes, with options to either stay on the page or leave without saving modifications."
+  },
+  {
+    "filename": "ref_100.png",
+    "site": "stripe",
+    "original_name": "stripe_119.png",
+    "content_type": "settings page",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "sidebar navigation",
+      "tabbed interface",
+      "toggle switch",
+      "preview panel",
+      "breadcrumb navigation",
+      "sandbox mode indicator"
+    ],
+    "description": "This is a settings page from Stripe's dashboard for configuring onboarding options for connected accounts. The page features a sidebar navigation, tabbed interface for different configuration categories, and a toggle switch to enable networked onboarding functionality. A preview panel on the right shows how the onboarding flow will appear to users, asking if they want to link accounts to existing businesses on Stripe."
+  },
+  {
+    "filename": "ref_101.png",
+    "site": "stripe",
+    "original_name": "stripe_120.png",
+    "content_type": "settings page",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "sidebar navigation",
+      "form fields",
+      "radio buttons",
+      "validation",
+      "save button",
+      "expandable sections"
+    ],
+    "description": "This is a Stripe payment processing platform settings page for configuring site links. The page allows users to set up links for different components like Balances and Documents, with options to specify whether embedded components are used. It includes form validation, radio button selections, and a sidebar navigation menu with various payment-related sections like Transactions, Customers, and Billing."
+  },
+  {
+    "filename": "ref_102.png",
+    "site": "stripe",
+    "original_name": "stripe_121.png",
+    "content_type": "modal dialog",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "modal overlay",
+      "form layout",
+      "checkbox list",
+      "dropdown selection",
+      "date picker",
+      "progress indicator",
+      "sectioned content",
+      "action buttons"
+    ],
+    "description": "This is a configuration modal for adding revenue recognition rules in Stripe's payment platform. The interface allows users to select applicable categories (customers, products, invoices, etc.), configure revenue treatment and allocation settings, and set effective date periods. The modal is part of Stripe's sandbox environment for testing financial functionality before going live."
+  },
+  {
+    "filename": "ref_103.jpg",
+    "site": "stripe",
+    "original_name": "stripe_122.jpg",
+    "content_type": "data table",
+    "industry": "Financial Services",
+    "ui_patterns": [
+      "data table",
+      "sidebar navigation",
+      "filtering",
+      "status indicators",
+      "pagination",
+      "search bar",
+      "action buttons",
+      "tabbed navigation",
+      "modal dialog"
+    ],
+    "description": "This is a Stripe payment processing dashboard showing a transactions table in sandbox/testing mode. The interface displays payment records with details like amounts, status, currency, and customer information. A filter modal is currently open allowing users to filter transactions by status (pending, refunded, succeeded, etc.). The left sidebar provides navigation to various payment management features including balances, customers, and billing tools."
+  },
+  {
+    "filename": "ref_104.png",
+    "site": "walgreens",
+    "original_name": "walgreens_123.png",
+    "content_type": "homepage",
+    "industry": "Healthcare",
+    "ui_patterns": [
+      "promotional banners",
+      "product grid",
+      "percentage discounts",
+      "call-to-action buttons",
+      "seasonal promotions",
+      "brand merchandising"
+    ],
+    "description": "This is Walgreens' homepage featuring prominent Easter-themed promotional sections with discounts on seasonal items like candy, decorations, and gifts. The page displays multiple promotional banners offering 50% off deals and buy-one-get-one promotions across different product categories. Below the seasonal promotions is a Beauty Savings Event section highlighting cosmetics and personal care deals with rewards programs and percentage discounts."
+  },
+  {
+    "filename": "ref_105.png",
+    "site": "walgreens",
+    "original_name": "walgreens_124.png",
+    "content_type": "product grid",
+    "industry": "Healthcare",
+    "ui_patterns": [
+      "product carousel",
+      "coupon cards",
+      "promotional banners",
+      "grid layout",
+      "call-to-action buttons"
+    ],
+    "description": "This is a Walgreens pharmacy website homepage featuring a product showcase with health and beauty items displayed in a carousel format at the top. Below that is a promotional section offering up to $100 off with coupons, displaying manufacturer coupon offers in a grid layout. Each coupon card shows discount amounts ($3-$6 off 2 items) for brands like Garnier, L'Oreal Paris, Maybelline, and Dove with 'Clip' buttons to activate the offers. The layout emphasizes deals and promotions to encourage customer engagement and purchases."
+  },
+  {
+    "filename": "ref_106.png",
+    "site": "walgreens",
+    "original_name": "walgreens_125.png",
+    "content_type": "homepage",
+    "industry": "Healthcare",
+    "ui_patterns": [
+      "promotional banner",
+      "product grid",
+      "coupon display",
+      "category tiles",
+      "seasonal campaigns"
+    ],
+    "description": "This is the Walgreens homepage featuring a spring-themed promotional layout. The page displays coupon clips at the top, followed by an M&M's promotional banner offering buy 2 get 1 free deals. The main content area showcases 'Get prepped for spring' with four product category tiles featuring different health and wellness promotions including allergy relief, P&G oral care rewards, spring cleaning products, and vitamins. Each tile includes pricing, discount information, and product imagery with decorative spring flower elements."
+  },
+  {
+    "filename": "ref_107.png",
+    "site": "walgreens",
+    "original_name": "walgreens_126.png",
+    "content_type": "homepage",
+    "industry": "Healthcare",
+    "ui_patterns": [
+      "hero section",
+      "card grid",
+      "service tiles",
+      "promotional banners",
+      "navigation bar",
+      "call-to-action buttons"
+    ],
+    "description": "This is Walgreens' main homepage featuring a health-focused design with the tagline 'Because your health matters'. The page displays four main service cards covering vaccination protection, flu/COVID-19 testing, weight-loss medication, and colon cancer screening. Below are additional service tiles for prescription management, refills, delivery, and telehealth consultations. The layout uses a clean card-based design with prominent imagery and clear calls-to-action for various pharmacy and healthcare services."
+  },
+  {
+    "filename": "ref_108.png",
+    "site": "walgreens",
+    "original_name": "walgreens_127.png",
+    "content_type": "homepage",
+    "industry": "Healthcare",
+    "ui_patterns": [
+      "hero banner",
+      "service shortcuts",
+      "promotional grid",
+      "category cards",
+      "horizontal scroll",
+      "call-to-action buttons"
+    ],
+    "description": "This is the Walgreens pharmacy homepage featuring quick access buttons for prescription services like checking Rx status, requesting refills, and same-day delivery. The main content showcases graduation-themed promotional offers with 60% off various photo products including prints, cards, and custom frames. The layout uses a grid of promotional cards with product images and discount information to drive engagement with their photo services."
+  },
+  {
+    "filename": "ref_109.png",
+    "site": "walgreens",
+    "original_name": "walgreens_128.png",
+    "content_type": "homepage",
+    "industry": "Healthcare",
+    "ui_patterns": [
+      "promotional banners",
+      "product carousel",
+      "deal cards",
+      "grid layout",
+      "reward badges",
+      "navigation tabs"
+    ],
+    "description": "This is the Walgreens pharmacy website homepage featuring weekly deals and promotional offers. The page displays a 'Deals of the Week' section with product cards showing special pricing on snacks, storage bags, and beverages in a horizontal carousel layout. Below that is an 'Offers just for you' section displaying cash rewards in circular badge format, with various dollar amounts ($5, $10, $4, $15) for personalized deals that expire in 3 days."
+  },
+  {
+    "filename": "ref_110.png",
+    "site": "walgreens",
+    "original_name": "walgreens_129.png",
+    "content_type": "homepage",
+    "industry": "Healthcare",
+    "ui_patterns": [
+      "promotional banners",
+      "carousel/slider",
+      "reward cards",
+      "call-to-action buttons",
+      "grid layout",
+      "navigation tabs"
+    ],
+    "description": "This is the Walgreens homepage featuring a carousel of promotional offers and cash rewards deals. The main content area displays multiple reward offers in a card-based layout, each with clip buttons for saving deals. The page includes navigation elements and promotional content showcasing various cash back incentives for different product categories. Below the main carousel is an 'Explore more' section with additional promotional content and services."
+  },
+  {
+    "filename": "ref_111.png",
+    "site": "walgreens",
+    "original_name": "walgreens_130.png",
+    "content_type": "homepage",
+    "industry": "Healthcare",
+    "ui_patterns": [
+      "hero sections",
+      "promotional banners",
+      "category grid",
+      "call-to-action buttons",
+      "loyalty program integration",
+      "mobile app promotion"
+    ],
+    "description": "This is the main homepage for Walgreens, a pharmacy and healthcare retailer. The page features multiple promotional sections including myWalgreens membership signup, mobile app download with discount codes, delivery/pickup services, and credit card rewards. Below the promotional banners is a featured categories section displaying product categories like Easter Shop, Allergy & Sinus, Grocery & Beverage, Vitamins & Supplements, Personal Care, Beauty, Household & Pet Essentials, Medicines & Treatments, and Contact Lenses in a grid layout."
+  },
+  {
+    "filename": "ref_112.png",
+    "site": "walgreens",
+    "original_name": "walgreens_131.png",
+    "content_type": "footer",
+    "industry": "Healthcare",
+    "ui_patterns": [
+      "multi-column footer",
+      "grouped navigation links",
+      "privacy policy links",
+      "company information section",
+      "newsletter signup",
+      "copyright notice"
+    ],
+    "description": "This is the footer section of the Walgreens website, displaying organized links across multiple columns for customer service, company information, terms and conditions, and advertising programs. The footer includes essential navigation elements like shipping, returns, help/FAQs, privacy policies, and affiliate programs. At the top of the visible area is a promotional banner encouraging users to sign up for deals and offers, with the Walgreens logo prominently displayed above the footer content."
+  },
+  {
+    "filename": "ref_113.png",
+    "site": "walmart",
+    "original_name": "walmart_132.png",
+    "content_type": "product grid",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "product carousel",
+      "category navigation",
+      "search bar",
+      "promotional banners",
+      "price display",
+      "user account menu",
+      "shopping cart",
+      "filter options",
+      "themed product sections"
+    ],
+    "description": "This is Walmart's e-commerce homepage featuring Easter-themed product recommendations organized into categories like basket fillers, stuffed animals, toys, and candy. The page displays products in a grid layout with prices, images, and promotional sections. The interface includes standard e-commerce navigation with departments, services, search functionality, and user account access in the header."
+  },
+  {
+    "filename": "ref_114.png",
+    "site": "walmart",
+    "original_name": "walmart_133.png",
+    "content_type": "search results",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "search bar",
+      "filter options",
+      "promotional banner",
+      "breadcrumb navigation",
+      "sort functionality",
+      "user account menu",
+      "shopping cart indicator"
+    ],
+    "description": "This is Walmart's flash deals page for beauty and personal care products. The page features a prominent Flash Deals promotional banner advertising up to 65% off with weekly finds and limited time offers. Users can filter results by various criteria including in-store availability, price, brand, and fulfillment speed. The interface includes standard e-commerce elements like a search bar, user account access, and shopping cart functionality."
+  },
+  {
+    "filename": "ref_115.png",
+    "site": "walmart",
+    "original_name": "walmart_134.png",
+    "content_type": "detail page",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "product image gallery",
+      "thumbnail navigation",
+      "image zoom",
+      "product carousel",
+      "breadcrumb navigation",
+      "search bar",
+      "shopping cart",
+      "user account menu",
+      "store pickup/delivery options"
+    ],
+    "description": "This is a Walmart product detail page showcasing a Lux Decor Queen Comforter bedding product. The page features a large product image gallery on the right with a white comforter displayed on a bed, accompanied by smaller thumbnail images on the left showing different views and details of the product. The standard Walmart e-commerce interface includes the blue header with search functionality, shopping cart, and account options, along with store location and pickup/delivery preferences."
+  },
+  {
+    "filename": "ref_116.png",
+    "site": "walmart",
+    "original_name": "walmart_135.png",
+    "content_type": "help page",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "brand showcase grid",
+      "expandable FAQ sections",
+      "top navigation bar",
+      "search functionality",
+      "account management",
+      "shopping cart integration"
+    ],
+    "description": "This is a Walmart baby registry FAQ page that provides information and support for users setting up baby registries. The page features a grid of popular baby brands like Jergens, Palmer's, Pampers, and Millie Moon at the top. Below are expandable FAQ sections covering topics like redeeming free house cleaning, eligibility for welcome boxes, and claiming registry benefits. The interface maintains Walmart's standard e-commerce navigation with search, account access, and shopping cart functionality."
+  },
+  {
+    "filename": "ref_117.png",
+    "site": "walmart",
+    "original_name": "walmart_136.png",
+    "content_type": "homepage",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "hero banner",
+      "category navigation",
+      "promotional sections",
+      "search bar",
+      "shopping cart",
+      "user account menu",
+      "product showcase"
+    ],
+    "description": "This is Walmart's e-commerce homepage focused on shoes and fashion. The page features a prominent search bar, navigation categories for different product types, and two main promotional sections showcasing different shoe styles. The left section promotes 'The shoe edit' with mules and flats, while the right section displays white lace-up shoes with floral elements. The layout includes typical e-commerce elements like pickup/delivery options, user account access, and shopping cart functionality."
+  },
+  {
+    "filename": "ref_118.png",
+    "site": "walmart",
+    "original_name": "walmart_137.png",
+    "content_type": "product grid",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "product cards",
+      "star ratings",
+      "pagination",
+      "filtering sidebar",
+      "search bar",
+      "navigation menu",
+      "shipping information",
+      "breadcrumbs"
+    ],
+    "description": "This is a Walmart.com product listing page showing jewelry storage and care products. The page displays products in a grid layout with product images, names, ratings, and shipping details. It includes filtering options on the left sidebar and pagination controls at the bottom. The page features the standard Walmart e-commerce layout with search functionality, account information, and shopping cart access in the header."
+  },
+  {
+    "filename": "ref_119.png",
+    "site": "walmart",
+    "original_name": "walmart_138.png",
+    "content_type": "product grid",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "product cards",
+      "grid layout",
+      "price display",
+      "ratings and reviews",
+      "filtering options",
+      "search bar",
+      "shopping cart",
+      "promotional badges",
+      "sponsored content",
+      "pagination"
+    ],
+    "description": "This is a Walmart e-commerce product listing page specifically showing women's jewelry deals. The page displays a grid layout of jewelry items including rings, earrings, and cleaning kits with product images, prices, ratings, and shipping information. Each product card shows promotional pricing, customer reviews, and availability details. The interface includes typical e-commerce features like a search bar, shopping cart indicator, and various product filtering options in the navigation."
+  },
+  {
+    "filename": "ref_120.png",
+    "site": "walmart",
+    "original_name": "walmart_139.png",
+    "content_type": "product grid",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "product grid",
+      "filter sidebar",
+      "search bar",
+      "product cards",
+      "pagination",
+      "sponsored content",
+      "price display",
+      "ratings/reviews",
+      "shipping information",
+      "clearance labels",
+      "wishlist functionality"
+    ],
+    "description": "This is a Walmart e-commerce product listing page showing men's work clothing items in a grid layout. The page features a left sidebar with filtering options including brand, price, size, color, and other product attributes. The main content area displays product cards with images, prices, ratings, and shipping details. Navigation includes a top header with search functionality and department categories."
+  },
+  {
+    "filename": "ref_121.png",
+    "site": "walmart",
+    "original_name": "walmart_140.png",
+    "content_type": "product grid",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "product cards",
+      "filter sidebar",
+      "search bar",
+      "shopping cart",
+      "price display",
+      "add to cart buttons",
+      "product ratings",
+      "promotional badges"
+    ],
+    "description": "This is a Walmart e-commerce product listing page showing a grid of various products including DVDs, trading cards, and home goods. The left sidebar contains filtering options for price, brand, subscription, and other product attributes. Each product card displays an image, price, ratings, and add to cart functionality. The page includes typical e-commerce elements like a search bar, shopping cart indicator, and promotional messaging."
+  },
+  {
+    "filename": "ref_122.png",
+    "site": "walmart",
+    "original_name": "walmart_141.png",
+    "content_type": "product grid",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "product cards",
+      "filter sidebar",
+      "price display",
+      "product options",
+      "shopping cart",
+      "search bar",
+      "breadcrumb navigation",
+      "promotional badges",
+      "stock indicators",
+      "delivery options"
+    ],
+    "description": "This is a Walmart e-commerce product listing page showing baby diapers. The layout features a left sidebar with filtering options (price, brand, subscription, etc.) and a main content area displaying product cards in a grid format. Each product card shows images, pricing, ratings, delivery options, and action buttons. The page includes typical e-commerce elements like a shopping cart, search functionality, and promotional messaging."
+  },
+  {
+    "filename": "ref_123.png",
+    "site": "walmart",
+    "original_name": "walmart_142.png",
+    "content_type": "map interface",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "interactive map",
+      "location pins",
+      "sidebar navigation",
+      "search functionality",
+      "filter options",
+      "organization listings"
+    ],
+    "description": "This is Walmart's Spark Good charitable giving platform showing a map-based interface for locating American Red Cross chapters in the Bay Area and Central Valley regions. The page displays an interactive Google Maps view with location markers, while the left sidebar contains a list of specific Red Cross organizations with 'Round Up' donation options. Users can search and filter charitable organizations by location and cause type through this geographically-oriented donation interface."
+  },
+  {
+    "filename": "ref_124.png",
+    "site": "walmart",
+    "original_name": "walmart_143.png",
+    "content_type": "product grid",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "navigation breadcrumbs",
+      "filter bar",
+      "category tabs",
+      "product cards",
+      "search bar",
+      "user account menu",
+      "shopping cart",
+      "sort dropdown",
+      "category grid navigation",
+      "brand logo"
+    ],
+    "description": "This is Walmart's premium fashion section showing new arrivals in an e-commerce product grid layout. The page features category navigation tabs (Women, Men, Shoes, Jewelry, etc.), filtering options for brand, price, and fulfillment speed, and a grid of product category tiles. The interface includes typical e-commerce elements like a shopping cart with item count, user account access, and store pickup/delivery options."
+  },
+  {
+    "filename": "ref_125.png",
+    "site": "walmart",
+    "original_name": "walmart_144.png",
+    "content_type": "detail page",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "product gallery",
+      "product specifications",
+      "customer reviews",
+      "add to cart",
+      "seller information",
+      "shipping options",
+      "breadcrumb navigation",
+      "search bar",
+      "product recommendations",
+      "zoom functionality"
+    ],
+    "description": "This is a Walmart e-commerce product detail page for a SKIMI Ionic Hair Dryer. The page features a comprehensive product gallery with multiple images, detailed specifications, customer reviews with ratings, and purchasing options. The layout includes standard e-commerce elements like add to cart functionality, seller verification badges, shipping information, and related product recommendations in the sidebar."
+  },
+  {
+    "filename": "ref_126.png",
+    "site": "walmart",
+    "original_name": "walmart_145.png",
+    "content_type": "product grid",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "navigation breadcrumbs",
+      "filter sidebar",
+      "price range slider",
+      "product thumbnails",
+      "sort dropdown",
+      "search bar",
+      "category navigation",
+      "shopping cart icon",
+      "wishlist hearts"
+    ],
+    "description": "This is a Walmart e-commerce product listing page specifically for premium accessories. The page features a horizontal navigation menu with product categories, filtering options including price range sliders and brand selection, and a grid layout for displaying products. Users can sort results, add items to wishlist, and navigate through different product categories like women's accessories, shoes, jewelry, and handbags."
+  },
+  {
+    "filename": "ref_127.png",
+    "site": "walmart",
+    "original_name": "walmart_146.png",
+    "content_type": "product grid",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "product cards",
+      "filtering sidebar",
+      "sponsored content",
+      "price display",
+      "rating system",
+      "shipping information",
+      "search functionality",
+      "navigation breadcrumbs",
+      "wishlist/favorites",
+      "best seller badges"
+    ],
+    "description": "This is a Walmart e-commerce product listing page specifically showing engagement rings. The page features a grid layout of product cards displaying rings with images, prices, ratings, and shipping details. A comprehensive filtering sidebar on the left allows users to refine results by stone type, shape, karats, color, and metal type. The interface includes typical e-commerce elements like sponsored product indicators, best seller badges, and heart icons for adding items to wishlists."
+  },
+  {
+    "filename": "ref_128.png",
+    "site": "walmart",
+    "original_name": "walmart_147.png",
+    "content_type": "category page",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "navigation breadcrumbs",
+      "category filters",
+      "related links section",
+      "search bar",
+      "shopping cart indicator",
+      "user account menu",
+      "footer links",
+      "feedback prompt"
+    ],
+    "description": "This is a Walmart e-commerce category page specifically for Young Adult products. The page displays a clean layout with navigation options, related product categories like clothing, shoes, accessories and beauty, and various shopping tools. The interface includes typical e-commerce elements like a search bar, shopping cart with item count, user account access, and store pickup/delivery options. At the bottom, there's a feedback section and comprehensive footer with various company and policy links."
+  },
+  {
+    "filename": "ref_129.png",
+    "site": "walmart",
+    "original_name": "walmart_148.png",
+    "content_type": "category page",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "top navigation bar",
+      "search functionality",
+      "category navigation",
+      "breadcrumb links",
+      "footer with multiple columns",
+      "user account integration",
+      "shopping cart indicator"
+    ],
+    "description": "This is a Walmart e-commerce website showing a women's bags and accessories category page. The page features a prominent search bar, navigation menu with various departments and services, and displays popular subcategories within women's bags and accessories. The layout includes typical e-commerce elements like pickup/delivery options, user account access, and a shopping cart with item count and total."
+  },
+  {
+    "filename": "ref_130.jpg",
+    "site": "walmart",
+    "original_name": "walmart_149.jpg",
+    "content_type": "form",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "modal dialog",
+      "multi-step wizard",
+      "address form",
+      "country selector",
+      "form validation",
+      "progress indicator",
+      "radio button selection"
+    ],
+    "description": "This is a baby registry creation form on Walmart's website, specifically showing the shipping address input step. The interface features a modal dialog overlay with an address form containing fields for country, name, street address, apartment/suite, city, state, and zip code. The form includes validation indicators and is part of a multi-step process for setting up gift delivery preferences for a baby registry."
+  },
+  {
+    "filename": "ref_131.jpg",
+    "site": "walmart",
+    "original_name": "walmart_150.jpg",
+    "content_type": "detail page",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "product gallery",
+      "customer reviews",
+      "rating filters",
+      "price display",
+      "add to cart",
+      "shipping options",
+      "breadcrumb navigation",
+      "search bar",
+      "user account menu",
+      "shopping cart indicator"
+    ],
+    "description": "This is a Walmart product detail page for Apple AirPods 4 with Active Noise Cancellation. The page displays customer photos, product pricing ($149.00), user reviews with star ratings and filtering options, and purchase/delivery options. The interface includes typical e-commerce elements like add to cart functionality, shipping details, and customer review management with verified purchase indicators."
+  },
+  {
+    "filename": "ref_132.jpg",
+    "site": "walmart",
+    "original_name": "walmart_151.jpg",
+    "content_type": "product grid",
+    "industry": "E-commerce",
+    "ui_patterns": [
+      "product carousel",
+      "heart favorites",
+      "price display",
+      "action buttons",
+      "search bar",
+      "navigation menu",
+      "account dropdown",
+      "shopping cart indicator",
+      "product recommendations"
+    ],
+    "description": "This is a Walmart e-commerce product listing page showing garden and outdoor items. The page displays a horizontal carousel of popular products in the category, each with product images, prices, and action buttons like 'Add' and 'Options'. The layout includes standard e-commerce navigation with search functionality, account access, and shopping cart, along with category-based product recommendations and bestseller indicators."
+  },
+  {
+    "filename": "ref_133.png",
+    "site": "x",
+    "original_name": "x_ads_152.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "multi-step form",
+      "sidebar navigation",
+      "form validation",
+      "error states",
+      "action buttons",
+      "dropdown menus",
+      "text inputs",
+      "warning messages"
+    ],
+    "description": "This is a campaign creation form for a digital advertising platform, specifically showing the campaign details step. The form includes fields for campaign objective (Sales), name, and funding source, with validation errors indicating no payment method is configured. The interface features a sidebar with navigation steps, form inputs with character limits, and action buttons for saving drafts or proceeding to the next step."
+  },
+  {
+    "filename": "ref_134.png",
+    "site": "x",
+    "original_name": "x_ads_153.png",
+    "content_type": "settings page",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "user management",
+      "permission controls",
+      "account settings",
+      "filtering",
+      "notification banner",
+      "tabbed navigation"
+    ],
+    "description": "This is an account management settings page for an advertising platform, specifically focused on managing user access and permissions. The page displays account contributor information, permission levels, and provides functionality to add or edit user access. There's a prominent notification banner about a system migration scheduled for March 26th. The interface shows typical user management features including filtering capabilities and clear role designations like 'Account administrator'."
+  },
+  {
+    "filename": "ref_135.png",
+    "site": "x",
+    "original_name": "x_ads_154.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "multi-step form",
+      "sidebar navigation",
+      "inline validation",
+      "progressive disclosure",
+      "action buttons",
+      "payment integration"
+    ],
+    "description": "This is a campaign creation form for a digital advertising platform, specifically showing the campaign details step. The interface displays a multi-step workflow with sidebar navigation showing progress through campaign setup stages. The form includes fields for campaign objective, name, and funding source, with clear validation messaging indicating missing payment methods. The layout uses a clean, structured design typical of enterprise advertising management tools."
+  },
+  {
+    "filename": "ref_136.png",
+    "site": "x",
+    "original_name": "x_ads_155.png",
+    "content_type": "modal dialog",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "modal dialog",
+      "card selection",
+      "radio button groups",
+      "categorized options",
+      "action buttons",
+      "help links"
+    ],
+    "description": "This is a campaign objective selection modal within a Google advertising platform. The interface presents different campaign goals organized into three categories: Awareness, Consideration, and Conversion. Users can select from options like Reach, Video views, App installs, and Sales, with the Sales option currently highlighted as selected. The modal includes descriptive text for each objective and has Cancel/Next action buttons at the bottom."
+  },
+  {
+    "filename": "ref_137.png",
+    "site": "x",
+    "original_name": "x_ads_156.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "wizard/stepped form",
+      "radio button selection",
+      "sidebar navigation",
+      "audience targeting",
+      "bid management",
+      "campaign configuration"
+    ],
+    "description": "This is an advertising campaign creation form interface showing bidding strategy options. The page displays three radio button choices for setting target costs and maximum bids for ad campaigns. The right sidebar shows audience estimates of 95-106 million users based on targeting selections. The interface includes navigation for different campaign setup steps and appears to be part of a multi-step campaign creation wizard."
+  },
+  {
+    "filename": "ref_138.png",
+    "site": "x",
+    "original_name": "x_ads_157.png",
+    "ui_elements": {
+      "notification_banner": "yellow system migration notice",
+      "sidebar": "campaign structure navigation",
+      "form_sections": "campaign details, delivery settings, placements",
+      "action_buttons": "Back, Save draft, Launch campaign"
+    },
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "multi-step form",
+      "sidebar navigation",
+      "summary view",
+      "action buttons",
+      "grouped form fields",
+      "notification banner"
+    ],
+    "description": "This is a campaign configuration interface for an advertising platform, showing the review and launch stage of campaign creation. The interface displays campaign settings including delivery options, bidding strategy, targeting, and scheduling in a structured form layout. Users can review their campaign configuration before launching, with options to save as draft or proceed with launch. A notification banner indicates system maintenance for an Ad Manager migration."
+  },
+  {
+    "filename": "ref_139.png",
+    "site": "x",
+    "original_name": "x_ads_158.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "multi-step form",
+      "sidebar navigation",
+      "dropdown selectors",
+      "search fields",
+      "checkboxes",
+      "audience estimation",
+      "progress indicators",
+      "action buttons"
+    ],
+    "description": "This is a campaign creation form interface for X (Twitter) advertising. The form allows users to configure targeting parameters including device types (mobile, desktop), device models, and carrier settings. It features an audience estimation tool showing the potential reach (80.0M-88.4M) based on selected targeting criteria. The interface includes options to target users who first used X on new devices within specified timeframes, with navigation elements for saving drafts and proceeding to the next step."
+  },
+  {
+    "filename": "ref_140.png",
+    "site": "x",
+    "original_name": "x_ads_159.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "multi-step form",
+      "sidebar navigation",
+      "audience targeting",
+      "estimation preview",
+      "keyword selection",
+      "bulk upload",
+      "progress tracking",
+      "tooltip help"
+    ],
+    "description": "This is a campaign creation form for digital advertising platform (appears to be Twitter Ads based on the X logo). The interface shows audience targeting configuration with custom audience selection, look-alike targeting options, and keyword targeting features. The right panel displays audience size estimates (95.9M-106.0M) to help advertisers understand their potential reach. The form includes navigation between different campaign setup steps and allows for bulk keyword uploads."
+  },
+  {
+    "filename": "ref_141.png",
+    "site": "x",
+    "original_name": "x_ads_160.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "multi-step form",
+      "left sidebar navigation",
+      "audience targeting",
+      "expandable sections",
+      "progress tracking",
+      "audience estimation",
+      "save draft functionality"
+    ],
+    "description": "This is a campaign creation form interface for X (Twitter) advertising platform. The form allows users to set up ad campaigns with audience targeting options including custom audiences, app activity, and website activity. It features a left sidebar for navigation through different campaign setup steps, an audience estimation tool showing projected reach of 95.9M-106.0M users, and standard form controls for saving drafts and proceeding to the next step."
+  },
+  {
+    "filename": "ref_142.png",
+    "site": "x",
+    "original_name": "x_ads_161.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "step-by-step wizard",
+      "sidebar navigation",
+      "form validation",
+      "inline editing",
+      "call-to-action buttons",
+      "error messaging"
+    ],
+    "description": "This is a campaign creation form interface for a digital advertising platform. The form includes sections for campaign details like objective selection, naming, and funding source configuration. It features a multi-step wizard layout with sidebar navigation showing campaign structure (campaign details, ad groups, review) and displays validation errors for missing payment methods. The interface includes options to save drafts or proceed to the next step in the campaign setup process."
+  },
+  {
+    "filename": "ref_143.png",
+    "site": "x",
+    "original_name": "x_ads_162.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "step navigation",
+      "form sections",
+      "validation messages",
+      "action buttons",
+      "sidebar navigation",
+      "payment integration"
+    ],
+    "description": "This is a campaign creation form for X Ads (formerly Twitter Ads) platform. The form is structured with a left sidebar showing campaign hierarchy and progress steps, while the main content area contains campaign configuration fields including objective selection, naming, and funding source setup. There's a prominent warning about missing payment methods and an action to add a credit card. The interface includes standard form navigation with Exit, Save draft, and Next buttons at the bottom."
+  },
+  {
+    "filename": "ref_144.png",
+    "site": "x",
+    "original_name": "x_ads_163.png",
+    "content_type": "help page",
+    "industry": "Social Media",
+    "ui_patterns": [
+      "breadcrumb navigation",
+      "cookie consent banner",
+      "help center layout",
+      "informational content",
+      "action buttons"
+    ],
+    "description": "This is a help center page from X (formerly Twitter) explaining their cookie policy. The page features a clean layout with breadcrumb navigation and informational content about how cookies are used on the platform. A cookie consent banner appears at the bottom with options to accept all cookies or refuse non-essential ones. The page is part of X's help documentation system, providing transparency about their data collection practices."
+  },
+  {
+    "filename": "ref_145.png",
+    "site": "x",
+    "original_name": "x_ads_164.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "multi-step form",
+      "sidebar navigation",
+      "wizard interface",
+      "input validation",
+      "toggle switches",
+      "progress tracking",
+      "action buttons"
+    ],
+    "description": "This is an ad campaign creation form interface for a digital advertising platform. The page shows the ad group details step of a multi-step campaign setup wizard, with a sidebar navigation showing the campaign structure and current progress. The main content area contains form fields for configuring ad group settings including name input, dynamic product ads toggle, and budget/schedule sections. Navigation buttons at the bottom allow users to go back or proceed to the next step."
+  },
+  {
+    "filename": "ref_146.png",
+    "site": "x",
+    "original_name": "x_ads_165.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "multi-step form",
+      "sidebar navigation",
+      "budget input fields",
+      "date/time pickers",
+      "audience metrics display",
+      "progress indicators",
+      "action buttons"
+    ],
+    "description": "This is an advertising campaign setup form interface, specifically showing the budget and scheduling configuration step. The form includes fields for daily budget allocation, campaign start/end dates, and displays estimated audience reach metrics. The interface features a sidebar navigation showing the campaign structure and progress through different setup stages, with options to save drafts or proceed to the next step."
+  },
+  {
+    "filename": "ref_147.png",
+    "site": "x",
+    "original_name": "x_ads_166.png",
+    "content_type": "help page",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "header navigation",
+      "hero banner",
+      "cookie consent banner",
+      "multiple browser tabs",
+      "breadcrumb navigation"
+    ],
+    "description": "This is a help documentation page for X Business (formerly Twitter Business) focusing on device, carrier, and new mobile targeting features for advertising campaigns. The page features a dark hero section with blue-tinted imagery of mobile/communication equipment. A cookie consent banner appears at the bottom with options to accept or refuse non-essential cookies. The browser shows multiple tabs open related to campaign setup and targeting options."
+  },
+  {
+    "filename": "ref_148.png",
+    "site": "x",
+    "original_name": "x_ads_167.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "form fields",
+      "autocomplete/search suggestions",
+      "audience targeting",
+      "bulk upload",
+      "sidebar navigation",
+      "audience estimation",
+      "tag-based input",
+      "action buttons"
+    ],
+    "description": "This is an ad campaign creation form within an advertising platform, likely Twitter/X Ads Manager. The interface allows users to configure targeting parameters including keywords, follower look-alikes, interests, movies/TV shows, and conversation topics. The form provides real-time audience size estimation and includes features like bulk upload functionality and autocomplete suggestions for targeting criteria."
+  },
+  {
+    "filename": "ref_149.png",
+    "site": "x",
+    "original_name": "x_ads_168.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "multi-step wizard",
+      "sidebar navigation",
+      "date picker",
+      "calendar widget",
+      "input validation",
+      "progress tracking",
+      "audience metrics",
+      "budget controls"
+    ],
+    "description": "This is an ad campaign creation form interface showing campaign setup options including budget, scheduling, and audience targeting. The interface includes a calendar widget for selecting campaign dates, budget input fields, and displays estimated audience reach metrics. A sidebar shows the campaign structure and navigation between different setup steps, with save and next buttons for form progression."
+  },
+  {
+    "filename": "ref_150.png",
+    "site": "x",
+    "original_name": "x_ads_169.png",
+    "content_type": "modal dialog",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "modal overlay",
+      "radio button selection",
+      "form controls",
+      "brand safety settings",
+      "sensitivity controls",
+      "account exclusions"
+    ],
+    "description": "This is a brand safety and suitability controls modal within an advertising campaign management interface. The dialog allows users to configure content sensitivity settings with options for Standard or Limited sensitivity thresholds, helping brands control what type of content appears near their ads. It includes account handle exclusions functionality and demonstrates X (formerly Twitter) advertising platform's brand safety features for campaign management."
+  },
+  {
+    "filename": "ref_151.png",
+    "site": "x",
+    "original_name": "x_ads_170.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "multi-step form",
+      "sidebar navigation",
+      "search fields",
+      "audience estimation",
+      "bulk upload",
+      "progressive disclosure",
+      "targeting options"
+    ],
+    "description": "This is an advertising campaign creation form interface for targeting configuration. The page shows various targeting options including keywords, follower look-alikes, interests, movies/TV shows, and conversation topics, each with search fields for user input. On the right side, there's an audience estimate showing the potential reach (95.9M-106.0M) based on current targeting selections. The interface includes bulk upload options and follows a multi-step campaign setup workflow with navigation controls at the bottom."
+  },
+  {
+    "filename": "ref_152.png",
+    "site": "x",
+    "original_name": "x_ads_171.png",
+    "content_type": "form",
+    "industry": "Digital Marketing",
+    "ui_patterns": [
+      "multi-step form",
+      "calendar picker",
+      "sidebar navigation",
+      "progress indicator",
+      "audience estimation",
+      "budget input",
+      "date range selector"
+    ],
+    "description": "This is an advertising campaign creation form interface, specifically showing the ad group details configuration step. The form includes campaign scheduling with a calendar picker set to April 2027, budget allocation fields, and audience targeting options. The interface displays an estimated audience reach of 95.9M-106.0M users and includes navigation elements for moving between different campaign setup stages."
+  }
+]
