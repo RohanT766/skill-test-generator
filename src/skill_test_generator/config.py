@@ -273,7 +273,7 @@ class SkillTestGeneratorConfig(RunConfig):
         description="CUA benchmark world package for agent evaluation.",
     )
     cua_agent_package: str = Field(
-        default="computer-use-agent:3.2.35",
+        default="computer-use-agent:3.2.48",
         description="Computer-use agent package.",
     )
 

@@ -72,12 +72,26 @@ If a reference screenshot is provided, derive your color palette from it — \
 do NOT invent a different scheme. If no reference is provided, specify a \
 unique color palette and do NOT default to dark navy/slate.
 
+DATA DISPLAY — BE CREATIVE, NOT JUST DATA TABLES:
+Do NOT default to a plain data table unless the skill specifically requires \
+tabular display. Match how the reference screenshot displays data, and think \
+about what display format fits the industry and scenario:
+- Product catalogs → card grids with images/prices/ratings (like Amazon, \
+Costco, Shopify storefronts)
+- Inventory/warehouse → product cards with stock badges, category filters
+- Project management → kanban boards, timeline views
+- CRM contacts → card lists with avatars and quick-action buttons
+- Analytics → chart dashboards with summary cards
+- Real estate / listings → gallery cards with photos, map views
+- Only use a data table when the skill explicitly requires row-based \
+tabular interaction (e.g. aggregating across table rows).
+The reference screenshot should be your primary guide for display format. \
+If it shows cards, use cards. If it shows a grid, use a grid.
+
 VISUAL QUALITY:
-- Fill the viewport. Data tables should have many visible columns with \
-realistic widths.
-- Cards to group sections. Proper typography hierarchy.
-- The page should look busy with real data — not sparse placeholder content.
-- Rows should have hover states. Status columns should use colored badges.
+- Fill the viewport with rich, realistic content — not sparse placeholders.
+- Proper typography hierarchy. Status indicators should use colored badges.
+- The page should feel like a real production app with real data density.
 
 ADVERSARIAL DATA DESIGN — THE SIM MUST ACTIVELY STRAIN THE SKILL:
 The seed data is not just test data — it is a trap. Design it so that an \
@@ -198,22 +212,26 @@ layout structure. Do NOT copy specific text or data values from the image.
 knowledge of that product's visual design to fill in details the screenshot \
 alone cannot convey — interaction patterns, button styles, spacing conventions.
 
-CRITICAL #2 — Design quality and layout variety:
+CRITICAL #2 — Data display format and layout:
+- Do NOT default to a plain data table. Follow the spec's display format \
+and the reference screenshot. If the spec describes card grids, build card \
+grids. If it describes a kanban board, build a kanban board.
+- Product catalogs → card grids with prices, ratings, badges, "Add to Cart" \
+buttons. Think Amazon, Costco, Shopify storefronts.
+- Inventory/warehouse → product cards with stock indicators, category filters.
+- Project management → kanban columns, timeline rows.
+- CRM contacts → avatar card lists with inline actions.
+- Analytics → chart panels (use recharts) with summary stat cards.
+- Only use a data table when the spec explicitly calls for tabular display.
+- If the spec includes a "clone_target", use your knowledge of that product \
+to match its exact display conventions.
 - Apply accent_color for buttons, badges, links, and highlights.
-- Data tables MUST be inside a Card with a CardHeader — never a bare table floating on the page.
 - Edit forms using Dialog or Sheet with labeled inputs and toast feedback (sonner).
-- Hover states on clickable rows. Colored status badges. Proper typography.
+- Hover states on interactive elements. Colored status badges. Proper typography.
 - CRITICAL — FULL WIDTH: Page content MUST span the full available width. \
 Do NOT wrap content in a narrow centered container (no mx-auto max-w-*, no \
 container class). The layout provides padding on <main>. Content \
 should use the full width of its parent.
-- CRITICAL — VISUAL VARIETY: Do NOT always generate the same page structure \
-of "row of summary stat cards at top, then a data table below." That pattern \
-is overused. Instead, vary the page layout across apps. Consider: a toolbar \
-row with search and filter chips above the table, a page title with \
-description text above the table, split-panel or master-detail views, tab \
-sections, or a compact header with action buttons. Each app should feel like \
-a different product, not the same dashboard template reskinned.
 
 CRITICAL #3 — Edit functionality:
 - The app MUST have a working edit form or dialog for the primary entity.
