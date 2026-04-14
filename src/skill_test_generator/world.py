@@ -828,6 +828,8 @@ else:
                 checks.append({"name": "GET /api/health", "pass": True, "error": ""})
 
                 for r in spec.get("api_routes", []):
+                    if not isinstance(r, dict):
+                        continue
                     route = r.get("route", "")
                     if not route or "[" in route or "/health" in route:
                         continue
@@ -889,6 +891,8 @@ else:
 
                     live_api_data: dict[str, str] = {}
                     for r in spec.get("api_routes", []):
+                        if not isinstance(r, dict):
+                            continue
                         route = r.get("route", "")
                         if not route or "[" in route or "/health" in route:
                             continue
@@ -914,10 +918,13 @@ else:
                                 all_data += "\n" + out
                             try:
                                 resp_json = json.loads(out)
+                                pagination = resp_json.get("pagination")
+                                if not isinstance(pagination, dict):
+                                    pagination = {}
                                 tp = (resp_json.get("totalPages")
                                       or resp_json.get("total_pages")
-                                      or resp_json.get("pagination", {}).get("totalPages")
-                                      or resp_json.get("pagination", {}).get("total_pages"))
+                                      or pagination.get("totalPages")
+                                      or pagination.get("total_pages"))
                                 if tp and page >= int(tp):
                                     break
                                 rows = resp_json.get("data", resp_json.get("items", []))
