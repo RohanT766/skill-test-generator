@@ -1352,6 +1352,10 @@ else:
             config.run_concurrency,
         )
 
+        all_attempt_records: list[dict] = []
+        completed_count = 0
+        total_work = len(work_items)
+
         async with httpx.AsyncClient(
             base_url=config.chronos_url, timeout=httpx.Timeout(120.0)
         ) as http:
@@ -1366,6 +1370,7 @@ else:
                 task_name: str,
                 session_num: int,
             ) -> None:
+                nonlocal completed_count
                 stagger_delay = idx * 2.0
                 if stagger_delay > 0:
                     await asyncio.sleep(stagger_delay)
@@ -1373,6 +1378,8 @@ else:
                     session_label = (
                         f"{task_name} [{session_num}/{n_sessions}] (testcase {tc_id})"
                     )
+
+                    attempts_for_item: list[dict] = []
 
                     for attempt in range(1, max_retries + 1):
                         logger.info(
@@ -1395,20 +1402,31 @@ else:
                             )
                             result["session_num"] = session_num
                             result["attempt"] = attempt
-
-                            status_str = "PASS" if result.get("score", 0) > 0 else "FAIL"
-                            logger.info(
-                                "    %s | score=%.2f | chronos=%s | plato=%s",
-                                status_str,
-                                result.get("score", 0),
-                                result.get("chronos_url", ""),
-                                result.get("plato_url", ""),
-                            )
+                            result["skill_name"] = vs.skill_name
+                            result["slug"] = vs.slug
 
                             session_status = result.get("status", "")
                             is_infra_failure = session_status in (
                                 "failed", "error", "cancelled",
                             )
+
+                            if result.get("score", 0) > 0:
+                                result["outcome"] = "PASS"
+                            elif is_infra_failure:
+                                result["outcome"] = "ERROR"
+                            else:
+                                result["outcome"] = "FAIL"
+
+                            attempts_for_item.append(result)
+
+                            logger.info(
+                                "    %s | score=%.2f | chronos=%s | plato=%s",
+                                result["outcome"],
+                                result.get("score", 0),
+                                result.get("chronos_url", ""),
+                                result.get("plato_url", ""),
+                            )
+
                             if is_infra_failure and attempt < max_retries:
                                 logger.warning(
                                     "    Session %s ended with status=%s, retrying…",
@@ -1426,17 +1444,28 @@ else:
                                 "    Failed to run testcase %s (attempt %d): %s",
                                 tc_id, attempt, e,
                             )
+                            err_result = {
+                                "testcase_id": tc_id,
+                                "task_name": task_name,
+                                "session_num": session_num,
+                                "attempt": attempt,
+                                "status": "error",
+                                "outcome": "ERROR",
+                                "error": str(e),
+                                "skill_name": vs.skill_name,
+                                "slug": vs.slug,
+                            }
+                            attempts_for_item.append(err_result)
                             if attempt >= max_retries:
-                                vs.task_results.append(
-                                    {
-                                        "testcase_id": tc_id,
-                                        "task_name": task_name,
-                                        "session_num": session_num,
-                                        "attempt": attempt,
-                                        "status": "error",
-                                        "error": str(e),
-                                    }
-                                )
+                                vs.task_results.append(err_result)
+
+                    all_attempt_records.extend(attempts_for_item)
+                    completed_count += 1
+                    if completed_count % 5 == 0 or completed_count == total_work:
+                        logger.info(
+                            "RUN progress: %d/%d work items done",
+                            completed_count, total_work,
+                        )
 
             await asyncio.gather(
                 *[
@@ -1448,6 +1477,111 @@ else:
         for vs in self.state.variants:
             if vs.testcase_ids:
                 vs.stage = "evaluated"
+
+        self._log_run_summary(all_attempt_records)
+
+    def _log_run_summary(self, all_attempts: list[dict]) -> None:
+        """Log a structured summary of all RUN phase sessions and attempts."""
+        total_attempts = len(all_attempts)
+        retried_attempts = [a for a in all_attempts if a.get("attempt", 1) > 1]
+        total_retries = len(retried_attempts)
+
+        final_results: list[dict] = []
+        for vs in self.state.variants:
+            final_results.extend(vs.task_results)
+
+        n_pass = sum(1 for r in final_results if r.get("outcome") == "PASS")
+        n_fail = sum(1 for r in final_results if r.get("outcome") == "FAIL")
+        n_error = sum(1 for r in final_results if r.get("outcome") == "ERROR")
+        n_total = len(final_results)
+
+        logger.info("=" * 70)
+        logger.info("RUN PHASE SUMMARY")
+        logger.info("=" * 70)
+        logger.info(
+            "Total sessions launched: %d  (retries: %d)",
+            total_attempts, total_retries,
+        )
+        logger.info(
+            "Final outcomes: %d PASS | %d FAIL | %d ERROR  (of %d work items)",
+            n_pass, n_fail, n_error, n_total,
+        )
+        if n_total:
+            effective_total = n_pass + n_fail
+            if effective_total > 0:
+                logger.info(
+                    "Pass rate (excluding errors): %d/%d = %.1f%%",
+                    n_pass, effective_total,
+                    n_pass / effective_total * 100,
+                )
+            else:
+                logger.info("Pass rate: N/A (no completed sessions)")
+        logger.info("-" * 70)
+
+        attempts_by_skill: dict[str, list[dict]] = {}
+        for a in all_attempts:
+            skill = a.get("skill_name", "unknown")
+            attempts_by_skill.setdefault(skill, []).append(a)
+
+        for vs in self.state.variants:
+            skill_name = vs.skill_name
+            slug = vs.slug
+            skill_attempts = attempts_by_skill.get(skill_name, [])
+            skill_finals = [r for r in vs.task_results]
+
+            s_pass = sum(1 for r in skill_finals if r.get("outcome") == "PASS")
+            s_fail = sum(1 for r in skill_finals if r.get("outcome") == "FAIL")
+            s_error = sum(1 for r in skill_finals if r.get("outcome") == "ERROR")
+            s_retries = sum(1 for a in skill_attempts if a.get("attempt", 1) > 1)
+
+            logger.info(
+                "SKILL: %s  [%s]", skill_name, slug,
+            )
+            logger.info(
+                "  Results: %d PASS | %d FAIL | %d ERROR | %d retries",
+                s_pass, s_fail, s_error, s_retries,
+            )
+
+            tc_attempts: dict[str, list[dict]] = {}
+            for a in skill_attempts:
+                tc_key = a.get("testcase_id", "?")
+                tc_attempts.setdefault(tc_key, []).append(a)
+
+            for tc_id, tc_att_list in tc_attempts.items():
+                task_name = tc_att_list[0].get("task_name", "?")
+                final_for_tc = [
+                    r for r in skill_finals if r.get("testcase_id") == tc_id
+                ]
+                final = final_for_tc[0] if final_for_tc else None
+                outcome_str = final.get("outcome", "?") if final else "ALL_ERRORED"
+
+                logger.info(
+                    "  TESTCASE: %s  (%s)  → %s",
+                    task_name, tc_id, outcome_str,
+                )
+
+                for att in sorted(tc_att_list, key=lambda x: x.get("attempt", 1)):
+                    attempt_num = att.get("attempt", 1)
+                    is_final = (
+                        final is not None
+                        and att.get("chronos_id") == final.get("chronos_id")
+                        and att.get("chronos_id") is not None
+                    )
+                    marker = " (final)" if is_final else " (retried)"
+                    chronos_url = att.get("chronos_url", "")
+                    plato_url = att.get("plato_url", "")
+                    logger.info(
+                        "    attempt %d%s | %s | score=%.2f | chronos=%s | plato=%s",
+                        attempt_num,
+                        marker,
+                        att.get("outcome", att.get("status", "?")),
+                        att.get("score", 0),
+                        chronos_url,
+                        plato_url,
+                    )
+            logger.info("-" * 70)
+
+        logger.info("=" * 70)
 
     async def _launch_and_wait(
         self,
@@ -1663,6 +1797,10 @@ else:
             return
 
         final_results = []
+        global_passed = 0
+        global_failed = 0
+        global_errored = 0
+
         for vs in self.state.variants:
             skill_result = {
                 "skill_name": vs.skill_name,
@@ -1674,22 +1812,33 @@ else:
             }
 
             passed = 0
-            total = 0
+            failed = 0
+            errored = 0
             for tr in vs.task_results:
-                total += 1
+                outcome = tr.get("outcome", "")
+                is_error = outcome == "ERROR" or tr.get("status") in (
+                    "failed", "error", "cancelled",
+                )
                 is_pass = tr.get("score", 0) > 0
-                if is_pass:
+
+                if is_error:
+                    errored += 1
+                elif is_pass:
                     passed += 1
+                else:
+                    failed += 1
 
                 task_entry: dict = {
                     "task_name": tr.get("task_name", ""),
                     "testcase_id": tr.get("testcase_id", ""),
                     "status": tr.get("status", ""),
+                    "outcome": "PASS" if is_pass else ("ERROR" if is_error else "FAIL"),
                     "score": tr.get("score", 0),
                     "pass": is_pass,
                     "chronos_url": tr.get("chronos_url", ""),
                     "plato_url": tr.get("plato_url", ""),
                     "error": tr.get("error"),
+                    "attempt": tr.get("attempt", 1),
                 }
 
                 scoring_details = tr.get("scoring_details")
@@ -1698,31 +1847,61 @@ else:
 
                 skill_result["tasks"].append(task_entry)
 
-            skill_result["pass_rate"] = f"{passed}/{total}" if total else "0/0"
-            skill_result["pass_pct"] = round(passed / total * 100, 1) if total else 0
+            completed = passed + failed
+            skill_result["passed"] = passed
+            skill_result["failed"] = failed
+            skill_result["errored"] = errored
+            skill_result["pass_rate"] = f"{passed}/{completed}" if completed else "0/0"
+            skill_result["pass_pct"] = (
+                round(passed / completed * 100, 1) if completed else 0
+            )
             final_results.append(skill_result)
+
+            global_passed += passed
+            global_failed += failed
+            global_errored += errored
 
         (config.output / "final_results.json").write_text(
             json.dumps(final_results, indent=2)
         )
 
-        logger.info("=" * 60)
+        global_completed = global_passed + global_failed
+        global_pct = (
+            round(global_passed / global_completed * 100, 1)
+            if global_completed
+            else 0
+        )
+
+        logger.info("=" * 70)
         logger.info("FINAL RESULTS")
-        logger.info("=" * 60)
+        logger.info("=" * 70)
+        logger.info(
+            "Overall: %d PASS | %d FAIL | %d ERROR",
+            global_passed, global_failed, global_errored,
+        )
+        logger.info(
+            "Pass rate (excluding errors): %d/%d = %.1f%%",
+            global_passed, global_completed, global_pct,
+        )
+        logger.info("-" * 70)
+
         for r in final_results:
             logger.info(
-                "  %s: %s (%.1f%%)",
+                "SKILL: %s — %s (%.1f%%)  [%d pass, %d fail, %d error]",
                 r["skill_name"],
                 r["pass_rate"],
                 r["pass_pct"],
+                r["passed"],
+                r["failed"],
+                r["errored"],
             )
             for t in r["tasks"]:
-                pflag = "PASS" if t["pass"] else "FAIL"
                 logger.info(
-                    "    [%s] %s | score=%.2f | chronos=%s | plato=%s",
-                    pflag,
+                    "  [%s] %s | score=%.2f | attempt=%d | chronos=%s | plato=%s",
+                    t["outcome"],
                     t["task_name"],
                     t["score"],
+                    t.get("attempt", 1),
                     t.get("chronos_url", ""),
                     t.get("plato_url", ""),
                 )
@@ -1737,6 +1916,7 @@ else:
                             res.get("score", 0),
                             res.get("reason", "n/a"),
                         )
+        logger.info("=" * 70)
 
     # ------------------------------------------------------------------
     # Helpers
@@ -1774,15 +1954,31 @@ else:
         for vs in self.state.variants:
             status = f"[{vs.stage}]"
             tasks = f" ({vs.task_count} tasks)" if vs.task_count else ""
-            passed = sum(1 for t in vs.task_results if t.get("score", 0) > 0)
-            total = len(vs.task_results)
-            rate = f" pass_rate={passed}/{total}" if total else ""
+            passed = sum(
+                1 for t in vs.task_results
+                if t.get("score", 0) > 0
+            )
+            errored = sum(
+                1 for t in vs.task_results
+                if t.get("outcome") == "ERROR"
+                or t.get("status") in ("failed", "error", "cancelled")
+            )
+            completed = len(vs.task_results) - errored
+            rate = (
+                f" pass_rate={passed}/{completed}"
+                if completed
+                else " pass_rate=0/0"
+            )
+            if errored:
+                rate += f" ({errored} errored out)"
             err = f" ERROR: {vs.error}" if vs.error else ""
             lines.append(f"  {status} {vs.skill_name}{tasks}{rate}{err}")
             for tr in vs.task_results:
-                pflag = "PASS" if tr.get("score", 0) > 0 else "FAIL"
+                outcome = tr.get("outcome", "FAIL")
+                if not outcome:
+                    outcome = "PASS" if tr.get("score", 0) > 0 else "FAIL"
                 lines.append(
-                    f"    [{pflag}] {tr.get('task_name', '')} "
+                    f"    [{outcome}] {tr.get('task_name', '')} "
                     f"chronos={tr.get('chronos_url', '')} "
                     f"plato={tr.get('plato_url', '')}"
                 )
