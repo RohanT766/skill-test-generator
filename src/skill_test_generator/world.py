@@ -1160,27 +1160,12 @@ else:
                         pass
 
     def _derive_wait_selector(self, slug: str) -> str:
-        """Build a CSS selector for snapshot login flow based on variant spec components."""
-        spec = next((s for s in self._variant_specs if s.get("slug") == slug), {})
-        all_components: set[str] = set()
-        for page in spec.get("pages", []):
-            for comp in page.get("key_components", []):
-                all_components.add(comp.lower())
+        """CSS selector for the login flow to confirm the app rendered.
 
-        selectors: list[str] = []
-        if "table" in all_components:
-            selectors.append("tbody tr")
-        if "card" in all_components:
-            selectors.append("[class*=card]")
-        if "sidebar" in all_components:
-            selectors.append("[class*=sidebar], nav")
-        if "accordion" in all_components:
-            selectors.append("[data-state]")
-
-        if not selectors:
-            selectors = ["main", "[role='main']", "h1", "h2"]
-
-        return ", ".join(selectors)
+        The template layout.tsx always wraps children in <main id="app-root">,
+        so this is guaranteed to appear once the page hydrates.
+        """
+        return "#app-root"
 
     def _tar_variant(self, variant_dir: Path, name: str) -> bytes:
         """Create a tarball of the variant directory, excluding heavy dirs.
