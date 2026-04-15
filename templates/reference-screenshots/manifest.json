@@ -1680,25 +1680,6 @@
     "description": "This is a Discord server interface for a gaming community called 'Secret Clan' focused on the game Rust. The screenshot shows a chat channel with players discussing raiding strategies and sharing game screenshots, with various voice channels and text channels visible in the sidebar, along with a member list showing online players and their roles."
   },
   {
-    "filename": "ref_223.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_7c4cf4b82fab.jpg",
-    "content_type": "messaging interface",
-    "industry": "Social Media",
-    "ui_patterns": [
-      "sidebar navigation",
-      "channel list",
-      "user list with avatars",
-      "threaded messaging",
-      "search bar",
-      "dropdown menu",
-      "notification indicators",
-      "user status badges",
-      "context menu"
-    ],
-    "description": "This is a Discord server interface for an Animal Crossing: New Horizons gaming community. The screenshot shows the main chat interface with various channels like server-info, rules, and specialized trading channels for in-game items. A context menu is open showing save/capture options, and there's a notification about claiming an account."
-  },
-  {
     "filename": "ref_224.jpg",
     "site": "ddg_search",
     "original_name": "ddg_b92729dc5b4f.jpg",
@@ -4834,25 +4815,6 @@
     "description": "This is Facebook Ads Manager, a digital advertising platform interface showing a campaigns data table. The screenshot displays a list of advertising campaigns with their delivery status, performance metrics like reach, impressions, cost per result, budget, and amount spent. Users can manage, edit, and monitor their Facebook advertising campaigns from this dashboard view."
   },
   {
-    "filename": "ref_513.png",
-    "site": "ddg_search",
-    "original_name": "ddg_1ab06f9144dc.png",
-    "content_type": "editor",
-    "industry": "Web Development",
-    "ui_patterns": [
-      "Left sidebar navigation",
-      "Tabbed interface",
-      "Slider controls",
-      "Image canvas workspace",
-      "Property panels",
-      "Effect thumbnails",
-      "Mobile preview",
-      "Adjustment sliders",
-      "Modal overlay"
-    ],
-    "description": "This is Canva's photo editing interface, showing an image editor with adjustment tools. The left panel contains various editing controls like brightness, contrast, highlights, and shadows with slider adjustments. The main canvas shows a lifestyle photo being edited, and there's a mobile preview on the right showing effects options including Duotone, Auto Focus, and Blur filters."
-  },
-  {
     "filename": "ref_514.jpg",
     "site": "ddg_search",
     "original_name": "ddg_bc8ac0c5c974.jpg",
@@ -7144,26 +7106,6 @@
       "notification badge"
     ],
     "description": "This is a sales analytics dashboard showing sales and win rate data by team member. The interface displays key metrics like $335K total value and 33.33% total win rate, along with a horizontal bar chart comparing performance across team members (Jesse Price, Jon Lee, Veronica Lutz, No Assignee) and a detailed data table below showing various sales metrics."
-  },
-  {
-    "filename": "ref_744.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_3a8ae94a33cb.jpg",
-    "content_type": "kanban board",
-    "industry": "CRM",
-    "ui_patterns": [
-      "kanban columns",
-      "deal cards",
-      "profile modal overlay",
-      "navigation sidebar",
-      "search bar",
-      "action buttons",
-      "stage progression",
-      "value metrics",
-      "data table",
-      "contact profile"
-    ],
-    "description": "This is a CRM sales pipeline interface showing deal stages in a kanban-style layout with columns for Qualified, First Meeting, Demo Scheduled, and Contract Send. A LinkedIn profile modal for Alice Ocean (Sales Executive France) is overlaid on top, showing connection options and deal details worth 4,000\u20ac. The interface displays various deals with their values and stages in the sales process."
   },
   {
     "filename": "ref_746.png",
@@ -9932,26 +9874,6 @@
     "description": "This is a social media management platform interface showing a dashboard for creating and managing social media content. The left sidebar contains content creation options and templates, while the main area displays social media streams including posts and mentions. The interface appears to be for managing multiple social media accounts and analyzing engagement metrics."
   },
   {
-    "filename": "ref_1080.png",
-    "site": "ddg_search",
-    "original_name": "ddg_6e709b5f65db.png",
-    "content_type": "dashboard",
-    "industry": "Social Media",
-    "ui_patterns": [
-      "sidebar navigation",
-      "multi-column layout",
-      "metric cards with numbers",
-      "social media post cards",
-      "engagement statistics",
-      "video player embed",
-      "search interface",
-      "filter controls",
-      "tabbed interface",
-      "action buttons"
-    ],
-    "description": "This is a Hootsuite social media management dashboard showing multiple streams of social media content. The interface displays various social media posts, engagement metrics, and analytics across different platforms including Twitter. Users can monitor posts, mentions, tweets, and engagement statistics while managing multiple social media accounts from a unified dashboard."
-  },
-  {
     "filename": "ref_1081.png",
     "site": "ddg_search",
     "original_name": "ddg_352dc83a274e.png",
@@ -10045,44 +9967,6 @@
       "performance summary section"
     ],
     "description": "This is a social media analytics dashboard for Sprout Coffee Co., showing profile performance metrics across multiple social media platforms. The interface displays key metrics like impressions, engagements, and post link clicks, along with an audience growth chart tracking daily gains across Twitter, Facebook, Instagram, and LinkedIn for December 2021."
-  },
-  {
-    "filename": "ref_1086.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_4f34c731f275.jpg",
-    "content_type": "dashboard",
-    "industry": "Social Media",
-    "ui_patterns": [
-      "sidebar navigation",
-      "tab navigation",
-      "donut chart",
-      "line chart",
-      "metric cards",
-      "message feed",
-      "social media post preview",
-      "engagement metrics",
-      "sentiment visualization",
-      "alert notifications"
-    ],
-    "description": "This is a social media analytics dashboard for Sprout Coffee, showing sentiment analysis and performance metrics for their social media content. The interface displays sentiment trends with charts, a messages feed showing recent social interactions, and includes a mobile preview of Instagram posts featuring matcha drinks."
-  },
-  {
-    "filename": "ref_1089.png",
-    "site": "ddg_search",
-    "original_name": "ddg_6a4f34b48ab7.png",
-    "content_type": "dashboard",
-    "industry": "Digital Marketing",
-    "ui_patterns": [
-      "top navigation tabs",
-      "weekly calendar grid",
-      "time slots with hourly intervals",
-      "scheduled content cards with timestamps",
-      "social media platform icons",
-      "user avatar in header",
-      "sidebar with social media accounts",
-      "queue management interface"
-    ],
-    "description": "This is a social media scheduling and publishing platform showing a weekly calendar view for May 24-30. The interface displays scheduled posts across different social media platforms (Instagram, Facebook, Twitter, Pinterest, LinkedIn) with specific time slots, and includes a sidebar showing connected social media accounts with profile images."
   },
   {
     "filename": "ref_1094.png",
@@ -13086,26 +12970,6 @@
       "Action buttons (DEPOSIT, WITHDRAW)"
     ],
     "description": "This is a cryptocurrency trading platform dashboard showing the BTC-USD trading pair. The interface displays a comprehensive trading view with wallet balances, order book data, price charts with candlestick patterns, trade history, and order placement forms. The platform appears to be designed for active cryptocurrency trading with real-time market data and multiple trading tools integrated into a single dashboard view."
-  },
-  {
-    "filename": "ref_1503.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_2cd99adf6e65.jpg",
-    "content_type": "dashboard",
-    "industry": "Financial Services",
-    "ui_patterns": [
-      "top navigation bar",
-      "portfolio value card",
-      "line chart",
-      "data table with watchlist",
-      "mobile modal overlay",
-      "cryptocurrency icons",
-      "percentage change indicators",
-      "time period selector",
-      "trade button",
-      "wallet balance display"
-    ],
-    "description": "This is Coinbase, a cryptocurrency trading platform. The screenshot shows the main dashboard with portfolio value tracking, a price chart over time, and a watchlist table showing various cryptocurrencies like Bitcoin, Ethereum, XRP, and Bitcoin Cash with their current prices and market performance. There's also a mobile view overlay showing Bitcoin details."
   },
   {
     "filename": "ref_1504.png",
