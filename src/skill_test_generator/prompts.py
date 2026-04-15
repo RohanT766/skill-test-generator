@@ -248,6 +248,15 @@ primary guide for content layout.
 - The spec's color_palette describes the full color scheme. Use it for \
 chrome, backgrounds, accents, buttons, badges, status indicators, hover \
 states, and text colors throughout the app.
+- CRITICAL — CONSISTENT BACKGROUNDS: Set the base page background on \
+<html> or <body> in app/layout.tsx (e.g. className="bg-slate-950 \
+text-white min-h-screen") so the color covers the ENTIRE viewport and \
+scrollable area. NEVER rely on a fixed-height wrapper div for the \
+background — that creates visible white gaps when the user scrolls past \
+the initial viewport. Every child container and scrollable region must \
+either inherit the background or explicitly set its own matching one. \
+Tables, cards, dialogs, and dropdowns must all respect the palette — \
+no element should flash white against a dark theme or vice-versa.
 - If the spec includes a "clone_target", use your knowledge of that product \
 to match its exact display conventions.
 - Edit forms using Dialog or Sheet with labeled inputs and toast feedback (sonner).
