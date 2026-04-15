@@ -170,7 +170,11 @@ class SkillTestGeneratorConfig(RunConfig):
             "When set, skips INGEST/DESIGN/CODEGEN and runs RUN+EVALUATE."
         ),
     )
-    concurrency: int = Field(default=4, ge=1)
+    design_concurrency: int = Field(
+        default=10,
+        ge=1,
+        description="Max concurrent LLM API calls during the DESIGN stage.",
+    )
 
     template_name: str = Field(default="sohan")
     sim_name_prefix: str = Field(default="skill-test")
@@ -180,7 +184,7 @@ class SkillTestGeneratorConfig(RunConfig):
         default=4000,
         description="Port the claude-code agent uses to run the dev server for verification.",
     )
-    max_parallel_pipelines: int = Field(
+    vm_concurrency: int = Field(
         default=10,
         ge=1,
         description=(

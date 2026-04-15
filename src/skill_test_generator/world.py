@@ -314,7 +314,7 @@ class SkillTestGeneratorWorld(
             skills=self._skills,
             anthropic_api_key=config.anthropic_api_key,
             model=config.design_model,
-            concurrency=config.concurrency,
+            concurrency=config.design_concurrency,
             specs_per_skill=config.specs_per_skill,
         )
         (config.output / "variant_specs.json").write_text(
@@ -359,8 +359,8 @@ class SkillTestGeneratorWorld(
         Replaces the old sequential CODEGEN → TASKS → PUBLISH stages.
 
         Two independent semaphores gate concurrency:
-          • llm_sem  — concurrent LLM API calls  (config.concurrency)
-          • vm_sem   — concurrent pipeline VMs    (config.max_parallel_pipelines)
+          • llm_sem  — concurrent LLM API calls  (config.design_concurrency)
+          • vm_sem   — concurrent pipeline VMs    (config.vm_concurrency)
         """
         import anthropic as _anthropic
 
@@ -389,15 +389,15 @@ class SkillTestGeneratorWorld(
         variants_dir.mkdir(parents=True, exist_ok=True)
 
         llm_client = _anthropic.AsyncAnthropic(api_key=config.anthropic_api_key)
-        llm_sem = asyncio.Semaphore(config.concurrency)
-        vm_sem = asyncio.Semaphore(config.max_parallel_pipelines)
+        llm_sem = asyncio.Semaphore(config.design_concurrency)
+        vm_sem = asyncio.Semaphore(config.vm_concurrency)
 
         eligible = [vs for vs in self.state.variants if vs.stage == "designed"]
         logger.info(
             "Parallel pipelines: %d variants  (llm_concurrency=%d, max_vms=%d)",
             len(eligible),
-            config.concurrency,
-            config.max_parallel_pipelines,
+            config.design_concurrency,
+            config.vm_concurrency,
         )
 
         async def _single_pipeline(vs: VariantStatus) -> None:

@@ -11,7 +11,7 @@
   "specs_per_skill": 1,
 
   "stage": null,
-  "concurrency": 4,
+  "design_concurrency": 10,
 
   "template_name": "sohan",
   "sim_name_prefix": "skill-test",

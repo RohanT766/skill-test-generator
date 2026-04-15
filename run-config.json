@@ -7,7 +7,7 @@
   "template_name": "sohan",
   "sim_name_prefix": "skill-test",
   "specs_per_skill": 2,
-  "concurrency": 3,
+  "design_concurrency": 10,
   "max_skills": 3,
   "codegen_verify_port": 4000,
   "record_sessions": true,
