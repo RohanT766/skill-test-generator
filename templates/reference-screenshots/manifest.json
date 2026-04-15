@@ -38,39 +38,6 @@
     "description": "This is Booking.com's flight search interface featuring a prominent search form with options for round-trip, one-way, and multi-city flights. The page includes input fields for departure/arrival locations, travel dates, and passenger count, along with flight type preferences. Below the main search area, there's an offers section highlighting exclusive deals and partner airlines, with the overall design emphasizing ease of flight comparison and booking."
   },
   {
-    "filename": "ref_006.png",
-    "site": "booking",
-    "original_name": "booking_006.png",
-    "content_type": "listing page",
-    "industry": "Travel",
-    "ui_patterns": [
-      "article cards",
-      "pagination",
-      "author bylines",
-      "featured images",
-      "content grid",
-      "editorial team section"
-    ],
-    "description": "This is a travel blog or content section on Booking.com showing articles written by Ben Taylor. The page displays travel-related articles with featured images, publication dates, and brief descriptions. Articles focus on vacation destinations in the USA, including romantic getaways and dog-friendly locations. The layout includes pagination controls and an editorial team section at the bottom."
-  },
-  {
-    "filename": "ref_007.png",
-    "site": "booking",
-    "original_name": "booking_007.png",
-    "content_type": "homepage",
-    "industry": "Travel",
-    "ui_patterns": [
-      "recent searches",
-      "product cards",
-      "horizontal carousel",
-      "hero sections",
-      "ratings and reviews",
-      "image thumbnails",
-      "call-to-action buttons"
-    ],
-    "description": "This is a hotel booking website homepage displaying the user's recent search history for destinations like Paris, Hell's Kitchen, and New York State. The main content area features a section for last-minute hotel deals near the user's location, showcasing various hotels with images, names, ratings, and brief descriptions. The layout uses a card-based design with hotel images and key information to facilitate easy browsing and booking decisions."
-  },
-  {
     "filename": "ref_008.png",
     "site": "booking",
     "original_name": "booking_008.png",
@@ -104,23 +71,6 @@
       "destination suggestions"
     ],
     "description": "This is a hotel booking search page on Booking.com specifically for hotels near San Francisco International Airport. The page features a search form with location autocomplete showing New York-related suggestions, date selection fields, and guest/room options. The interface includes navigation tabs for different travel services like flights, car rental, and attractions, along with a prominent search functionality for finding accommodations."
-  },
-  {
-    "filename": "ref_010.png",
-    "site": "booking",
-    "original_name": "booking_010.png",
-    "content_type": "form",
-    "industry": "Travel",
-    "ui_patterns": [
-      "form sections",
-      "dropdown selectors",
-      "checkboxes",
-      "conditional options",
-      "step-by-step wizard",
-      "progress indicators",
-      "policy disclosures"
-    ],
-    "description": "This is a hotel booking form page on Booking.com where users can specify additional requirements for their reservation. The form includes sections for estimated arrival time selection and crib/extra bed requests for an Executive Twin room. It displays clear policy information about extra bed availability and charges, with options to add a free crib or extra bed with age selection. The page includes navigation buttons to proceed to final booking details."
   },
   {
     "filename": "ref_011.png",
@@ -173,22 +123,6 @@
     "description": "This is Booking.com's apartment search page featuring a prominent search form overlaid on a background image of apartment interiors. The page includes navigation tabs for different accommodation types, location and date input fields, guest selection options, and a section for recent searches. The interface uses a blue color scheme with clear call-to-action buttons and maintains the typical booking platform layout with user account access in the top right corner."
   },
   {
-    "filename": "ref_016.png",
-    "site": "booking",
-    "original_name": "booking_016.png",
-    "content_type": "landing page",
-    "industry": "Travel",
-    "ui_patterns": [
-      "hero section",
-      "promotional banners",
-      "feature cards",
-      "call-to-action buttons",
-      "benefits grid",
-      "rewards program promotion"
-    ],
-    "description": "This is a travel booking website's landing page featuring flight search functionality. The page prominently displays a credit card rewards promotion for earning travel credits on flights, followed by a section showcasing various travel benefits like discounts on stays and rental cars. The bottom section highlights key selling points including wide selection, transparent pricing, and flexible booking options with accompanying icons and descriptive text."
-  },
-  {
     "filename": "ref_017.png",
     "site": "booking",
     "original_name": "booking_017.png",
@@ -205,25 +139,6 @@
       "user account indicator"
     ],
     "description": "This is Booking.com's flight search interface featuring a prominent search form for finding flights. The page includes options for round-trip, one-way, and multi-city trips, with fields for departure/arrival locations, travel dates, and passenger count. There's an important travel update notification about Middle East flight disruptions and longer wait times for customer service."
-  },
-  {
-    "filename": "ref_018.png",
-    "site": "booking",
-    "original_name": "booking_018.png",
-    "content_type": "search interface",
-    "industry": "Travel",
-    "ui_patterns": [
-      "search form",
-      "date picker",
-      "dropdown selector",
-      "card grid",
-      "promotional banner",
-      "image carousel",
-      "call-to-action button",
-      "price display",
-      "rating system"
-    ],
-    "description": "This is a travel booking website showing a search interface for New York vacations. The page features a prominent search form at the top with destination, date, and guest selection fields, followed by promotional content including vacation packages. Below are travel offer cards displaying flights from Los Angeles to New York and hotel accommodations with pricing, ratings, and imagery. The layout uses a card-based design to showcase different travel options with clear pricing and booking information."
   },
   {
     "filename": "ref_019.png",
@@ -261,36 +176,6 @@
     "description": "This is Costco's website homepage featuring their typical warehouse club retail layout. The page displays a prominent promotional banner for furniture, main navigation categories like Grocery, Pharmacy, and Photo, and a sidebar showing grocery subcategories. The layout includes delivery method options and promotional tiles highlighting different shopping features. The interface uses Costco's signature red and blue branding with a clean, organized structure typical of large retail websites."
   },
   {
-    "filename": "ref_021.png",
-    "site": "costco",
-    "original_name": "costco_021.png",
-    "content_type": "error page",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "error message",
-      "reference number display",
-      "minimal layout"
-    ],
-    "description": "This is an access denied error page that appears when a user attempts to visit a restricted Costco webpage for grocery and household items. The page displays a clear error message stating the user lacks permission to access the requested resource. It includes a reference number for troubleshooting purposes and follows a standard, minimal error page layout with basic text information."
-  },
-  {
-    "filename": "ref_023.png",
-    "site": "etsy",
-    "original_name": "etsy_023.png",
-    "content_type": "product grid",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "product cards",
-      "price display",
-      "image gallery",
-      "personalized recommendations",
-      "horizontal scroll",
-      "favoriting/wishlist",
-      "product thumbnails"
-    ],
-    "description": "This is an Etsy product browsing page showing a grid layout of handmade jewelry and accessories. The page displays product cards with images, titles, and pricing information, featuring items like pearl necklaces, bracelets, and evening bags. There's a 'Picks inspired by your shopping' section with personalized product recommendations displayed in a horizontal scrollable format."
-  },
-  {
     "filename": "ref_025.png",
     "site": "hubspot",
     "original_name": "hubspot_044.png",
@@ -305,23 +190,6 @@
       "property management interface"
     ],
     "description": "This is a property settings page within HubSpot's CRM platform, specifically showing company properties configuration. The interface allows users to manage, create, and configure data properties that collect information about companies in their database. The page features a comprehensive data table with filtering options, search functionality, and tabs for organizing different types of properties and settings. Users can view property details like name, group, creator, and usage, with options to create new properties and manage data quality monitoring."
-  },
-  {
-    "filename": "ref_026.jpg",
-    "site": "hubspot",
-    "original_name": "hubspot_045.jpg",
-    "content_type": "login page",
-    "industry": "CRM",
-    "ui_patterns": [
-      "authentication form",
-      "error message display",
-      "remember me checkbox",
-      "forgot password link",
-      "alternative sign-in options",
-      "call-to-action",
-      "branding placement"
-    ],
-    "description": "This is a HubSpot login page displaying an authentication expiration notice. The page features a centered login form with email and password fields, a 'Remember me' checkbox, and forgot password option. A prominent error message indicates the user's authentication has expired due to inactivity and they need to log in again to continue. The page includes HubSpot branding and offers alternative sign-in methods along with a demo request option at the bottom."
   },
   {
     "filename": "ref_027.png",
@@ -421,22 +289,6 @@
       "breadcrumb navigation"
     ],
     "description": "This is a user preferences settings page within HubSpot's CRM platform. The interface shows a two-level navigation structure with a sidebar containing grouped settings categories and a main content area with tabbed navigation for different preference types. The user is currently viewing their profile settings under the 'General' section, where they can edit personal information like name, profile image, and language preferences. The layout follows typical enterprise software patterns with clear visual hierarchy and organized information architecture."
-  },
-  {
-    "filename": "ref_034.png",
-    "site": "hubspot",
-    "original_name": "hubspot_053.png",
-    "content_type": "modal dialog",
-    "industry": "CRM",
-    "ui_patterns": [
-      "conditional logic",
-      "form controls",
-      "dropdown menus",
-      "live preview",
-      "property configuration",
-      "add/remove items"
-    ],
-    "description": "This is a property logic configuration modal for a CRM system, specifically for editing Deal object properties. The interface allows users to set up conditional logic where properties are shown or hidden based on values in other properties. It features a controlling property selector on the left (Deal Priority Level) with conditional operators and values, while the right side shows a live preview of how the form will appear to users when the conditions are met."
   },
   {
     "filename": "ref_035.png",
@@ -1590,68 +1442,6 @@
     "description": "This is a Stripe payment processing dashboard showing a transactions table in sandbox/testing mode. The interface displays payment records with details like amounts, status, currency, and customer information. A filter modal is currently open allowing users to filter transactions by status (pending, refunded, succeeded, etc.). The left sidebar provides navigation to various payment management features including balances, customers, and billing tools."
   },
   {
-    "filename": "ref_104.png",
-    "site": "walgreens",
-    "original_name": "walgreens_123.png",
-    "content_type": "homepage",
-    "industry": "Healthcare",
-    "ui_patterns": [
-      "promotional banners",
-      "product grid",
-      "percentage discounts",
-      "call-to-action buttons",
-      "seasonal promotions",
-      "brand merchandising"
-    ],
-    "description": "This is Walgreens' homepage featuring prominent Easter-themed promotional sections with discounts on seasonal items like candy, decorations, and gifts. The page displays multiple promotional banners offering 50% off deals and buy-one-get-one promotions across different product categories. Below the seasonal promotions is a Beauty Savings Event section highlighting cosmetics and personal care deals with rewards programs and percentage discounts."
-  },
-  {
-    "filename": "ref_105.png",
-    "site": "walgreens",
-    "original_name": "walgreens_124.png",
-    "content_type": "product grid",
-    "industry": "Healthcare",
-    "ui_patterns": [
-      "product carousel",
-      "coupon cards",
-      "promotional banners",
-      "grid layout",
-      "call-to-action buttons"
-    ],
-    "description": "This is a Walgreens pharmacy website homepage featuring a product showcase with health and beauty items displayed in a carousel format at the top. Below that is a promotional section offering up to $100 off with coupons, displaying manufacturer coupon offers in a grid layout. Each coupon card shows discount amounts ($3-$6 off 2 items) for brands like Garnier, L'Oreal Paris, Maybelline, and Dove with 'Clip' buttons to activate the offers. The layout emphasizes deals and promotions to encourage customer engagement and purchases."
-  },
-  {
-    "filename": "ref_106.png",
-    "site": "walgreens",
-    "original_name": "walgreens_125.png",
-    "content_type": "homepage",
-    "industry": "Healthcare",
-    "ui_patterns": [
-      "promotional banner",
-      "product grid",
-      "coupon display",
-      "category tiles",
-      "seasonal campaigns"
-    ],
-    "description": "This is the Walgreens homepage featuring a spring-themed promotional layout. The page displays coupon clips at the top, followed by an M&M's promotional banner offering buy 2 get 1 free deals. The main content area showcases 'Get prepped for spring' with four product category tiles featuring different health and wellness promotions including allergy relief, P&G oral care rewards, spring cleaning products, and vitamins. Each tile includes pricing, discount information, and product imagery with decorative spring flower elements."
-  },
-  {
-    "filename": "ref_107.png",
-    "site": "walgreens",
-    "original_name": "walgreens_126.png",
-    "content_type": "homepage",
-    "industry": "Healthcare",
-    "ui_patterns": [
-      "hero section",
-      "card grid",
-      "service tiles",
-      "promotional banners",
-      "navigation bar",
-      "call-to-action buttons"
-    ],
-    "description": "This is Walgreens' main homepage featuring a health-focused design with the tagline 'Because your health matters'. The page displays four main service cards covering vaccination protection, flu/COVID-19 testing, weight-loss medication, and colon cancer screening. Below are additional service tiles for prescription management, refills, delivery, and telehealth consultations. The layout uses a clean card-based design with prominent imagery and clear calls-to-action for various pharmacy and healthcare services."
-  },
-  {
     "filename": "ref_108.png",
     "site": "walgreens",
     "original_name": "walgreens_127.png",
@@ -1666,38 +1456,6 @@
       "call-to-action buttons"
     ],
     "description": "This is the Walgreens pharmacy homepage featuring quick access buttons for prescription services like checking Rx status, requesting refills, and same-day delivery. The main content showcases graduation-themed promotional offers with 60% off various photo products including prints, cards, and custom frames. The layout uses a grid of promotional cards with product images and discount information to drive engagement with their photo services."
-  },
-  {
-    "filename": "ref_109.png",
-    "site": "walgreens",
-    "original_name": "walgreens_128.png",
-    "content_type": "homepage",
-    "industry": "Healthcare",
-    "ui_patterns": [
-      "promotional banners",
-      "product carousel",
-      "deal cards",
-      "grid layout",
-      "reward badges",
-      "navigation tabs"
-    ],
-    "description": "This is the Walgreens pharmacy website homepage featuring weekly deals and promotional offers. The page displays a 'Deals of the Week' section with product cards showing special pricing on snacks, storage bags, and beverages in a horizontal carousel layout. Below that is an 'Offers just for you' section displaying cash rewards in circular badge format, with various dollar amounts ($5, $10, $4, $15) for personalized deals that expire in 3 days."
-  },
-  {
-    "filename": "ref_110.png",
-    "site": "walgreens",
-    "original_name": "walgreens_129.png",
-    "content_type": "homepage",
-    "industry": "Healthcare",
-    "ui_patterns": [
-      "promotional banners",
-      "carousel/slider",
-      "reward cards",
-      "call-to-action buttons",
-      "grid layout",
-      "navigation tabs"
-    ],
-    "description": "This is the Walgreens homepage featuring a carousel of promotional offers and cash rewards deals. The main content area displays multiple reward offers in a card-based layout, each with clip buttons for saving deals. The page includes navigation elements and promotional content showcasing various cash back incentives for different product categories. Below the main carousel is an 'Explore more' section with additional promotional content and services."
   },
   {
     "filename": "ref_111.png",
@@ -3042,26 +2800,6 @@
       "dropdown menu"
     ],
     "description": "This is the People Home page for Acme Inc., which appears to be a company directory or HR platform. The page features a plant logo, an inspirational quote from Marshall McLuhan about tools shaping us, and includes contact information and links to company resources. The left sidebar shows an account switcher with multiple organizations and workspaces available to the user."
-  },
-  {
-    "filename": "ref_196.png",
-    "site": "ddg_search",
-    "original_name": "ddg_c562f381801e.png",
-    "content_type": "homepage",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "personalized greeting",
-      "recently visited items grid",
-      "document cards with timestamps",
-      "task management section",
-      "expandable task lists",
-      "featured templates gallery",
-      "template preview thumbnails",
-      "dark theme interface",
-      "sidebar navigation",
-      "user avatar indicators"
-    ],
-    "description": "This appears to be the homepage of Notion, a productivity and collaboration platform. The interface shows a personalized welcome message, recently visited documents and tasks, and a featured templates section including options like Life Wiki, Journal, To-do list, and Simple Business templates. The dark-themed interface provides quick access to the user's recent work and popular template options to get started."
   },
   {
     "filename": "ref_197.png",
@@ -4527,24 +4265,6 @@
     "description": "This is Amazon Seller Central, a platform for merchants to manage their Amazon marketplace presence. The screenshot shows the product catalog search interface where sellers can find existing products in Amazon's catalog to begin adding their inventory. The page includes a search form for product lookup by various identifiers and options to add new products, upload bulk product files, or learn about listing products."
   },
   {
-    "filename": "ref_301.png",
-    "site": "ddg_search",
-    "original_name": "ddg_1bce4806adb3.png",
-    "content_type": "form wizard",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "progress indicator",
-      "step-by-step navigation",
-      "text input field",
-      "validation feedback",
-      "character limit indicator",
-      "help text",
-      "primary action button",
-      "inline validation messages"
-    ],
-    "description": "This is Etsy's shop setup wizard, specifically the step for naming a new shop. The interface shows a multi-step process with a progress indicator at the top, and includes a text input field with real-time validation feedback and character requirements. Users can enter their shop name and receive immediate feedback on availability and naming guidelines."
-  },
-  {
     "filename": "ref_302.jpg",
     "site": "ddg_search",
     "original_name": "ddg_6f5107c52718.jpg",
@@ -4783,26 +4503,6 @@
     "description": "This is a Porter analytics dashboard showing website performance metrics for April 2021. The interface displays key metrics like revenue ($123,965.26), pageviews (334,987), and users (62,708) with corresponding charts, alongside detailed breakdowns by product, page performance, traffic sources, and audience demographics including geographic and device distribution."
   },
   {
-    "filename": "ref_318.png",
-    "site": "ddg_search",
-    "original_name": "ddg_fd981ebc0ab2.png",
-    "content_type": "dashboard",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "KPI cards with metrics",
-      "Line chart with trend comparison",
-      "Real-time activity widget",
-      "Bar chart visualization",
-      "Geographic data table",
-      "World map visualization",
-      "Recently accessed items carousel",
-      "Suggested reports grid",
-      "Traffic source breakdown table",
-      "Dropdown filters and selectors"
-    ],
-    "description": "This is a Google Analytics dashboard showing website performance metrics and user behavior data. The interface displays key performance indicators like users, sessions, conversions, and bounce rate over time, along with real-time user activity, geographic distribution, and traffic source analysis. The dashboard includes various data visualization widgets and quick access to recent reports and analytics tools."
-  },
-  {
     "filename": "ref_322.png",
     "site": "ddg_search",
     "original_name": "ddg_5d514d991ce3.png",
@@ -4900,24 +4600,6 @@
     "description": "This is Amplitude's analytics platform showing a feature adoption dashboard for Kyle Povar. The interface displays multiple bar charts analyzing the adoption of different features by plan type (Enterprise, Business, Free) across various user actions like Send Message, Search Contacts, and React with Emoji over the last 30 days."
   },
   {
-    "filename": "ref_330.png",
-    "site": "ddg_search",
-    "original_name": "ddg_ea71759dadaf.png",
-    "content_type": "dashboard",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "filter controls",
-      "time range selector",
-      "metric cards",
-      "line charts",
-      "dashboard grid layout",
-      "breadcrumb navigation",
-      "date range filters",
-      "metric visualization panels"
-    ],
-    "description": "This is an analytics dashboard showing various user engagement metrics including retention rates, active user percentages, event segmentation, and contact information. The dashboard displays multiple line charts tracking different metrics over time periods, with filtering options for daily, weekly, and monthly views, and appears to be focused on behavioral analytics and user tracking."
-  },
-  {
     "filename": "ref_331.png",
     "site": "ddg_search",
     "original_name": "ddg_ea7c4dd671bc.png",
@@ -4975,26 +4657,6 @@
       "Tabbed interface"
     ],
     "description": "This is a business intelligence dashboard showing sales analytics across multiple dimensions including category sales, sales over time, state sales, and city sales. The interface appears to be a data visualization tool like Tableau, displaying various chart types including bar charts, line graphs, and geographic maps with an active context menu for chart customization options."
-  },
-  {
-    "filename": "ref_335.png",
-    "site": "ddg_search",
-    "original_name": "ddg_242ca3414da0.png",
-    "content_type": "dashboard",
-    "industry": "Digital Marketing",
-    "ui_patterns": [
-      "metric cards",
-      "horizontal bar charts",
-      "timeline chart",
-      "data tables",
-      "filter dropdowns",
-      "date range selector",
-      "navigation breadcrumbs",
-      "percentage breakdown visualizations",
-      "activity type buttons",
-      "weekday/hourly distribution charts"
-    ],
-    "description": "This is an engagement analysis dashboard for tracking customer account activities and interactions. The interface displays key metrics like total activities, contacts, page views, and form submissions, along with detailed breakdowns by company accounts and individual contacts. The dashboard includes various charts showing activity timelines, weekday patterns, and hourly distributions to help analyze customer engagement behavior."
   },
   {
     "filename": "ref_336.png",
@@ -5304,24 +4966,6 @@
     "description": "This is a competitive marketing analysis dashboard displaying sales performance across multiple channels including online, social media, stores, and outlets. The interface shows key metrics like total sales ($32K), ROI percentages, and breakdowns by product lines (Maximus and Prim series) with various visualizations including charts and graphs to track performance over time."
   },
   {
-    "filename": "ref_356.png",
-    "site": "ddg_search",
-    "original_name": "ddg_e6332f2b764a.png",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "key performance indicator cards",
-      "horizontal bar chart",
-      "donut chart",
-      "summary metrics grid",
-      "color-coded legend",
-      "tabular data display",
-      "multi-section layout",
-      "header with company info and timestamp"
-    ],
-    "description": "This is a sales analytics dashboard showing key business metrics for Cronus company. The interface displays sales overview data including revenue, costs, profit margins, and outstanding invoices, along with breakdowns by top customers, product categories, and salesperson performance through various charts and data visualizations."
-  },
-  {
     "filename": "ref_357.png",
     "site": "ddg_search",
     "original_name": "ddg_7b1e853ede3e.png",
@@ -5415,26 +5059,6 @@
       "balance summary section"
     ],
     "description": "This is a Rocketship financial dashboard showing key business metrics and analytics. The interface displays today's gross volume of $17,503.00, deposited payouts, and detailed analytics including gross volume trends, new customers, successful payments, and revenue metrics with percentage changes and sparkline charts for visual tracking over time."
-  },
-  {
-    "filename": "ref_367.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_dd48008c6d7d.jpg",
-    "content_type": "form",
-    "industry": "Education",
-    "ui_patterns": [
-      "Payment form",
-      "Credit card input fields",
-      "Google Pay button",
-      "Order summary",
-      "Price breakdown",
-      "Quantity selector",
-      "Country dropdown",
-      "ZIP code field",
-      "Payment method toggle",
-      "Powered by Stripe branding"
-    ],
-    "description": "This is a checkout page for Web Dev Simplified, LLC selling online programming courses. The page shows an order for two courses - 'Learn React Today' and 'Learn CSS Today' - totaling $350.00. The payment form includes options for Google Pay or credit card payment with standard billing information fields."
   },
   {
     "filename": "ref_371.png",
@@ -5690,26 +5314,6 @@
     "description": "This is a GitHub repository detail page for the GitHub CLI (Command Line Interface) tool. The page displays project information including commit history, repository statistics like stars and forks, recent releases, and project metadata such as license and documentation links."
   },
   {
-    "filename": "ref_405.png",
-    "site": "ddg_search",
-    "original_name": "ddg_fe0182034acb.png",
-    "content_type": "form",
-    "industry": "Developer Tools",
-    "ui_patterns": [
-      "Repository selector dropdowns",
-      "Branch comparison interface",
-      "Text input field for title",
-      "Rich text editor with formatting toolbar",
-      "Markdown editor with preview tab",
-      "File attachment area",
-      "Checkbox for maintainer permissions",
-      "Primary action button (Create pull request)",
-      "Help resources sidebar",
-      "Auto-merge notification banner"
-    ],
-    "description": "This is GitHub's pull request creation form, allowing developers to propose changes by comparing code across different branches. The interface shows fields for adding a title and description, with a rich text editor that supports markdown formatting and file attachments. The form includes options for maintainer edit permissions and displays merge compatibility information."
-  },
-  {
     "filename": "ref_412.png",
     "site": "ddg_search",
     "original_name": "ddg_7acbf18fbafc.png",
@@ -5766,26 +5370,6 @@
       "deployment status tracking"
     ],
     "description": "This is Zeit.co (now Vercel), a web development and deployment platform. The screenshot shows the deployments dashboard with a table of preview deployments that are currently being worked on, displaying deployment names, status, branch, age, and creator information. The interface includes navigation tabs for Overview, Deployments, Domains, and Settings."
-  },
-  {
-    "filename": "ref_420.png",
-    "site": "ddg_search",
-    "original_name": "ddg_dc2eaa0ac311.png",
-    "content_type": "dashboard",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "filter dropdowns",
-      "circular progress indicator",
-      "metric cards with scores",
-      "line charts",
-      "time series visualization",
-      "data tables",
-      "collapsible sections",
-      "color-coded performance indicators",
-      "multi-panel layout",
-      "trend visualization"
-    ],
-    "description": "This is a web performance analytics dashboard showing Real Experience Score (RES) and Core Web Vitals metrics. The interface displays performance data over time with charts for RES trends, First Contentful Paint, Largest Contentful Paint, and Cumulative Layout Shift metrics. The dashboard includes filtering options for device type, percentile, time range, and data aggregation intervals."
   },
   {
     "filename": "ref_421.png",
@@ -6019,26 +5603,6 @@
       "employee profile cards"
     ],
     "description": "This is a BambooHR dashboard showing an employee's home page view. The interface displays vacation time available, sick days, pending onboarding tasks, time-off requests, employee directory with profile photos, upcoming celebrations and anniversaries, and new employee announcements. It serves as a central hub for HR-related activities and company information."
-  },
-  {
-    "filename": "ref_435.png",
-    "site": "ddg_search",
-    "original_name": "ddg_656a8a0a90ad.png",
-    "content_type": "dashboard",
-    "industry": "HR",
-    "ui_patterns": [
-      "metric cards",
-      "heat map visualization",
-      "pie chart",
-      "line chart",
-      "donut chart",
-      "geographic map",
-      "key performance indicators",
-      "data visualization widgets",
-      "user avatars",
-      "engagement metrics"
-    ],
-    "description": "This is a BambooHR dashboard showing an executive pulse report with 5 key HR metrics. The dashboard displays employee data including total employees, new hires by quarter, terminated employees, and retention rates through various visualizations including maps, charts, and KPI cards. It's designed to give HR directors a quick overview of critical workforce metrics."
   },
   {
     "filename": "ref_436.png",
@@ -6600,26 +6164,6 @@
       "dashboard widgets"
     ],
     "description": "This is a Zendesk Support Dashboard showing customer service metrics and analytics. The interface displays key performance indicators including a dynamic count of 343, median first reply time of 49 hours, and 80% average customer satisfaction. A detailed bar chart shows daily ticket activity over the last 30 days with color-coded categories for tickets created, deleted, reopened, and solved."
-  },
-  {
-    "filename": "ref_482.png",
-    "site": "ddg_search",
-    "original_name": "ddg_6f7b8bd03e83.png",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "metric cards with large numbers",
-      "line charts with multiple series",
-      "bar charts",
-      "donut charts with center values",
-      "circular progress indicators",
-      "time period selector",
-      "dark theme interface",
-      "grid layout with multiple widgets",
-      "color-coded data visualization",
-      "percentage displays"
-    ],
-    "description": "This is a KPI dashboard for a ticketing or customer support system. The interface displays various metrics including tickets taken and solved, response times, ticket priorities, resolution statistics, and assignee performance. The dashboard features multiple data visualizations including charts, graphs, and circular indicators to track support team performance and ticket management metrics."
   },
   {
     "filename": "ref_483.png",
@@ -7618,26 +7162,6 @@
       "help widget"
     ],
     "description": "This is a CRM dashboard for Coupler.io showing comprehensive sales analytics and pipeline management. The interface displays key sales metrics like total sales (5.2M), win rates, close rates, and pipeline value through colorful metric cards, along with detailed charts showing won deals over the last 12 months, deal projections, sales pipeline breakdown, and deal loss reasons analysis. The dashboard includes filtering options for deal owner, stage, pipeline, and labels, with a date range selector for customizing report periods."
-  },
-  {
-    "filename": "ref_579.png",
-    "site": "ddg_search",
-    "original_name": "ddg_bb2f3895178a.png",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "KPI cards",
-      "Date range picker",
-      "Gauge chart",
-      "Horizontal bar chart",
-      "Vertical bar chart",
-      "Line chart",
-      "Geographic map visualization",
-      "List with profile avatars",
-      "Header navigation",
-      "Card-based layout"
-    ],
-    "description": "This is a sales analytics dashboard showing comprehensive sales performance metrics for the year 2021. The interface displays total sales progress against goals, breakdowns by category, quarter, sales manager, region, and states, along with weekly trends. It appears to be a business intelligence or CRM tool designed for sales performance monitoring and analysis."
   },
   {
     "filename": "ref_580.png",
