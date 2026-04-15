@@ -2576,25 +2576,6 @@
     "description": "This is Jira Software's backlog view for the Twine project. The screenshot shows a sprint planning interface with a list of user stories and issues organized in a backlog format, including story points, assignees, and priority levels for agile project management."
   },
   {
-    "filename": "ref_163.png",
-    "site": "ddg_search",
-    "original_name": "ddg_aa4bbfadb7af.png",
-    "content_type": "kanban board",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "issue tracking cards",
-      "status columns",
-      "detail panel",
-      "filter controls",
-      "create button",
-      "progress indicators",
-      "user avatars",
-      "priority labels"
-    ],
-    "description": "This is a Jira project management interface showing a backlog view with issue tracking cards. The screenshot displays a spaceship tracker app development project with various tasks organized in a kanban-style layout, including a detailed issue panel on the right showing task information, assignees, and status updates."
-  },
-  {
     "filename": "ref_164.jpg",
     "site": "ddg_search",
     "original_name": "ddg_817152cc2ac8.jpg",
@@ -2753,26 +2734,6 @@
     "description": "This is Linear, a project management and issue tracking tool for software development teams. The screenshot shows a kanban board view with columns for different workflow states like 'Ready for testing', 'In Review', and 'In Design', containing development tasks and issues with details like assignees, labels, and due dates."
   },
   {
-    "filename": "ref_172.png",
-    "site": "ddg_search",
-    "original_name": "ddg_c3b090cd51c9.png",
-    "content_type": "detail page",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "issue detail view",
-      "properties panel",
-      "comments section",
-      "status indicators",
-      "priority labels",
-      "user avatars",
-      "action buttons",
-      "tag/label system",
-      "collapsible sections"
-    ],
-    "description": "This is Liveblocks, a collaborative software platform that appears to offer issue tracking functionality. The screenshot shows a linear-like issue tracker interface with a specific issue detail page for 'Build collaborative experiences faster', displaying issue properties, comments, and team collaboration features in a clean, modern interface."
-  },
-  {
     "filename": "ref_173.png",
     "site": "ddg_search",
     "original_name": "ddg_1473af197dc9.png",
@@ -2791,26 +2752,6 @@
       "collapsible row groups"
     ],
     "description": "This is a Monday.com stakeholder register dashboard showing project stakeholder management data. The interface displays two project sections (Project A and Project B) with detailed stakeholder information including names, roles, contact points, impact levels, and communication preferences organized in a comprehensive data table format."
-  },
-  {
-    "filename": "ref_174.png",
-    "site": "ddg_search",
-    "original_name": "ddg_17b87fea527e.png",
-    "content_type": "data table",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "tabular data grid",
-      "status indicators with color coding",
-      "project timeline visualization",
-      "user avatars",
-      "grouped data sections",
-      "progress bars",
-      "invite team button",
-      "mobile responsive design",
-      "branded header",
-      "add new item buttons"
-    ],
-    "description": "This is Monday.com's project management interface showing a team task tracking table. The screenshot displays tasks organized by time periods (This Month, Next Month) with columns for person assignment, design status, R&D status, testing status, and timeline progress bars. Status indicators use color coding (green for Done, orange for Working on it, red for Stuck) to show project progress across different phases."
   },
   {
     "filename": "ref_175.png",
@@ -3047,44 +2988,6 @@
     "description": "This is a ClickUp dashboard showing project management metrics and analytics. The interface displays various widgets including a Sprint 1 burndown chart, task completion statistics with bar charts, goal progress tracking, and an upcoming features roadmap. The dashboard provides an overview of project status, completed versus remaining tasks, and development milestones."
   },
   {
-    "filename": "ref_187.png",
-    "site": "ddg_search",
-    "original_name": "ddg_639b6e72fc3a.png",
-    "content_type": "landing page",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "large hero text",
-      "brand logo placement",
-      "bright yellow background",
-      "product screenshot showcase",
-      "dashboard preview",
-      "project management interface mockup",
-      "message board display",
-      "to-do list visualization",
-      "chat interface preview",
-      "schedule/calendar component"
-    ],
-    "description": "This is a landing page for Basecamp, a project management software platform. The page features a bright yellow background with large bold text stating 'Refreshingly simple project management' alongside the Basecamp logo. On the right side is a screenshot of the actual Basecamp interface showing various project management features including message boards, to-do lists, chat, and scheduling components for a logo redesign project."
-  },
-  {
-    "filename": "ref_188.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_5d9a9facf289.jpg",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "search bar",
-      "project cards grid",
-      "avatar clusters",
-      "pinned content section",
-      "bottom navigation tabs",
-      "status indicators",
-      "team member count",
-      "brand logo placement"
-    ],
-    "description": "This is the mobile dashboard for Enormicom, a project management and team collaboration platform. The interface displays pinned projects in a card grid layout, showing various teams and initiatives like Admin/HR, Customer Support, and company events. Each project card includes team member avatars, descriptions, and participant counts, providing an overview of active work across the organization."
-  },
-  {
     "filename": "ref_189.png",
     "site": "ddg_search",
     "original_name": "ddg_37abf97d8242.png",
@@ -3101,25 +3004,6 @@
       "Login/signup links"
     ],
     "description": "This is a landing page for Basecamp's integrations marketplace. The page promotes third-party tools and integrations for Basecamp, with a focus on mobile and desktop apps. It features a promotional banner about their brand campaign and includes navigation elements for pricing, customer login, and developer integration opportunities."
-  },
-  {
-    "filename": "ref_190.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_cf31a5cbe02b.jpg",
-    "content_type": "messaging interface",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "bottom navigation bar",
-      "avatar circles",
-      "notification badges",
-      "message list feed",
-      "user profile pictures",
-      "timestamp display",
-      "status indicators",
-      "category headers",
-      "unread message markers"
-    ],
-    "description": "This is a mobile messaging interface for Basecamp, a business collaboration platform. The screenshot shows a feed of team communications including notifications, messages, and updates from various team members. The interface includes a top row of user avatars, a \"New for you\" section with notifications, and a chronological list of team messages and announcements."
   },
   {
     "filename": "ref_191.png",
@@ -3293,25 +3177,6 @@
     "description": "This is a Notion database page showing a User Research table view. The interface displays research sessions with participants, including details like names, tasks, dates, status, and assigned interviewers. Users can filter by completion status, task type, date, and other criteria to manage their research activities."
   },
   {
-    "filename": "ref_203.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_59ba27e0debc.jpg",
-    "content_type": "kanban board",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "kanban columns",
-      "task cards",
-      "assignee avatars",
-      "status tags",
-      "color-coded labels",
-      "task properties panel",
-      "group filtering",
-      "board navigation",
-      "team member assignment"
-    ],
-    "description": "This is a Notion team task management board showing a kanban-style layout with multiple columns for different team members. The interface displays various tasks organized by assignee (Mary Cassatt, Berthe Morisot, Marie Bracquemond, etc.) with colored status tags, priority indicators, and filtering options. It's part of Notion's project management capabilities for organizing team workflows and task assignments."
-  },
-  {
     "filename": "ref_204.jpg",
     "site": "ddg_search",
     "original_name": "ddg_986f8a71c3b4.jpg",
@@ -3430,43 +3295,6 @@
     "description": "This is a Slack Connect interface showing pending invitations and connections. The page displays channel invitations, DM invitations, and created invite links with various users from different organizations, along with approval status and expiration information."
   },
   {
-    "filename": "ref_210.png",
-    "site": "ddg_search",
-    "original_name": "ddg_2bc917539069.png",
-    "content_type": "messaging interface",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "channel list",
-      "message thread",
-      "user avatars",
-      "threaded conversations",
-      "search bar",
-      "direct messages list",
-      "message composer",
-      "thread sidebar"
-    ],
-    "description": "This is a Slack-like team messaging application called TidBITS. The interface shows a typical chat workspace with a channel sidebar on the left, a main channel view in the center displaying the #random channel conversation, and a thread sidebar on the right showing a specific conversation thread between users."
-  },
-  {
-    "filename": "ref_211.png",
-    "site": "ddg_search",
-    "original_name": "ddg_e38a2f590d64.png",
-    "content_type": "messaging interface",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "conversation threads",
-      "user avatars",
-      "message input field",
-      "channel organization",
-      "threaded messaging",
-      "company dropdown selector",
-      "expandable sidebar sections"
-    ],
-    "description": "This appears to be a team messaging application interface, likely Slack or a similar workplace communication tool. The interface shows a sidebar with Threads, Channels, and Direct messages sections, while the main area displays conversation threads including #project-website and #team-design with participant names and message previews. Users can see threaded conversations with profile pictures and a reply input field at the bottom."
-  },
-  {
     "filename": "ref_212.png",
     "site": "ddg_search",
     "original_name": "ddg_1efc06156b66.png",
@@ -3504,24 +3332,6 @@
       "Search/jump functionality"
     ],
     "description": "This is a Slack workspace interface showing a messaging thread discussion. The left sidebar displays various channels organized by weeks, and the main content area shows a conversation thread where users are sharing files and discussing topics related to character development. There's also a thread panel on the right showing message composition."
-  },
-  {
-    "filename": "ref_215.png",
-    "site": "ddg_search",
-    "original_name": "ddg_c6243715f231.png",
-    "content_type": "messaging interface",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "channel list",
-      "message thread",
-      "user avatars",
-      "timestamp display",
-      "action buttons",
-      "notification badge",
-      "app integration card"
-    ],
-    "description": "This is a Slack-like messaging interface for Acme Corp showing a conversation in the #proj-website-launch channel. The interface displays messages between team members Anna and Bob discussing branding assets, with a ThreadPatrol app suggesting to move a reply to a thread to keep the channel clean."
   },
   {
     "filename": "ref_216.webp",
@@ -3621,25 +3431,6 @@
       "notification badges"
     ],
     "description": "This is Microsoft Teams, a business communication and collaboration platform. The screenshot shows the chat interface with a conversation thread between Marie Beaudouin and other team members discussing lunch plans and work meetings. There's a sidebar showing recent chats and contacts, with a search function active showing results for 'august'."
-  },
-  {
-    "filename": "ref_221.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_4fd95bc1bb64.jpg",
-    "content_type": "messaging interface",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "contact list",
-      "conversation view",
-      "message composer",
-      "tabs",
-      "user avatars",
-      "status indicators",
-      "toolbar buttons",
-      "timestamp display"
-    ],
-    "description": "This is Microsoft Teams showing a messaging interface with a conversation between users. The left sidebar displays recent contacts and suggested connections, while the main area shows an active chat conversation with Kristina McElroy. The interface includes typical messaging features like a text input field, emoji picker, and file attachment options."
   },
   {
     "filename": "ref_222.png",
@@ -3776,25 +3567,6 @@
       "Quick access buttons"
     ],
     "description": "This is the Zoom desktop application's main dashboard interface. The screen shows the home view with options to start a new meeting or join an existing one, along with meeting configuration options like video settings and personal meeting ID. The interface displays the current time and date, and indicates there are no upcoming meetings scheduled for today."
-  },
-  {
-    "filename": "ref_230.png",
-    "site": "ddg_search",
-    "original_name": "ddg_b08be293d09a.png",
-    "content_type": "messaging interface",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "video grid layout",
-      "participant thumbnails",
-      "meeting controls bar",
-      "transcript panel",
-      "notes panel",
-      "mute/unmute controls",
-      "screen sharing controls",
-      "chat interface",
-      "sidebar overlay"
-    ],
-    "description": "This is a video conferencing interface showing a team meeting with multiple participants displayed in a grid layout. The screenshot shows what appears to be a business collaboration platform with features like live transcription and note-taking capabilities. There's an active transcript panel on the right side showing meeting content, and standard video call controls are visible at the bottom of the interface."
   },
   {
     "filename": "ref_231.jpg",
@@ -4241,25 +4013,6 @@
     "description": "This is a Pipedrive CRM sales pipeline view showing deals organized in a kanban board format across different sales stages. The interface displays deals moving from initial contact through to negotiation, with monetary values and company names visible on each deal card. Status indicators and progress markers help track deal advancement through the sales process."
   },
   {
-    "filename": "ref_254.png",
-    "site": "ddg_search",
-    "original_name": "ddg_a8a24d1ce8d1.png",
-    "content_type": "dashboard",
-    "industry": "CRM",
-    "ui_patterns": [
-      "top navigation bar",
-      "metrics cards",
-      "pipeline visualization",
-      "funnel chart",
-      "progress indicators",
-      "conversion percentages",
-      "time period filters",
-      "circular progress chart",
-      "deal stage workflow"
-    ],
-    "description": "This is a Pipedrive CRM statistics dashboard showing pipeline metrics and sales performance. The page displays key metrics like new deals (286), stage movements (414), average deal age (42.8 days), and open deals (194). It includes a visual pipeline funnel showing conversion rates through different sales stages from Idea to In Negotiation, along with won/lost deal statistics and revenue figures."
-  },
-  {
     "filename": "ref_255.png",
     "site": "ddg_search",
     "original_name": "ddg_064d1971b3ef.png",
@@ -4277,24 +4030,6 @@
       "icon navigation menu"
     ],
     "description": "This appears to be a Pipedrive CRM dashboard showing various data visualizations and analytics. The interface displays multiple chart types including pie charts and bar charts with green and purple color schemes, likely representing sales or pipeline metrics. The left sidebar contains the typical CRM navigation icons for deals, contacts, activities, and other core functions."
-  },
-  {
-    "filename": "ref_257.png",
-    "site": "ddg_search",
-    "original_name": "ddg_d62219918d1f.png",
-    "content_type": "kanban board",
-    "industry": "CRM",
-    "ui_patterns": [
-      "Pipeline columns",
-      "Deal cards with monetary values",
-      "Top navigation bar",
-      "Left sidebar with email interface",
-      "Contact information panel",
-      "Drag and drop cards",
-      "Status indicators",
-      "Calendar widget"
-    ],
-    "description": "This is Pipedrive, a CRM platform showing a sales pipeline view with deals organized in columns by stage (Untouched contact, Contact made, Qualified, etc.). The interface includes email tracking functionality on the left sidebar and contact details panel on the right, demonstrating an integrated sales and communication workflow."
   },
   {
     "filename": "ref_258.png",
@@ -4356,25 +4091,6 @@
     "description": "This is a Salesforce CRM dashboard for a user named Amelia Burrows. The interface displays multiple analytics widgets including a sales pipeline funnel chart, leads by source bar chart, accounts by industry pie chart, and a table of open deals with amounts and stages. There's also a SalesSignals activity feed on the right showing recent interactions and messages from contacts."
   },
   {
-    "filename": "ref_261.png",
-    "site": "ddg_search",
-    "original_name": "ddg_04595ded05be.png",
-    "content_type": "dashboard",
-    "industry": "CRM",
-    "ui_patterns": [
-      "Navigation bar with multiple sections",
-      "Welcome message with user name",
-      "Grid layout with multiple chart widgets",
-      "Bar charts with colored segments",
-      "Pie chart with industry breakdown",
-      "Funnel chart showing pipeline stages",
-      "Legend indicators with color coding",
-      "Card-based layout for different metrics",
-      "User avatar and profile dropdown"
-    ],
-    "description": "This is Zoho CRM's main dashboard interface showing various sales and marketing analytics. The screen displays multiple data visualization widgets including leads by source, accounts by industry, pipeline stages, and lead status breakdowns. It provides a comprehensive overview of CRM metrics with colorful charts and graphs for tracking business performance."
-  },
-  {
     "filename": "ref_262.png",
     "site": "ddg_search",
     "original_name": "ddg_8db1824432ce.png",
@@ -4412,25 +4128,6 @@
       "currency input"
     ],
     "description": "This is a CRM deal creation form page showing various input fields for deal information. The form includes fields for deal owner, name, account, amount, closing date, stage, probability, expected revenue, and other deal-related data. It's part of a CRM system with navigation tabs for Leads, Contacts, Accounts, Deals, Tasks, Meetings, Calls, and Projects visible in the header."
-  },
-  {
-    "filename": "ref_264.png",
-    "site": "ddg_search",
-    "original_name": "ddg_89ccdeb9d502.png",
-    "content_type": "kanban board",
-    "industry": "CRM",
-    "ui_patterns": [
-      "navigation bar",
-      "pipeline stages with value indicators",
-      "deal cards with financial data",
-      "sidebar filter panel",
-      "checkbox filtering options",
-      "progress percentages",
-      "date stamps",
-      "expandable filter sections",
-      "search functionality"
-    ],
-    "description": "This is a CRM deal pipeline view showing sales opportunities organized by stage (Qualification, Needs Analysis, Value Proposition, Identify Decision Makers). The interface displays deal cards with company names, amounts, and dates, along with filtering options in the left sidebar. This appears to be Zoho CRM's deals management interface for tracking sales pipeline progress."
   },
   {
     "filename": "ref_265.png",
@@ -4507,24 +4204,6 @@
       "fullscreen mode toggle"
     ],
     "description": "This is a Shopify analytics dashboard showing key e-commerce metrics and performance data. The interface displays various charts and metrics including total sales, sessions, conversion rates, and customer analytics with time-based comparisons. Multiple data visualizations show trends over time with options to compare different date ranges."
-  },
-  {
-    "filename": "ref_269.png",
-    "site": "ddg_search",
-    "original_name": "ddg_ac1a7c99a65a.png",
-    "content_type": "dashboard",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "sidebar navigation",
-      "date range picker",
-      "metric cards",
-      "line charts",
-      "percentage change indicators",
-      "view report buttons",
-      "comparison metrics",
-      "time series visualization"
-    ],
-    "description": "This is a Shopify store analytics dashboard showing an overview of key e-commerce metrics. The interface displays total sales, online store sessions, and returning customer rate with time period comparisons, along with line charts tracking sales and sessions over time for the period October 4-11, 2018."
   },
   {
     "filename": "ref_270.png",
@@ -4705,25 +4384,6 @@
     "description": "{\n  \"content_type\": \"data table\",\n  \"industry\": \"E-commerce\",\n  \"ui_patterns\": [\n    \"Left sidebar navigation\",\n    \"Data table with sortable columns\",\n    \"Top navigation bar\",\n    \"Search bar\",\n    \"Pagination controls\",\n    \"Breadcrumb navigation\",\n    \"Dropdown menus\",\n    \"Collapsible sidebar\","
   },
   {
-    "filename": "ref_282.png",
-    "site": "ddg_search",
-    "original_name": "ddg_aecebc96be2e.png",
-    "content_type": "dashboard",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "sidebar navigation",
-      "metric cards",
-      "time period selector",
-      "line charts",
-      "dropdown filters",
-      "branded header",
-      "advice/tips section",
-      "expandable menu items",
-      "performance metrics grid"
-    ],
-    "description": "This is a BigCommerce e-commerce analytics dashboard showing store performance metrics. The interface displays key metrics like visitors, conversion rate, orders, and revenue for the selected time period, along with trend charts and a spotlight section containing marketing advice and tips for store optimization."
-  },
-  {
     "filename": "ref_283.png",
     "site": "ddg_search",
     "original_name": "ddg_d90a7ea81fcd.png",
@@ -4796,25 +4456,6 @@
       "notification badge"
     ],
     "description": "This is a Magento e-commerce admin dashboard showing sales analytics and performance metrics. The dashboard displays lifetime sales figures, average order values, recent orders, bestselling products, and search terms in a comprehensive overview format for store administrators."
-  },
-  {
-    "filename": "ref_287.png",
-    "site": "ddg_search",
-    "original_name": "ddg_2e661915fcd1.png",
-    "content_type": "dashboard",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "metric cards",
-      "data tables",
-      "bar chart",
-      "navigation sidebar",
-      "tabs",
-      "dropdown filters",
-      "search functionality",
-      "real-time data indicators",
-      "tabbed interface"
-    ],
-    "description": "This is an e-commerce analytics dashboard for Magento, showing business performance metrics and sales data. The interface displays lifetime sales, average order value, recent orders, search terms analysis, and customer data with various charts and tables for comprehensive business insights."
   },
   {
     "filename": "ref_288.png",
@@ -4951,26 +4592,6 @@
     "description": "This is a sales analytics dashboard for an e-commerce business, likely an Amazon seller. The interface shows key sales metrics including total order items, units ordered, and product sales over $22 million, along with comparative line charts tracking units ordered and sales performance over time from March to June 2024."
   },
   {
-    "filename": "ref_295.png",
-    "site": "ddg_search",
-    "original_name": "ddg_4915308abd2a.png",
-    "content_type": "dashboard",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "key performance indicator cards",
-      "donut chart",
-      "bar chart",
-      "line chart",
-      "scatter plot",
-      "data table",
-      "metric tiles with percentage values",
-      "multi-chart layout",
-      "color-coded data visualization",
-      "tabular product listing"
-    ],
-    "description": "This is an Amazon Seller Dashboard showing comprehensive business analytics for an e-commerce seller. The dashboard displays key financial metrics including $44.1M revenue, 3.4M sales, and various profit margins through multiple visualizations including charts, graphs, and data tables. It provides insights into cost analysis, revenue trends over time, profit margins by product type, and detailed product performance data."
-  },
-  {
     "filename": "ref_296.png",
     "site": "ddg_search",
     "original_name": "ddg_e0d745b14796.png",
@@ -4989,26 +4610,6 @@
       "Sort dropdown"
     ],
     "description": "This is an Amazon search results page showing accessories and supplies products. The page displays a grid of product listings with images, prices, ratings, and delivery information. Users can filter results using the left sidebar which includes options for departments, brands, price ranges, and customer reviews."
-  },
-  {
-    "filename": "ref_297.png",
-    "site": "ddg_search",
-    "original_name": "ddg_a3a1dafd17f5.png",
-    "content_type": "detail page",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "product image gallery",
-      "product variations selector",
-      "add to cart button",
-      "buy now button",
-      "price display",
-      "product reviews and ratings",
-      "shipping options",
-      "quantity selector",
-      "breadcrumb navigation",
-      "product bullet points"
-    ],
-    "description": "This is an Amazon product detail page for a coffee mug. The page displays product images, color variations, pricing at $9.99, Prime shipping options, and typical e-commerce elements like Add to Cart and Buy Now buttons. The layout includes product descriptions, bullet points, and other purchase options in a standard Amazon product page format."
   },
   {
     "filename": "ref_298.jpg",
@@ -5105,46 +4706,6 @@
       "guidance text"
     ],
     "description": "This is Etsy's seller onboarding interface for creating a new product listing. The form allows sellers to upload photos and videos of their items, with detailed guidance on best practices for product photography including lighting, angles, and composition. The interface shows a step-by-step process with sections for adding photos, adjusting thumbnails, and uploading videos to showcase products effectively."
-  },
-  {
-    "filename": "ref_304.png",
-    "site": "ddg_search",
-    "original_name": "ddg_105dcb802257.png",
-    "content_type": "homepage",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "mobile app screenshots",
-      "bottom navigation bar",
-      "onboarding screens",
-      "product grid layout",
-      "search interface",
-      "category navigation",
-      "shopping basket view",
-      "user profile section",
-      "favorites/wishlist feature",
-      "sign-in prompts"
-    ],
-    "description": "This shows the Etsy mobile app interface with multiple screens displaying the top-level navigation and user flow. The screenshots demonstrate various sections including the home feed with product recommendations, category browsing, user profiles, shopping basket, and favorites functionality. This appears to be a design showcase or documentation of Etsy's mobile app user interface patterns."
-  },
-  {
-    "filename": "ref_305.png",
-    "site": "ddg_search",
-    "original_name": "ddg_fa9445a6edd3.png",
-    "content_type": "product grid",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "Mobile app interface mockups",
-      "Product grid layout",
-      "Star ratings and reviews",
-      "Product image thumbnails",
-      "Price display",
-      "Shop navigation tabs",
-      "User profile section",
-      "Product detail views",
-      "Company branding with logo",
-      "Multi-screen mobile mockup presentation"
-    ],
-    "description": "This is an Etsy shop profile showcase for boldmfg, displaying multiple mobile app interface screens. The images show various views of an Etsy shop including product listings, reviews, shop policies, and company information for what appears to be a furniture and home goods manufacturer based in Austin, Texas."
   },
   {
     "filename": "ref_306.png",
@@ -5287,26 +4848,6 @@
     "description": "This is Walmart Grocery's online shopping interface showing a product grid of fresh produce and snacks. The page displays various fruits, vegetables, and packaged foods with prices, quantities, and add to cart functionality. A shopping cart sidebar shows selected items with a total and checkout option."
   },
   {
-    "filename": "ref_314.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_6e98d0ec91e4.jpg",
-    "content_type": "homepage",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "mobile app interface",
-      "header with logo and cart",
-      "personalized greeting",
-      "delivery address selector",
-      "call-to-action button",
-      "product grid",
-      "product cards with images and prices",
-      "bottom navigation bar",
-      "favorites/wishlist functionality",
-      "price per unit display"
-    ],
-    "description": "This is the Walmart Grocery mobile app homepage showing a personalized grocery delivery service. The interface displays featured grocery items like Progresso soup and Totino's pizza rolls, with delivery address selection and time slot reservation options. The app emphasizes convenient grocery delivery with fresh groceries and pantry staples delivered to customers' doors."
-  },
-  {
     "filename": "ref_315.png",
     "site": "ddg_search",
     "original_name": "ddg_3c0aefce5426.png",
@@ -5402,25 +4943,6 @@
       "dashboard grid layout"
     ],
     "description": "This is a Google Analytics 4 dashboard showing website performance metrics and analytics data. The main view displays key metrics like total spend ($20,500.90), sessions vs page views over time, and a conversion funnel with impressions, clicks, and conversions. There's also an edit widget panel on the right side for customizing dashboard components."
-  },
-  {
-    "filename": "ref_320.png",
-    "site": "ddg_search",
-    "original_name": "ddg_86a54d52cb95.png",
-    "content_type": "dashboard",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "sidebar navigation",
-      "metric cards with large numbers",
-      "line chart visualization",
-      "real-time data display",
-      "geographic data breakdown",
-      "date range selector",
-      "tabbed content areas",
-      "collapsible sections",
-      "country-based user statistics"
-    ],
-    "description": "This appears to be a Google Analytics dashboard showing website performance metrics. The interface displays key statistics like total users (74K), new users (64K), average engagement time (2m 45s), and total revenue ($309K), along with a line chart showing user trends over time and geographic breakdowns of user locations."
   },
   {
     "filename": "ref_322.png",
@@ -5560,26 +5082,6 @@
     "description": "This is Amplitude's analytics platform showing a feature adoption dashboard for Kyle Povar. The interface displays multiple bar charts analyzing the adoption of different features by plan type (Enterprise, Business, Free) across various user actions like Send Message, Search Contacts, and React with Emoji over the last 30 days."
   },
   {
-    "filename": "ref_329.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_40871dd9a37d.jpg",
-    "content_type": "dashboard",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "top navigation bar",
-      "dashboard header with title",
-      "metric cards with KPIs",
-      "stacked bar charts",
-      "line graph with multiple series",
-      "percentage indicators",
-      "color-coded data visualization",
-      "user avatars",
-      "action buttons (Share, Notebook, Save)",
-      "grid layout for widgets"
-    ],
-    "description": "This is an Amplitude analytics dashboard showing website performance metrics and user behavior data. The dashboard displays key metrics like checkout funnel conversion rates, active users by channel, multi-product customer counts, and revenue by customer segment through various charts and visualizations. Amplitude is a digital analytics platform that helps companies understand user behavior and optimize their products."
-  },
-  {
     "filename": "ref_330.png",
     "site": "ddg_search",
     "original_name": "ddg_ea71759dadaf.png",
@@ -5635,26 +5137,6 @@
       "Legend for chart elements"
     ],
     "description": "This is a Tableau business intelligence dashboard showing sales analytics data. The interface displays area charts comparing profitable vs unprofitable sales across different segments (Consumer, Corporate, Home Office) over time from 2019-2021. The left panel shows data sources, tables, and parameters for configuring the analysis."
-  },
-  {
-    "filename": "ref_333.png",
-    "site": "ddg_search",
-    "original_name": "ddg_5365840935d3.png",
-    "content_type": "dashboard",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "navigation tabs",
-      "time series line charts",
-      "bar charts",
-      "horizontal bar charts",
-      "data visualization panels",
-      "breadcrumb navigation",
-      "toolbar with actions",
-      "multi-column layout",
-      "metrics cards",
-      "filtering controls"
-    ],
-    "description": "This is a web analytics dashboard showing traffic data and insights. The interface displays various charts including weekly and hourly traffic patterns, top viewers, top views, data source users, and data sources. It appears to be part of an admin analytics platform with multiple visualization widgets arranged in a grid layout."
   },
   {
     "filename": "ref_334.png",
@@ -5715,26 +5197,6 @@
     "description": "This is a Tableau dashboard showing engagement analysis for accounts. The interface displays various metrics like activities total, contacts total, and page views, along with bar charts showing activity by company and type. Multiple visualization panels provide insights into account engagement patterns and performance metrics."
   },
   {
-    "filename": "ref_337.png",
-    "site": "ddg_search",
-    "original_name": "ddg_b267ee2a08f8.png",
-    "content_type": "listing page",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "global search bar",
-      "page header with title and description",
-      "search input field",
-      "filter dropdown",
-      "view toggle buttons",
-      "sort dropdown",
-      "hierarchical folder structure",
-      "list view with items",
-      "action button",
-      "dark theme UI"
-    ],
-    "description": "This is a dashboard management page for a data analytics platform. The interface shows a list of MLI (Machine Learning Intelligence) dashboards with dates, organized under a General folder. Users can search, filter, and create new dashboards to visualize their data."
-  },
-  {
     "filename": "ref_338.png",
     "site": "ddg_search",
     "original_name": "ddg_90278b521fee.png",
@@ -5752,26 +5214,6 @@
       "grid layout of monitoring widgets"
     ],
     "description": "This is a Grafana dashboard for MSSQL Server monitoring, displaying real-time database performance metrics. The dashboard shows key performance indicators organized into sections for database status, CPU utilization, memory usage, and I/O operations with various charts and gauges. It provides comprehensive monitoring capabilities for database administrators to track the health and performance of their SQL Server instances."
-  },
-  {
-    "filename": "ref_339.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_adc489da35cd.jpg",
-    "content_type": "dashboard",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "data visualization cards",
-      "line charts",
-      "bar charts",
-      "gauge/radial charts",
-      "data tables",
-      "heat map",
-      "integration flow diagram",
-      "call-to-action buttons",
-      "color-coded metrics",
-      "grid layout"
-    ],
-    "description": "This is Grafana's homepage showcasing their data visualization and monitoring platform. The dashboard displays various chart types and visualizations including bar charts, line graphs, gauges, heat maps, and data tables. The interface demonstrates how Grafana connects to different data sources like Graphite, Cloudwatch, Prometheus, Elasticsearch, InfluxDB, and Hosted Metrics to create comprehensive monitoring dashboards."
   },
   {
     "filename": "ref_340.png",
@@ -5792,25 +5234,6 @@
       "collapsible panels"
     ],
     "description": "This is a Prometheus 2.0 monitoring dashboard showing various system metrics and statistics. The interface displays multiple time-series charts tracking metrics like samples appended, scrape duration, memory profile, WAL corruptions, active appenders, blocks loaded, head chunks, compaction activity, reload count, and query durations. It appears to be a comprehensive monitoring tool for tracking database and system performance over the last 3 hours."
-  },
-  {
-    "filename": "ref_341.png",
-    "site": "ddg_search",
-    "original_name": "ddg_b504166440d9.png",
-    "content_type": "dashboard",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "breadcrumb navigation",
-      "global search bar",
-      "time series chart",
-      "panel editor interface",
-      "tabbed navigation",
-      "toggle switches",
-      "time range selector",
-      "metric visualization",
-      "color-coded data series"
-    ],
-    "description": "This is a Grafana dashboard interface showing a time series chart panel in edit mode. The screenshot displays metrics data over the last 6 hours with multiple colored data series representing different routes. The user is currently editing a dashboard panel and can see query, transform, and alert configuration tabs at the bottom."
   },
   {
     "filename": "ref_342.png",
@@ -6158,26 +5581,6 @@
     "description": "This is a Stripe payments dashboard showing the getting started experience. The page displays options for collecting payments, including sharing a link to a checkout page and manually charging customers. It features preview mockups of payment interfaces and emphasizes no-code solutions for quick setup."
   },
   {
-    "filename": "ref_361.png",
-    "site": "ddg_search",
-    "original_name": "ddg_940d8c3c421d.png",
-    "content_type": "dashboard",
-    "industry": "Financial Services",
-    "ui_patterns": [
-      "metric cards",
-      "navigation tabs",
-      "horizontal bar charts",
-      "donut chart",
-      "world map visualization",
-      "key performance indicators",
-      "sidebar navigation",
-      "top navigation bar",
-      "data filters",
-      "branded header"
-    ],
-    "description": "This is a Stripe payment processing dashboard showing subscription and payment analytics. The interface displays key metrics like MRR, subscription counts, payment volumes, and refund data across multiple visualization types including charts, maps, and metric cards. It appears to be the Account Overview section of Stripe's business analytics platform."
-  },
-  {
     "filename": "ref_362.png",
     "site": "ddg_search",
     "original_name": "ddg_69b0512cbddb.png",
@@ -6234,25 +5637,6 @@
       "balance summary section"
     ],
     "description": "This is a Rocketship financial dashboard showing key business metrics and analytics. The interface displays today's gross volume of $17,503.00, deposited payouts, and detailed analytics including gross volume trends, new customers, successful payments, and revenue metrics with percentage changes and sparkline charts for visual tracking over time."
-  },
-  {
-    "filename": "ref_365.png",
-    "site": "ddg_search",
-    "original_name": "ddg_bbf5e5fa9777.png",
-    "content_type": "form",
-    "industry": "Financial Services",
-    "ui_patterns": [
-      "mobile app interface",
-      "amount input field",
-      "optional description field",
-      "numeric keypad",
-      "navigation header with back button",
-      "progress indicator",
-      "branded color scheme",
-      "minimalist design",
-      "product selection button"
-    ],
-    "description": "This is a Stripe payment processing mobile app interface showing a payment amount entry form. The screen displays a $50.00 payment amount with an optional description field and a numeric keypad for input. This appears to be part of Stripe's mobile payment solution for quick transaction processing."
   },
   {
     "filename": "ref_367.jpg",
@@ -6392,26 +5776,6 @@
     "description": "This is a financial dashboard for a business accounting software showing the Demo Company's financial overview. The dashboard displays bank account balances, cash flow charts, account watchlist, invoices owed, and bills to pay with various visualization charts and summary data tables."
   },
   {
-    "filename": "ref_378.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_5014a3770410.jpg",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "Top navigation bar",
-      "Card-based layout",
-      "Data visualization charts",
-      "Financial summary widgets",
-      "Account balance displays",
-      "Performance metrics",
-      "Bar charts",
-      "Line graphs",
-      "Account watchlist table",
-      "Invoice tracking section"
-    ],
-    "description": "This is a business accounting dashboard for Hornblower Enterprises, showing financial overview and performance metrics. The interface displays bank account balances, account watchlists, business performance charts, and invoice tracking in a card-based layout. This appears to be an accounting or financial management software platform designed for business users to monitor their financial health and key metrics."
-  },
-  {
     "filename": "ref_379.png",
     "site": "ddg_search",
     "original_name": "ddg_e2df51a55e4b.png",
@@ -6430,26 +5794,6 @@
       "multi-column layout"
     ],
     "description": "This is a financial dashboard for Foxglove Cafe showing business banking information and financial management tools. The interface displays bank account balances, reconciliation status, cash flow charts, invoices owed, bills to pay, and expense claims. It appears to be an accounting or bookkeeping software platform with integrated banking features."
-  },
-  {
-    "filename": "ref_380.png",
-    "site": "ddg_search",
-    "original_name": "ddg_02f70d70faca.png",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "top navigation bar",
-      "sidebar navigation",
-      "metric cards",
-      "line charts",
-      "bar charts",
-      "data tables",
-      "account summary widgets",
-      "mobile responsive design",
-      "status indicators",
-      "action buttons"
-    ],
-    "description": "This is a business accounting software dashboard for Foxglove Cafe, showing financial overview and key metrics. The interface displays bank account balances, sales performance charts, accounts payable/receivable summaries, and cash flow visualizations. The dashboard provides a comprehensive view of the business's financial health with both desktop and mobile views visible."
   },
   {
     "filename": "ref_381.png",
@@ -6548,43 +5892,6 @@
     "description": "This is a PayPal account dashboard showing the main summary page for a user named 'Test Buyer'. The interface displays the account balance of $4,999.99, recent transactions including a payment to Test Store and a PayPal transfer, and linked bank accounts and cards. The page provides quick access to common actions like adding money, transferring to bank, and getting the mobile app."
   },
   {
-    "filename": "ref_386.png",
-    "site": "ddg_search",
-    "original_name": "ddg_32faac2a959b.png",
-    "content_type": "data table",
-    "industry": "Financial Services",
-    "ui_patterns": [
-      "sidebar navigation menu",
-      "data table with sortable columns",
-      "tabbed interface",
-      "search bar",
-      "pagination controls",
-      "status badges",
-      "filter dropdowns",
-      "account balance display",
-      "action buttons"
-    ],
-    "description": "This is a PayPal account dashboard showing transaction history and activity. The interface displays a data table with payment transactions, including details like dates, payment status, recipient emails, and transaction types. The left sidebar provides navigation to various account features like overview, history, and settings."
-  },
-  {
-    "filename": "ref_388.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_02d2020788c7.jpg",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "mobile interface",
-      "location selector dropdown",
-      "metric cards with percentage change",
-      "bar chart visualization",
-      "time period comparison",
-      "weekly data breakdown",
-      "navigation back button",
-      "green/red color coding for metrics"
-    ],
-    "description": "This is a mobile business analytics dashboard showing sales reporting across multiple locations. The interface displays net sales metrics with a 3.65% increase, featuring a weekly bar chart comparison and detailed weekly breakdowns. The app appears to be designed for multi-location business performance tracking with live reporting capabilities."
-  },
-  {
     "filename": "ref_390.png",
     "site": "ddg_search",
     "original_name": "ddg_1c58dac3826a.png",
@@ -6641,42 +5948,6 @@
     "description": "This is a customer relationship management (CRM) system showing a modal dialog for creating a new customer. The form includes fields for basic contact information like name, phone number, email, and address, with country selection dropdowns for phone and address fields. The interface appears to be part of a broader customer management platform with navigation elements visible in the background."
   },
   {
-    "filename": "ref_394.png",
-    "site": "ddg_search",
-    "original_name": "ddg_660e70a2d252.png",
-    "content_type": "data table",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "tabular data grid",
-      "progress indicators",
-      "status badges",
-      "filter controls",
-      "pagination",
-      "action buttons",
-      "breadcrumb navigation"
-    ],
-    "description": "This appears to be an accounting or financial management software interface showing a data table with transaction records. The interface displays various financial entries with details like dates, amounts, merchants, and account categories, along with sidebar navigation for different accounting functions and progress tracking indicators at the top."
-  },
-  {
-    "filename": "ref_396.png",
-    "site": "ddg_search",
-    "original_name": "ddg_bfc862db52c4.png",
-    "content_type": "dashboard",
-    "industry": "Financial Services",
-    "ui_patterns": [
-      "left sidebar navigation",
-      "category icons with labels",
-      "credit card visualization",
-      "spending limit progress bar",
-      "status badges",
-      "financial metrics display",
-      "gradient backgrounds",
-      "card-based layout"
-    ],
-    "description": "This appears to be a financial management dashboard showing a Brex corporate credit card with Q3 commercial spending details. The interface displays available credit ($120,300.05) against a limit of $280,000.00, along with status indicators for budget compliance, policy adherence, and pre-approval status. The left sidebar shows different expense categories like shipping, software, T&E, advertising, and equipment."
-  },
-  {
     "filename": "ref_399.png",
     "site": "ddg_search",
     "original_name": "ddg_2dd94892ad42.png",
@@ -6714,26 +5985,6 @@
       "version badge"
     ],
     "description": "This is a GitHub repository detail page for the GitHub CLI (Command Line Interface) tool. The page displays project information including commit history, repository statistics like stars and forks, recent releases, and project metadata such as license and documentation links."
-  },
-  {
-    "filename": "ref_403.png",
-    "site": "ddg_search",
-    "original_name": "ddg_2b1b67c1724d.png",
-    "content_type": "data table",
-    "industry": "Developer Tools",
-    "ui_patterns": [
-      "global navigation header",
-      "organization banner",
-      "tabbed navigation",
-      "search bar with filters",
-      "repository list with metadata",
-      "programming language indicators",
-      "activity graphs",
-      "action buttons",
-      "status badges",
-      "dropdown menus"
-    ],
-    "description": "This is a GitHub organization page for CHIME/FRB Collaboration showing their repositories. The page displays a list of private repositories including frb-master, guidelines, and baseband-analysis, each with metadata like programming languages (Python), licensing (MIT), star counts, and recent update times. Small activity graphs are visible for each repository showing commit activity over time."
   },
   {
     "filename": "ref_405.png",
@@ -6811,25 +6062,6 @@
       "performance metrics display"
     ],
     "description": "This is a Vercel analytics dashboard showing web application performance metrics and monitoring data. The interface displays key metrics like successful requests, bad requests, and server errors, along with detailed charts for request methods, function duration percentiles, popular regions, and API route performance analysis."
-  },
-  {
-    "filename": "ref_418.png",
-    "site": "ddg_search",
-    "original_name": "ddg_8f1b6c89eb89.png",
-    "content_type": "dashboard",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "filter dropdowns",
-      "circular progress indicator",
-      "line charts",
-      "metric cards",
-      "data table",
-      "responsive design preview",
-      "time series visualization",
-      "performance metrics",
-      "mobile/desktop view toggle"
-    ],
-    "description": "This is a web performance analytics dashboard displaying Core Web Vitals and Real User Experience (RES) metrics. The interface shows performance scores including Real Experience Score, First Contentful Paint, Largest Contentful Paint, and Cumulative Layout Shift across mobile and desktop views. Multiple device previews demonstrate responsive analytics tracking with detailed page-level performance data."
   },
   {
     "filename": "ref_419.png",
@@ -6928,26 +6160,6 @@
       "settings panels"
     ],
     "description": "This is the Amazon Web Services (AWS) EC2 dashboard showing an overview of cloud computing resources in the US East region. The interface displays various resource counts like instances, security groups, and volumes, along with launch options and service health status. It includes promotional content for ML inference instances and cost reduction strategies."
-  },
-  {
-    "filename": "ref_424.png",
-    "site": "ddg_search",
-    "original_name": "ddg_eb25f6343179.png",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "navigation bar",
-      "search bar",
-      "card layout",
-      "metric tiles",
-      "section headers",
-      "action buttons",
-      "cost breakdown table",
-      "progress indicators",
-      "welcome panel",
-      "service shortcuts"
-    ],
-    "description": "This is the AWS Console Home dashboard showing an overview of Amazon Web Services account activity. The page displays various widgets including recently visited services, AWS health status, cost and usage metrics, and welcome information for getting started with AWS. The interface provides quick access to commonly used AWS services and account management features."
   },
   {
     "filename": "ref_425.png",
@@ -7102,24 +6314,6 @@
       "bulk selection checkboxes"
     ],
     "description": "This is a software development issue tracking interface, likely from The Tardis platform. The screenshot shows an unresolved issues dashboard displaying various JavaScript/React errors with details like event counts, user counts, and assignees. It appears to be a debugging and error monitoring tool for web applications."
-  },
-  {
-    "filename": "ref_433.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_ab7d5b60cbaf.jpg",
-    "content_type": "settings page",
-    "industry": "Developer Tools",
-    "ui_patterns": [
-      "Sidebar navigation",
-      "Form inputs",
-      "Toggle switch",
-      "Action buttons",
-      "Dropdown selector",
-      "Text input fields",
-      "Collapsible sections",
-      "Configuration panels"
-    ],
-    "description": "This is a GitLab settings page for configuring error tracking integration with Sentry. The page shows configuration options including enabling the integration, entering Sentry API URL and Auth Token, project selection, and metrics dashboard settings. It's part of the Operations settings section within a GitLab project management interface."
   },
   {
     "filename": "ref_434.png",
@@ -7453,26 +6647,6 @@
     "description": "This is a payroll reporting dashboard that displays employee compensation data across different departments. The interface shows a central pie chart visualization of net pay ($155,609) with departmental breakdowns, alongside a detailed data table showing metrics like employee count, payroll count, and total costs for Engineering, HR, Sales, and Support departments."
   },
   {
-    "filename": "ref_452.png",
-    "site": "ddg_search",
-    "original_name": "ddg_d70805f2cd9e.png",
-    "content_type": "dashboard",
-    "industry": "HR",
-    "ui_patterns": [
-      "sidebar navigation",
-      "job posting header with status badge",
-      "notification cards with action buttons",
-      "pipeline view with stage indicators",
-      "candidate data table",
-      "profile avatars",
-      "feedback tags/badges",
-      "progress counters",
-      "action buttons (Edit Stages, Add Candidate)",
-      "country flags"
-    ],
-    "description": "This is an HR recruitment dashboard for a Sales Manager position showing candidate pipeline management. The interface displays job details, application statistics, interview scheduling, and a candidate tracking table with stages from Application through Offer accepted. It includes candidate profiles with feedback tags and progress through the hiring process."
-  },
-  {
     "filename": "ref_453.jpg",
     "site": "ddg_search",
     "original_name": "ddg_c065dc26a3c2.jpg",
@@ -7510,24 +6684,6 @@
       "app integration icons"
     ],
     "description": "This is a client management interface for Rippling, showing a Client Command Center with a list of client companies. The page displays client information including employee counts, billing tasks, insurance tasks, and payroll tasks, along with collaborator avatars and integrated app access for each client."
-  },
-  {
-    "filename": "ref_455.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_ad03ebee75cb.jpg",
-    "content_type": "data table",
-    "industry": "HR",
-    "ui_patterns": [
-      "heat map visualization",
-      "data table with color coding",
-      "sidebar filters",
-      "tab navigation",
-      "toggle switches",
-      "header with share/download buttons",
-      "column headers",
-      "numerical data cells"
-    ],
-    "description": "This is an exit survey analytics dashboard showing employee feedback data broken down by department. The interface displays survey responses as a heat map table, with questions on the left and department columns (Overall, Design, Engineering, Sales, Marketing) showing numerical scores with color-coded cells ranging from low (red) to high (green) satisfaction levels."
   },
   {
     "filename": "ref_456.jpg",
@@ -7624,26 +6780,6 @@
       "card-based interface"
     ],
     "description": "This is a healthcare management dashboard for MedC, a medical practice software. The interface displays six main function cards arranged in a grid: Your Practice, Your Patients, E-Prescribing, Labs, Doctors, and Nurses. Each card includes an icon and an 'Add New' action button for managing different aspects of medical practice operations."
-  },
-  {
-    "filename": "ref_461.png",
-    "site": "ddg_search",
-    "original_name": "ddg_9d119727369b.png",
-    "content_type": "dashboard",
-    "industry": "Healthcare",
-    "ui_patterns": [
-      "sidebar navigation",
-      "line chart",
-      "progress indicators",
-      "color-coded status badges",
-      "appointment cards",
-      "reminder notifications",
-      "metric tiles",
-      "search bar",
-      "user profile dropdown",
-      "notification icons"
-    ],
-    "description": "This is a medical dashboard interface showing patient health metrics and appointments. The dashboard displays progress statistics with line charts, blood pressure and respiratory rate monitoring with color-coded indicators, upcoming medical analyses, medication reminders, and scheduled appointments with healthcare providers like Dr. Elva Hughes and Dr. Troy Love."
   },
   {
     "filename": "ref_462.png",
@@ -8049,26 +7185,6 @@
     "description": "This appears to be a customer support or CRM messaging interface, likely Intercom or similar platform. The screen shows a conversation inbox with multiple customer conversations in the left panel and a detailed message thread on the right. A customer profile panel for Elizabeth McGuane is visible on the far right with contact details and conversation history."
   },
   {
-    "filename": "ref_488.png",
-    "site": "ddg_search",
-    "original_name": "ddg_f4e0f88569b2.png",
-    "content_type": "dashboard",
-    "industry": "CRM",
-    "ui_patterns": [
-      "before and after comparison",
-      "sidebar navigation",
-      "contact list",
-      "conversation threads",
-      "user avatars",
-      "status badges",
-      "search bar",
-      "detail panel",
-      "tabbed interface",
-      "notification indicators"
-    ],
-    "description": "This appears to be a customer relationship management (CRM) or customer service platform showing a before and after interface comparison. The screenshot displays conversation management features with contact lists, message threads, user profiles, and various organizational tools for managing customer communications and support tickets."
-  },
-  {
     "filename": "ref_489.png",
     "site": "ddg_search",
     "original_name": "ddg_72ff3f5b60fb.png",
@@ -8392,24 +7508,6 @@
     "description": "This is Facebook's Ads Manager interface showing a campaign management dashboard. The page displays a data table of advertising campaigns with their performance metrics including delivery status, results, reach, impressions, and cost per result. Users can view and manage multiple campaigns with options to create, edit, duplicate, and filter campaigns based on various criteria."
   },
   {
-    "filename": "ref_508.png",
-    "site": "ddg_search",
-    "original_name": "ddg_e31ce1158bd5.png",
-    "content_type": "data table",
-    "industry": "Digital Marketing",
-    "ui_patterns": [
-      "Navigation bar with logo",
-      "Data table with multiple columns",
-      "Checkbox selection column",
-      "Toggle switches",
-      "Filter dropdowns",
-      "Search bar",
-      "Status indicators",
-      "Tabular data grid"
-    ],
-    "description": "This is Facebook Ads Manager, a digital advertising platform for managing Facebook and Instagram ad campaigns. The screenshot shows the main campaign management interface with a data table displaying ad campaigns, their performance metrics, and management controls including toggles to enable/disable campaigns and various filter options."
-  },
-  {
     "filename": "ref_509.png",
     "site": "ddg_search",
     "original_name": "ddg_d2207ea8423b.png",
@@ -8427,26 +7525,6 @@
       "performance metrics columns"
     ],
     "description": "This is Facebook Ads Manager, a digital advertising platform interface showing a campaigns data table. The screenshot displays a list of advertising campaigns with their delivery status, performance metrics like reach, impressions, cost per result, budget, and amount spent. Users can manage, edit, and monitor their Facebook advertising campaigns from this dashboard view."
-  },
-  {
-    "filename": "ref_510.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_8bf10da1d5ac.jpg",
-    "content_type": "data table",
-    "industry": "Digital Marketing",
-    "ui_patterns": [
-      "data table with sortable columns",
-      "toggle switches for on/off controls",
-      "search and filter bar",
-      "action buttons toolbar",
-      "status indicators",
-      "sidebar navigation",
-      "column headers with sorting arrows",
-      "performance metrics columns",
-      "date range selector",
-      "campaign management interface"
-    ],
-    "description": "This is a campaign management interface for a digital advertising platform, likely Facebook Ads Manager or similar. The screenshot shows a data table displaying multiple advertising campaigns with their performance metrics including delivery status, bid strategy, budget, attribution settings, reach, impressions, and cost per result. Users can toggle campaigns on/off, view detailed performance data, and manage their advertising campaigns from this centralized dashboard."
   },
   {
     "filename": "ref_511.jpg",
@@ -8698,26 +7776,6 @@
     "description": "This is a Supply Chain Inventory Management Dashboard that displays key logistics metrics and analytics. The dashboard shows inventory performance indicators including stockout rates, return rates, backorder rates, and days of supply across multiple warehouses. Various charts visualize inventory carrying costs, turnover ratios, and sales ratios to help manage supply chain operations effectively."
   },
   {
-    "filename": "ref_525.png",
-    "site": "ddg_search",
-    "original_name": "ddg_479ebb903e41.png",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "metric cards",
-      "donut chart",
-      "data tables",
-      "product grid",
-      "mobile app preview",
-      "search bar",
-      "notification badge",
-      "progress indicators",
-      "status columns"
-    ],
-    "description": "This is an inventory management software dashboard showing sales activity and inventory summary metrics. The interface displays key performance indicators like items to be packed, shipped, delivered and invoiced, along with product details, top selling items, and purchase/sales order information. A mobile app preview is shown on the right side of the screen."
-  },
-  {
     "filename": "ref_526.webp",
     "site": "ddg_search",
     "original_name": "ddg_31503e5500cc.webp",
@@ -8757,26 +7815,6 @@
     "description": "This is a shipment tracking interface for a logistics management platform. The page displays multiple shipments with their tracking progress shown as horizontal timelines, including departure and arrival information for various ports and cities. Each shipment card shows status indicators, shipping IDs, and estimated delivery times, with options to view the data in map or list format."
   },
   {
-    "filename": "ref_529.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_db233661ccc5.jpg",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "search bar with filters",
-      "tracking status indicators",
-      "progress bars",
-      "map interface",
-      "shipment cards",
-      "metrics widgets",
-      "timeline view",
-      "status badges",
-      "promotional feature highlights"
-    ],
-    "description": "This is a shipment tracking dashboard for a logistics platform. The interface shows real-time tracking of multiple packages with detailed information including weight, delivery status, and location mapping. The left side features promotional content highlighting the dashboard's customization capabilities, while the main area displays shipment cards with tracking IDs, delivery progress, and an integrated map showing delivery routes."
-  },
-  {
     "filename": "ref_530.png",
     "site": "ddg_search",
     "original_name": "ddg_a39b62e0a960.png",
@@ -8814,25 +7852,6 @@
       "geographic visualization"
     ],
     "description": "This is a logistics tracking dashboard called 'Tracktor' that monitors package delivery performance. The interface displays key metrics like average delivery time (6.7 days), order volumes, and delivery status across different stages. It features a world map visualization and real-time notification cards showing order updates from various global locations."
-  },
-  {
-    "filename": "ref_532.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_0c1b23a0390b.jpg",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "data table with hierarchical rows",
-      "tabbed interface",
-      "search bar",
-      "bar charts",
-      "collapsible sections",
-      "progress bars",
-      "breadcrumb navigation",
-      "column headers"
-    ],
-    "description": "This appears to be a business planning and analytics software dashboard showing S&OP (Sales & Operations Planning) aggregations. The interface displays hierarchical data in a table format with columns for different time periods (budget year, revenue forecasts) alongside charts and performance metrics. The left sidebar contains navigation menu items including Dashboard, Tasks, Collaboration, and Data management functions."
   },
   {
     "filename": "ref_533.webp",
@@ -8910,26 +7929,6 @@
     "description": "This is a roles and permissions management page within SaasRock, a business software platform. The interface displays a comprehensive table of user roles including SuperAdmin, Product Designer, Developer, Auditor, Marketing, Guest, and others, along with their descriptions, permission counts, and assigned user counts. The page allows administrators to manage access control and user permissions across different functional areas of the platform."
   },
   {
-    "filename": "ref_538.png",
-    "site": "ddg_search",
-    "original_name": "ddg_cd81b6c49f69.png",
-    "content_type": "dashboard",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "sidebar navigation",
-      "metric cards with statistics",
-      "line charts and graphs",
-      "progress bars",
-      "data table with pagination",
-      "donut charts",
-      "status badges",
-      "search functionality",
-      "user avatar",
-      "breadcrumb navigation"
-    ],
-    "description": "This is an ecommerce analytics dashboard for Phoenix, showing business performance metrics and data visualization. The dashboard displays key metrics like total orders, new customers, order status breakdown, sales charts, coupon usage statistics, and customer reviews in a comprehensive overview layout. It appears to be a business intelligence tool for monitoring ecommerce operations and performance."
-  },
-  {
     "filename": "ref_539.png",
     "site": "ddg_search",
     "original_name": "ddg_d25c5f6f04b7.png",
@@ -8969,26 +7968,6 @@
     "description": "This is a URL shortener service dashboard showing analytics and management features. The interface displays key metrics like total links, views, and clicks at the top, followed by a table of shortened links with their redirect URLs, view counts, and status. Users can manage their shortened URLs and view analytics data through this dashboard interface."
   },
   {
-    "filename": "ref_541.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_994ad4576cd5.jpg",
-    "content_type": "dashboard",
-    "industry": "Healthcare",
-    "ui_patterns": [
-      "top navigation bar",
-      "sidebar navigation menu",
-      "key metrics cards",
-      "line chart visualization",
-      "donut chart with percentage",
-      "data table with patient appointments",
-      "data table with doctor information",
-      "search bar",
-      "user profile dropdown",
-      "action buttons"
-    ],
-    "description": "This is a healthcare management dashboard called Dox, showing a comprehensive overview of hospital operations. The interface displays key metrics like appointments (540), hospital earnings ($3420), new patients (460), and operations (120), along with visualizations including a hospital survey line chart and gender distribution donut chart. The dashboard also features tables for upcoming appointments and doctor availability status."
-  },
-  {
     "filename": "ref_542.jpg",
     "site": "ddg_search",
     "original_name": "ddg_fd2e35a52c91.jpg",
@@ -9007,26 +7986,6 @@
       "expandable menu items"
     ],
     "description": "This is an admin interface for managing developer settings, specifically showing a data table called 'Edit Developer: Memory 1'. The interface displays a list of items with their status (Active/Inactive), descriptions, and action buttons for editing and deleting. The left sidebar contains various configuration categories including Settings, Developer options, User Settings, and Rules sections."
-  },
-  {
-    "filename": "ref_543.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_e329853211e3.jpg",
-    "content_type": "data table",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "breadcrumb navigation",
-      "data table with checkboxes",
-      "search bar with filters",
-      "user avatars in table rows",
-      "status indicators/badges",
-      "action buttons (edit, delete)",
-      "collapsible sidebar sections",
-      "user profile dropdown",
-      "column management controls"
-    ],
-    "description": "This is an administration interface for a business software system showing a Product Owners management page. The interface displays a data table with user information including names, photos, status (Active/Inactive), and descriptions, with options to edit and manage user accounts. The left sidebar provides navigation to various system administration functions including apps, user management, and storage settings."
   },
   {
     "filename": "ref_544.png",
@@ -9222,25 +8181,6 @@
     "description": "This is a calendar application showing a weekly view for March 17-23. The interface displays various scheduled events like meetings, appointments, and tasks across different days, with a sidebar on the left containing a task checklist. The calendar uses color coding to distinguish different types of events and activities."
   },
   {
-    "filename": "ref_556.png",
-    "site": "ddg_search",
-    "original_name": "ddg_c8491233b176.png",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "month view calendar grid",
-      "date picker dropdown",
-      "event cards with color coding",
-      "daily event listing",
-      "floating action button",
-      "mobile navigation hamburger menu",
-      "status bar with time and battery",
-      "calendar event tags/labels",
-      "dual view layout"
-    ],
-    "description": "This is a mobile calendar application showing January 2024 in month view. The interface displays scheduled events and meetings with color-coded labels, and includes a detailed day view showing specific time slots and event descriptions. The app appears to be a comprehensive scheduling tool with features for organizing various types of appointments and activities."
-  },
-  {
     "filename": "ref_557.jpg",
     "site": "ddg_search",
     "original_name": "ddg_13bcabfe26b5.jpg",
@@ -9259,26 +8199,6 @@
       "event time labels"
     ],
     "description": "This is Google Calendar showing a weekly view for January 18-20. The interface displays scheduled events as colored blocks across multiple days, with a sidebar containing a mini monthly calendar, calendar categories (Work/Personal), and options to create new events or meet with people. Various appointments and meetings are visible including an M&N internal review, Jade/Cameron meeting, and yoga session."
-  },
-  {
-    "filename": "ref_558.png",
-    "site": "ddg_search",
-    "original_name": "ddg_3d96ed62ad2a.png",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "search bar",
-      "progress bars",
-      "data visualization cards",
-      "circular progress indicator",
-      "line chart",
-      "file folder icons",
-      "metric cards with percentages",
-      "user profile dropdown",
-      "hamburger menu"
-    ],
-    "description": "This is a file management dashboard that helps users organize, track, and manage their digital files including photos, videos, and documents. The interface displays storage usage metrics, file organization stats with progress indicators, a weekly storage usage chart, and favorite document folders. The dashboard provides an overview of file management activities with visual analytics and quick access to different file categories."
   },
   {
     "filename": "ref_559.png",
@@ -9318,25 +8238,6 @@
       "user profile dropdown"
     ],
     "description": "This is a file management dashboard for a business software application called 'Shop'. The interface shows cloud storage integrations (Google Drive, OneDrive, Dropbox), recent file activity, storage usage analytics with charts, and detailed file breakdowns by type. Users can manage documents and monitor their storage consumption across different file categories."
-  },
-  {
-    "filename": "ref_561.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_5debf51cbc6d.jpg",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "file management categories",
-      "file grid layout",
-      "file type counters",
-      "folder directory structure",
-      "search bar",
-      "navigation arrows",
-      "file thumbnails",
-      "subscription call-to-action"
-    ],
-    "description": "This is a file management dashboard for a business software application. The interface displays file organization with categories for Images, Videos, and Documents, showing file counts and total storage usage. Users can navigate through folders and view files with thumbnails in a grid layout."
   },
   {
     "filename": "ref_562.png",
@@ -9450,24 +8351,6 @@
       "action buttons"
     ],
     "description": "This is Pinterest's settings page showing notification preferences and social network connections. The page allows users to configure when and how they receive notifications from Pinterest, including options for email, phone, and desktop notifications. It also shows connected social media accounts like Facebook and provides options to manage those integrations."
-  },
-  {
-    "filename": "ref_569.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_cdacb592d5ee.jpg",
-    "content_type": "settings page",
-    "industry": "Operating System",
-    "ui_patterns": [
-      "navigation header with back button",
-      "grouped list items with icons",
-      "search bar",
-      "alphabetical index sidebar",
-      "hierarchical menu structure",
-      "chevron indicators for navigation",
-      "app icon thumbnails",
-      "sectioned content layout"
-    ],
-    "description": "This is the iOS Settings app showing the main settings menu on the left and the Apps management section on the right. The left screen displays various system settings categories like Notifications, Privacy & Security, and App Store, while the right screen shows an alphabetical list of installed apps with their icons, allowing users to manage app-specific settings."
   },
   {
     "filename": "ref_570.png",
@@ -9684,25 +8567,6 @@
     "description": "This is a business analytics dashboard displaying market share and sales performance metrics. The interface shows various visualizations including market share trends over time, category volumes by segment, and year-to-date performance by manufacturer and region. The dashboard appears to be part of a Microsoft-integrated business intelligence platform given the Teams and sharing options in the toolbar."
   },
   {
-    "filename": "ref_581.png",
-    "site": "ddg_search",
-    "original_name": "ddg_6d3c46e22d2e.png",
-    "content_type": "landing page",
-    "industry": "Real Estate",
-    "ui_patterns": [
-      "hero section with large heading",
-      "navigation bar with dropdown menus",
-      "search form with multiple filter dropdowns",
-      "large background image",
-      "call-to-action button",
-      "price range slider",
-      "logo branding in top left",
-      "descriptive text block",
-      "footer text with template information"
-    ],
-    "description": "This is a real estate website called Finder that helps users search for properties to buy, sell, or rent. The landing page features a prominent hero section with the headline 'Easy way to find a perfect property' and a search form with filters for rental type, location, property type, and price range. The page emphasizes their 10+ years of experience and comprehensive real estate services."
-  },
-  {
     "filename": "ref_582.jpg",
     "site": "ddg_search",
     "original_name": "ddg_3fe8b65b67a2.jpg",
@@ -9740,82 +8604,6 @@
       "keyword search input"
     ],
     "description": "This is the homepage for South, a real estate website that helps users find homes. The page features a prominent hero section with a modern house image and \"FIND YOUR HOME\" messaging, along with a comprehensive property search form below that includes filters for location, categories, price range, bedrooms, bathrooms, and square footage."
-  },
-  {
-    "filename": "ref_584.png",
-    "site": "ddg_search",
-    "original_name": "ddg_aa89fe48baf9.png",
-    "content_type": "homepage",
-    "industry": "Real Estate",
-    "ui_patterns": [
-      "hero banner with background image",
-      "centered search form",
-      "property type toggle buttons",
-      "top navigation bar",
-      "login/signup buttons",
-      "search input field with location placeholder",
-      "call-to-action button",
-      "overlay text on background image"
-    ],
-    "description": "This is a real estate website homepage featuring a property search interface. The page displays 'Find Your Dream Home' as the main headline with a search form that includes options for 'For Sale' and 'For Rent' properties. The background shows an elegant kitchen interior, and the interface includes standard navigation elements like login/signup options and a location-based search field."
-  },
-  {
-    "filename": "ref_585.png",
-    "site": "ddg_search",
-    "original_name": "ddg_ca54383195da.png",
-    "content_type": "landing page",
-    "industry": "Real Estate",
-    "ui_patterns": [
-      "hero section with large heading",
-      "company logo in top left",
-      "product showcase with multiple device mockups",
-      "overlapping interface previews",
-      "property listing cards",
-      "sidebar navigation menu",
-      "property detail views",
-      "dotted pattern decorative elements",
-      "gradient background"
-    ],
-    "description": "This is a landing page for The One Technologies showcasing their real estate listing website platform. The page features a prominent headline about adding features to real estate listing websites, accompanied by multiple interface mockups displaying property listings, dashboards, and property detail pages."
-  },
-  {
-    "filename": "ref_586.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_0810c5285c68.jpg",
-    "content_type": "detail page",
-    "industry": "Real Estate",
-    "ui_patterns": [
-      "property gallery with navigation arrows",
-      "property details grid with specs",
-      "action buttons (Save, Ask, Tour, Hide, Share)",
-      "call-to-action buttons (Ask a Question, Schedule a Tour)",
-      "property description text block",
-      "tabbed navigation (Photos, Map, Nearby Listings)",
-      "listing snapshot data table",
-      "breadcrumb navigation",
-      "contact phone number display"
-    ],
-    "description": "This is a real estate property listing detail page showing a luxury waterfront home in Captiva, Florida priced at $9.5 million. The page features an aerial photograph of the beachfront property, detailed specifications, action buttons for saving and sharing, and contact options for scheduling tours or asking questions about the property."
-  },
-  {
-    "filename": "ref_587.png",
-    "site": "ddg_search",
-    "original_name": "ddg_6b19eaa9fe75.png",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "metric cards with trend indicators",
-      "welcome message with user personalization",
-      "action buttons (Customize Pricing, View Booking Form)",
-      "recent activity list",
-      "deployment links section",
-      "responsive design showing mobile and desktop views",
-      "search bar",
-      "percentage and dollar value metrics",
-      "green/red trend indicators"
-    ],
-    "description": "This is SmartPRO, a booking management platform dashboard showing key business metrics including total bookings, revenue, and conversion rates. The interface displays recent booking activity, deployment links for booking forms, and various analytics with month-over-month growth indicators. The screenshot shows both desktop and mobile responsive versions of the same dashboard."
   },
   {
     "filename": "ref_588.jpg",
