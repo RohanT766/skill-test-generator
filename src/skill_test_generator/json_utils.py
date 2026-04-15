@@ -133,6 +133,92 @@ def _clean_js(s: str) -> str:
     return s
 
 
+def _salvage_truncated_object(text: str) -> dict | None:
+    """When the LLM output is truncated mid-string, try to salvage complete
+    key-value pairs from a top-level ``{"key": "value", ...}`` object.
+
+    This is specifically designed for the codegen case where the JSON maps
+    file paths to file contents — we can lose the last (incomplete) file
+    and still have a usable result.
+    """
+    start = text.index("{")
+
+    # Walk the text with a state machine, tracking complete top-level pairs.
+    # Every time we finish a top-level value (depth==1, not in string, after
+    # a colon+value), record the position as a "safe cut point".
+    depth = 0
+    in_string = False
+    escape_next = False
+    last_safe_cut = -1
+    saw_colon = False
+
+    for i in range(start, len(text)):
+        ch = text[i]
+        if escape_next:
+            escape_next = False
+            continue
+        if ch == "\\" and in_string:
+            escape_next = True
+            continue
+        if ch == '"' and not escape_next:
+            in_string = not in_string
+            continue
+        if in_string:
+            continue
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                # Found complete object — no truncation
+                return None
+            if depth == 1 and saw_colon:
+                last_safe_cut = i
+                saw_colon = False
+        elif ch == "[":
+            depth += 1
+        elif ch == "]":
+            depth -= 1
+            if depth == 1 and saw_colon:
+                last_safe_cut = i
+                saw_colon = False
+        elif ch == ":":
+            if depth == 1:
+                saw_colon = True
+        elif ch == ",":
+            if depth == 1:
+                last_safe_cut = i - 1
+                saw_colon = False
+        # A completed string value at depth 1 after a colon
+        if not in_string and depth == 1 and saw_colon and ch == '"':
+            pass  # quote toggle already handled above
+
+    # Check if a top-level string value just ended (in_string toggled off)
+    # Re-scan: find last complete "key": "value" by checking the last
+    # position where depth==1 and we just closed a string.
+    # Simpler: use last_safe_cut.
+    if last_safe_cut <= start:
+        return None
+
+    truncated = text[start : last_safe_cut + 1].rstrip(", \n\t")
+    # Close the object
+    truncated += "}"
+
+    for attempt in (truncated, _clean_js(truncated)):
+        try:
+            result = json.loads(attempt)
+            if isinstance(result, dict) and result:
+                logger.warning(
+                    "Salvaged truncated JSON object with %d complete keys "
+                    "(output was likely cut off by max_tokens)",
+                    len(result),
+                )
+                return result
+        except json.JSONDecodeError:
+            continue
+    return None
+
+
 def extract_json(text: str) -> dict:
     """Extract a JSON object from LLM output, handling markdown fences,
     JS-style comments, trailing commas, unescaped string content, and
@@ -166,7 +252,18 @@ def extract_json(text: str) -> dict:
             except json.JSONDecodeError:
                 continue
 
-        # Truncation repair
+        # Salvage: for truncated {"key": "value", "key2": "val...} outputs,
+        # extract as many complete key-value pairs as possible.
+        # Try this BEFORE brace-repair because it's more precise about
+        # finding complete key-value boundaries.
+        try:
+            salvaged = _salvage_truncated_object(source)
+            if salvaged:
+                return salvaged
+        except (ValueError, IndexError):
+            pass
+
+        # Truncation repair — try closing open braces/brackets
         repaired = _clean_js(raw)
         quote_count = repaired.count('"') - repaired.count('\\"')
         if quote_count % 2 == 1:
@@ -178,14 +275,15 @@ def extract_json(text: str) -> dict:
         repaired += "}" * max(0, open_braces)
         try:
             result = json.loads(repaired)
-            logger.warning(
-                "Repaired truncated JSON (closed %d braces, %d brackets)",
-                max(0, open_braces),
-                max(0, open_brackets),
-            )
-            return result
+            if result:  # reject empty dicts from bad repairs
+                logger.warning(
+                    "Repaired truncated JSON (closed %d braces, %d brackets)",
+                    max(0, open_braces),
+                    max(0, open_brackets),
+                )
+                return result
         except json.JSONDecodeError:
-            continue
+            pass
 
     # Final fallback: grab everything between first { and last }
     first = text.index("{")
