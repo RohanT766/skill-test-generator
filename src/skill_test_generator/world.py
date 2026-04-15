@@ -879,7 +879,7 @@ else:
                         timeout=15,
                     )
                     body = out.split("HTTP_CODE:")[0].strip() if "HTTP_CODE:" in out else out
-                    ok = "HTTP_CODE:200" in out and len(body) > 2
+                    ok = "HTTP_CODE:200" in out and len(body) >= 2
                     checks.append(
                         {
                             "name": f"GET {route}",

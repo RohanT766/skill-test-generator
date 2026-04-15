@@ -708,25 +708,40 @@ def _post_process_code(code_files: dict[str, str]) -> dict[str, str]:
             and route_path.endswith("route.ts")
             and "health" not in route_path
             and "seedDatabase" not in content
-            and "getDb" in content
         ):
             continue
         if "import { seedDatabase }" not in content:
             content = "import { seedDatabase } from '@/db/seed';\n" + content
-        if "let seeded" not in content and "export async function GET" in content:
-            content = content.replace(
-                "export async function GET",
-                "\nlet seeded = false;\nexport async function GET",
+
+        get_match = _re.search(
+            r"export\s+(?:async\s+)?(?:function|const)\s+GET", content
+        )
+        if get_match and "let seeded" not in content:
+            content = content[: get_match.start()] + (
+                "\nlet seeded = false;\n" + content[get_match.start() :]
             )
-        if (
-            "let seeded" in content
-            and "await seedDatabase()" not in content
-            and "const db = await getDb();" in content
-        ):
-            content = content.replace(
-                "const db = await getDb();",
-                "const db = await getDb();\n  if (!seeded) { await seedDatabase(); seeded = true; }",
+
+        if "let seeded" in content and "await seedDatabase()" not in content:
+            db_call = _re.search(
+                r"(const\s+db\s*=\s*await\s+getDb\(\)\s*;?)", content
             )
+            if db_call:
+                content = content.replace(
+                    db_call.group(1),
+                    db_call.group(1)
+                    + "\n  if (!seeded) { await seedDatabase(); seeded = true; }",
+                )
+            else:
+                get_body = _re.search(
+                    r"(export\s+(?:async\s+)?(?:function|const)\s+GET[^{]*\{)",
+                    content,
+                )
+                if get_body:
+                    content = content.replace(
+                        get_body.group(0),
+                        get_body.group(0)
+                        + "\n  if (!seeded) { await seedDatabase(); seeded = true; }",
+                    )
         code_files[route_path] = content
 
     return code_files
