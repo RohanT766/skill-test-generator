@@ -459,7 +459,7 @@ def build_plato_task_configs(
 
             config: dict = {
                 "sim": sim_name,
-                "task_name": f"{slug}--{task.get('name', 'unnamed')}",
+                "task_name": f"{slug}-{task.get('name', 'unnamed')}",
                 "title": task.get("title", ""),
                 "instruction": task.get("instruction", ""),
                 "start_url": task.get("start_url", "/"),

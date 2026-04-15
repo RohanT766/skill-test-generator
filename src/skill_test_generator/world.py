@@ -1060,7 +1060,7 @@ else:
                     Type6,
                 )
 
-                PLATO_LOGO = "https://plato-api.anthropic.com/static/plato-logo.png"
+                PLATO_LOGO = "https://plato.so/favicon.ico"
                 sim_description = (
                     f"[skill: {vs.skill_name}] "
                     f"{spec.get('description', '') or ''}"
@@ -1269,7 +1269,7 @@ else:
                 scoring_type = task.get("scoring_type", "output")
                 v2_scoring_config = _build_v2_scoring_config(task, sim_name)
 
-                tc_name = f"{vs.slug}--{task.get('name', 'unnamed')}"
+                tc_name = f"{vs.slug}-{task.get('name', 'unnamed')}"
                 req = CreateTestCaseRequest(
                     name=tc_name,
                     prompt=task.get("instruction", ""),
