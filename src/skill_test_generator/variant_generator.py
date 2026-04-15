@@ -480,7 +480,7 @@ async def generate_variant_code(
     for codegen_attempt in range(3):
         async with client.messages.stream(
             model=model,
-            max_tokens=32768,
+            max_tokens=64000,
             system=VARIANT_CODE_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": content_blocks}],
         ) as stream:
