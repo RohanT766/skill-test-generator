@@ -477,9 +477,10 @@ class SkillTestGeneratorWorld(
                     "  [%s] Validation warnings: %s", vs.slug, validation_errors
                 )
 
-            # ── Phase 2: Pipeline VM (verify → build → task gen → snapshot) ──
+            # ── Phase 2: Pipeline VM (verify → build → snapshot) ──
             artifact_id: str | None = None
             last_checks: list[dict] = []
+            live_api_data: dict[str, str] = {}
 
             for attempt in range(3):
                 tarball = self._tar_variant(variant_dir, sim_name)
@@ -496,8 +497,6 @@ class SkillTestGeneratorWorld(
                             sim_name=sim_name,
                             spec=spec,
                             presigned_url=url,
-                            llm_client=llm_client,
-                            llm_sem=llm_sem,
                         )
                     except Exception as e:
                         logger.error("  [%s] Pipeline VM error: %s", vs.slug, e)
@@ -511,15 +510,7 @@ class SkillTestGeneratorWorld(
 
                 if result.get("artifact_id"):
                     artifact_id = result["artifact_id"]
-                    vm_tasks = result.get("tasks", [])
-                    if vm_tasks:
-                        self._all_tasks[vs.slug] = vm_tasks
-                        vs.task_count = len(vm_tasks)
-                        tasks_dir = config.output / vs.slug
-                        tasks_dir.mkdir(parents=True, exist_ok=True)
-                        (tasks_dir / "tasks.json").write_text(
-                            json.dumps({"tasks": vm_tasks}, indent=2),
-                        )
+                    live_api_data = result.get("live_api_data", {})
                     break
 
                 if failure_type == "code" and attempt == 0 and config.coder_agent:
@@ -561,6 +552,38 @@ class SkillTestGeneratorWorld(
 
             vs.artifact_id = artifact_id
             logger.info("  [%s] Artifact: %s", vs.slug, artifact_id)
+
+            # ── Phase 2b: Task generation (off-VM, uses fetched API data) ──
+            generated_tasks: list[dict] = []
+            if llm_client is not None and live_api_data:
+                gen_coro = generate_tasks_for_variant(
+                    llm_client,
+                    spec,
+                    config.design_model,
+                    output_tasks=config.output_tasks_per_variant,
+                    mutation_tasks=config.mutation_tasks_per_variant,
+                    live_api_data=live_api_data or None,
+                )
+                if llm_sem is not None:
+                    async with llm_sem:
+                        generated_tasks = await gen_coro
+                else:
+                    generated_tasks = await gen_coro
+
+                logger.info(
+                    "  [%s] Generated %d tasks (off-VM)",
+                    vs.slug,
+                    len(generated_tasks),
+                )
+
+            if generated_tasks:
+                self._all_tasks[vs.slug] = generated_tasks
+                vs.task_count = len(generated_tasks)
+                tasks_dir = config.output / vs.slug
+                tasks_dir.mkdir(parents=True, exist_ok=True)
+                (tasks_dir / "tasks.json").write_text(
+                    json.dumps({"tasks": generated_tasks}, indent=2),
+                )
 
             # ── Phase 3: Create testcases ─────────────────────────────
             tasks = self._all_tasks.get(vs.slug, [])
@@ -622,17 +645,14 @@ class SkillTestGeneratorWorld(
         sim_name: str,
         spec: dict,
         presigned_url: str,
-        llm_client: object | None = None,
-        llm_sem: asyncio.Semaphore | None = None,
     ) -> dict:
-        """Run verify + build + task gen + validation + snapshot on a pipeline VM.
+        """Run verify + build + snapshot on a pipeline VM.
 
-        Task generation now runs while the app is live on localhost so we can
-        feed real API response data into the LLM prompt and validate expected
-        outputs against the running app before snapshotting.
+        Also fetches live API data for task generation that runs after the VM
+        is closed.
 
         Returns ``{"artifact_id": str|None, "verified": bool, "checks": [...],
-        "tasks": [...]}``.
+        "live_api_data": {...}}``.
         The VM is always closed in the ``finally`` block.
         """
         from plato._generated.api.v2.sessions import (
@@ -889,124 +909,63 @@ else:
                 if not all(c["pass"] for c in checks):
                     return {"artifact_id": None, "verified": False, "checks": checks, "failure_type": "code"}
 
-                # ── TASK GEN + VALIDATION (app is live on localhost) ──
-                generated_tasks: list[dict] = []
-                if llm_client is not None:
-                    from .task_generator import generate_tasks_for_variant
-
-                    live_api_data: dict[str, str] = {}
-                    for r in api_routes:
-                        route = r.get("route", "")
-                        if not route or "[" in route or "/health" in route:
-                            continue
-                        methods = r.get("methods", [r.get("method", "GET")])
-                        if isinstance(methods, str):
-                            methods = [methods]
-                        if "GET" not in methods:
-                            continue
-                        # Fetch all pages of data for paginated endpoints
-                        all_data = ""
-                        page = 1
-                        while page <= 20:
-                            url_with_page = f"http://127.0.0.1:3000{route}?page={page}&pageSize=100"
-                            out, ok = await _exec(
-                                f"curl -s '{url_with_page}' 2>&1",
-                                timeout=15,
-                            )
-                            if not ok or not out or len(out) < 5:
-                                break
-                            if page == 1:
-                                all_data = out
-                            else:
-                                all_data += "\n" + out
-                            try:
-                                resp_json = json.loads(out)
-                                if isinstance(resp_json, list):
-                                    resp_json = {"data": resp_json}
-                                if not isinstance(resp_json, dict):
-                                    break
-                                pagination = resp_json.get("pagination")
-                                if not isinstance(pagination, dict):
-                                    pagination = {}
-                                tp = (resp_json.get("totalPages")
-                                      or resp_json.get("total_pages")
-                                      or pagination.get("totalPages")
-                                      or pagination.get("total_pages"))
-                                if tp and page >= int(tp):
-                                    break
-                                rows = resp_json.get("data", resp_json.get("items", []))
-                                if not rows:
-                                    break
-                            except (json.JSONDecodeError, ValueError):
-                                break
-                            page += 1
-                        if all_data:
-                            live_api_data[route] = all_data
-
-                    if live_api_data:
-                        logger.info(
-                            "  [%s] Fetched live API data from %d route(s)",
-                            vs.slug,
-                            len(live_api_data),
+                # ── FETCH LIVE API DATA (for taskgen after VM closes) ──
+                live_api_data: dict[str, str] = {}
+                for r in api_routes:
+                    route = r.get("route", "")
+                    if not route or "[" in route or "/health" in route:
+                        continue
+                    methods = r.get("methods", [r.get("method", "GET")])
+                    if isinstance(methods, str):
+                        methods = [methods]
+                    if "GET" not in methods:
+                        continue
+                    all_data = ""
+                    page = 1
+                    while page <= 20:
+                        url_with_page = f"http://127.0.0.1:3000{route}?page={page}&pageSize=100"
+                        out, ok = await _exec(
+                            f"curl -s '{url_with_page}' 2>&1",
+                            timeout=15,
                         )
+                        if not ok or not out or len(out) < 5:
+                            break
+                        if page == 1:
+                            all_data = out
+                        else:
+                            all_data += "\n" + out
+                        try:
+                            resp_json = json.loads(out)
+                            if isinstance(resp_json, list):
+                                resp_json = {"data": resp_json}
+                            if not isinstance(resp_json, dict):
+                                break
+                            pagination = resp_json.get("pagination")
+                            if not isinstance(pagination, dict):
+                                pagination = {}
+                            tp = (resp_json.get("totalPages")
+                                  or resp_json.get("total_pages")
+                                  or pagination.get("totalPages")
+                                  or pagination.get("total_pages"))
+                            if tp and page >= int(tp):
+                                break
+                            rows = resp_json.get("data", resp_json.get("items", []))
+                            if not rows:
+                                break
+                        except (json.JSONDecodeError, ValueError):
+                            break
+                        page += 1
+                    if all_data:
+                        live_api_data[route] = all_data
 
-                    # Kill the server to free memory while the LLM thinks.
-                    # Taskgen only needs the API data we already fetched.
-                    await _exec("fuser -k 3000/tcp 2>/dev/null", timeout=10)
-
-                    gen_coro = generate_tasks_for_variant(
-                        llm_client,
-                        spec,
-                        config.design_model,
-                        output_tasks=config.output_tasks_per_variant,
-                        mutation_tasks=config.mutation_tasks_per_variant,
-                        live_api_data=live_api_data or None,
-                    )
-                    if llm_sem is not None:
-                        async with llm_sem:
-                            generated_tasks = await gen_coro
-                    else:
-                        generated_tasks = await gen_coro
-
+                if live_api_data:
                     logger.info(
-                        "  [%s] Generated %d tasks (in VM phase)",
+                        "  [%s] Fetched live API data from %d route(s)",
                         vs.slug,
-                        len(generated_tasks),
+                        len(live_api_data),
                     )
 
-                # ── RESTART SERVER (for seed + snapshot) ──────────────
-                await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
-                start_cmd = (
-                    "node ./node_modules/next/dist/bin/next start "
-                    "--hostname 0.0.0.0 -p 3000"
-                )
-                await _exec(
-                    f"{preamble} && cd {app_dir} && mkdir -p /tmp/pglite-data && "
-                    f"NEXT_DIST_DIR=.next NODE_ENV=production PORT=3000 APP_PORT=3000 "
-                    f"nohup {start_cmd} > /tmp/next.log 2>&1 &",
-                    timeout=30,
-                )
-                for health_i in range(30):
-                    out, _ = await _exec(
-                        "curl -sf http://127.0.0.1:3000/api/health -o /dev/null "
-                        "&& echo OK || echo FAIL",
-                        timeout=10,
-                    )
-                    if "OK" in out:
-                        break
-                    await asyncio.sleep(3)
-                else:
-                    log_tail, _ = await _exec(
-                        "tail -80 /tmp/next.log 2>/dev/null || echo 'no log'",
-                        timeout=10,
-                    )
-                    raise RuntimeError(
-                        f"Server unhealthy after restart for snapshot. "
-                        f"next.log tail: {log_tail[-2000:]}"
-                    )
-
-                await asyncio.sleep(3)
-
+                # ── SEED API ROUTES (server still running from verify) ──
                 # Seed API routes before snapshot
                 seed_routes = [
                     r.get("route", "")
@@ -1173,7 +1132,7 @@ else:
                     "artifact_id": artifact_id,
                     "verified": True,
                     "checks": checks,
-                    "tasks": generated_tasks,
+                    "live_api_data": live_api_data,
                 }
 
             finally:
