@@ -1,6 +1,6 @@
 {
   "world": {
-    "package": "plato-world-skill-test-generator:0.3.68",
+    "package": "plato-world-skill-test-generator:0.3.69",
     "runtime": {
       "type": "vm",
       "vm": {
