@@ -85,6 +85,54 @@ def _fix_json_strings(text: str) -> str:
     return "".join(out)
 
 
+def _extract_outermost_object(text: str) -> str:
+    """Find the outermost ``{…}`` in *text* using a state machine that
+    tolerates literal newlines / tabs / control chars inside JSON strings
+    (which LLMs emit constantly when the values are source code).
+    """
+    start = text.index("{")
+    depth = 0
+    in_string = False
+    escape_next = False
+    end = start
+
+    for i in range(start, len(text)):
+        ch = text[i]
+        if escape_next:
+            escape_next = False
+            continue
+        if ch == "\\" and in_string:
+            escape_next = True
+            continue
+        if ch == '"' and not escape_next:
+            in_string = not in_string
+            continue
+        if in_string:
+            # Stay inside the string regardless of newlines / control chars.
+            continue
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                end = i
+                break
+
+    if end == start:
+        last_brace = text.rfind("}")
+        if last_brace > start:
+            end = last_brace
+
+    return text[start : end + 1]
+
+
+def _clean_js(s: str) -> str:
+    s = re.sub(r"//[^\n]*", "", s)
+    s = re.sub(r"/\*.*?\*/", "", s, flags=re.DOTALL)
+    s = re.sub(r",\s*([}\]])", r"\1", s)
+    return s
+
+
 def extract_json(text: str) -> dict:
     """Extract a JSON object from LLM output, handling markdown fences,
     JS-style comments, trailing commas, unescaped string content, and
@@ -98,78 +146,59 @@ def extract_json(text: str) -> dict:
     if "{" not in text:
         raise ValueError("No JSON object found in LLM output")
 
-    brace_start = text.index("{")
-    depth = 0
-    in_string = False
-    escape_next = False
-    end = brace_start
-    for i, ch in enumerate(text[brace_start:], brace_start):
-        if escape_next:
-            escape_next = False
-            continue
-        if ch == "\\" and in_string:
-            escape_next = True
-            continue
-        if ch == '"' and not escape_next:
-            in_string = not in_string
-            continue
-        if in_string:
-            continue
-        if ch == "{":
-            depth += 1
-        elif ch == "}":
-            depth -= 1
-            if depth == 0:
-                end = i
-                break
+    # Fix unescaped chars FIRST so brace-matching tracks in_string correctly,
+    # then also try on the raw text as a fallback.
+    fixed_text = _fix_json_strings(text)
 
-    if end == brace_start:
-        last_brace = text.rfind("}")
-        if last_brace > brace_start:
-            end = last_brace
-
-    raw = text[brace_start : end + 1]
-
-    def _clean_js(s: str) -> str:
-        s = re.sub(r"//[^\n]*", "", s)
-        s = re.sub(r"/\*.*?\*/", "", s, flags=re.DOTALL)
-        s = re.sub(r",\s*([}\]])", r"\1", s)
-        return s
-
-    # Attempt pipeline: raw → cleaned → string-fixed → string-fixed+cleaned → truncation repair
-    candidates = [
-        raw,
-        _clean_js(raw),
-        _fix_json_strings(raw),
-        _clean_js(_fix_json_strings(raw)),
-    ]
-    for candidate in candidates:
+    for source in (fixed_text, text):
         try:
-            return json.loads(candidate)
+            raw = _extract_outermost_object(source)
+        except ValueError:
+            continue
+
+        candidates = [
+            raw,
+            _clean_js(raw),
+        ]
+        for candidate in candidates:
+            try:
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                continue
+
+        # Truncation repair
+        repaired = _clean_js(raw)
+        quote_count = repaired.count('"') - repaired.count('\\"')
+        if quote_count % 2 == 1:
+            repaired += '"'
+        open_braces = repaired.count("{") - repaired.count("}")
+        open_brackets = repaired.count("[") - repaired.count("]")
+        repaired = repaired.rstrip(", \n\t")
+        repaired += "]" * max(0, open_brackets)
+        repaired += "}" * max(0, open_braces)
+        try:
+            result = json.loads(repaired)
+            logger.warning(
+                "Repaired truncated JSON (closed %d braces, %d brackets)",
+                max(0, open_braces),
+                max(0, open_brackets),
+            )
+            return result
         except json.JSONDecodeError:
             continue
 
-    # Last resort: truncation repair on the best-effort cleaned version
-    repaired = _clean_js(_fix_json_strings(raw))
-    quote_count = repaired.count('"') - repaired.count('\\"')
-    if quote_count % 2 == 1:
-        repaired += '"'
-    open_braces = repaired.count("{") - repaired.count("}")
-    open_brackets = repaired.count("[") - repaired.count("]")
-    repaired = repaired.rstrip(", \n\t")
-    repaired += "]" * max(0, open_brackets)
-    repaired += "}" * max(0, open_braces)
-    try:
-        result = json.loads(repaired)
-        logger.warning(
-            "Repaired truncated JSON (closed %d braces, %d brackets)",
-            max(0, open_braces),
-            max(0, open_brackets),
-        )
-        return result
-    except json.JSONDecodeError:
-        pass
+    # Final fallback: grab everything between first { and last }
+    first = text.index("{")
+    last = text.rfind("}")
+    if last > first:
+        blob = text[first : last + 1]
+        for attempt in (_fix_json_strings(blob), _clean_js(_fix_json_strings(blob))):
+            try:
+                return json.loads(attempt)
+            except json.JSONDecodeError:
+                continue
 
     raise ValueError(
-        f"Failed to parse JSON from LLM output (first 500 chars): {raw[:500]}"
+        f"Failed to parse JSON from LLM output (first 500 chars): "
+        f"{text[text.index('{'):text.index('{') + 500]}"
     )

@@ -477,14 +477,23 @@ async def generate_variant_code(
     )
     content_blocks.append({"type": "text", "text": user_text})
 
-    async with client.messages.stream(
-        model=model,
-        max_tokens=32768,
-        system=VARIANT_CODE_SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": content_blocks}],
-    ) as stream:
-        response = await stream.get_final_message()
-    return _extract_json(response.content[0].text)
+    last_err: Exception | None = None
+    for codegen_attempt in range(3):
+        async with client.messages.stream(
+            model=model,
+            max_tokens=32768,
+            system=VARIANT_CODE_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": content_blocks}],
+        ) as stream:
+            response = await stream.get_final_message()
+        try:
+            return _extract_json(response.content[0].text)
+        except (ValueError, KeyError, json.JSONDecodeError) as e:
+            last_err = e
+            logger.warning(
+                "Codegen JSON parse attempt %d/3 failed: %s", codegen_attempt + 1, e
+            )
+    raise last_err  # type: ignore[misc]
 
 
 def _copy_sohan_template(template_source: Path, dest: Path) -> None:
