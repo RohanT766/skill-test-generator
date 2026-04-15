@@ -71,12 +71,8 @@ skill definition. You will be given a skill name and description, plus the \
 full list of available content_type and industry labels.
 
 Pick 1-4 content_type values that would make good visual inspiration for an \
-app testing this skill. IMPORTANT: strongly prefer DIVERSE content types — \
-dashboards, kanban boards, card grids, detail pages, form views, inbox \
-panels, calendar views, listing pages, settings panels, etc. Only include \
-"data table" if the skill EXPLICITLY requires row-based tabular interaction \
-(like "aggregate across data grid rows"). Most skills can be tested in \
-non-table UIs — prefer those.
+app testing this skill. Prefer variety — the more visually interesting and \
+distinctive the content type, the better.
 
 Optionally pick 0-2 industry values if the skill strongly implies a domain. \
 If any industry could work, return an empty array for industries.
@@ -396,8 +392,8 @@ async def design_variant(
     user_text += (
         "Design a focused, polished snippet of a realistic product that "
         "isolates and tests this exact skill. Give it a real company name "
-        "and domain-specific data. Remember: include app_chrome with the "
-        "layout shell description."
+        "and domain-specific data. Remember: include chrome_description "
+        "and color_palette."
     )
     content_blocks.append({"type": "text", "text": user_text})
 

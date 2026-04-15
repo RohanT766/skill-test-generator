@@ -22,28 +22,16 @@ professionals in that industry use daily. \
 The app should feel like you opened one tab of a real polished SaaS product.
 
 APP CHROME — EVERY APP NEEDS A REALISTIC LAYOUT SHELL:
-The generated app must NOT be a bare data table on a white page. It must \
-have application chrome — the structural UI elements that make it look \
-like a real product.
-LAYOUT VARIETY IS CRITICAL — do NOT default to a left sidebar. Real web \
-apps use wildly different navigation patterns. Consider ALL of these with \
-equal weight:
-- Top navigation bar (horizontal nav, like Stripe, GitHub, Booking.com)
-- Slim top header + tab bar below (like Jira, Notion, Linear)
-- Full-width header with breadcrumbs (like Shopify Admin, AWS Console)
-- Compact icon rail on the left (like Slack, VS Code, Figma)
-- Split panel layout (like email clients, messaging apps)
-- Top header with a secondary side panel (like Google Analytics)
-- No sidebar at all — just a branded top bar (like most e-commerce sites)
-A left sidebar is only ONE of many options and should NOT be the default. \
-If a reference screenshot is provided, match its exact navigation pattern. \
-If no reference is provided, choose a pattern that fits the product type — \
-and AVOID left_sidebar unless the product genuinely calls for it (like an \
-admin panel or IDE). \
+The generated app must NOT be a bare page. It must have application \
+chrome — the structural navigation and branding elements that make it \
+look like a real product. If a reference screenshot is provided, study \
+its chrome carefully and replicate it — the type of navigation, its \
+dimensions, its position, its styling. If no reference is provided, \
+design chrome that fits the product and industry naturally. \
 Non-active navigation links do NOT need to go anywhere — they exist only \
 for visual realism. They should look clickable but be inactive/greyed. \
-The chrome MUST use the primary brand color. It must be defined in the \
-app's root layout so it appears on every page.
+The chrome must be defined in the app's root layout so it appears on \
+every page.
 
 SCOPE — SNIPPET, NOT FULL APP:
 You are building 1-3 pages maximum. Not a whole application. The page \
@@ -89,37 +77,24 @@ same visual language, same layout conventions, same color palette.
 default should be to match the reference's chrome, not to improvise.
 
 VISUAL IDENTITY:
-If a reference screenshot is provided, derive your color palette from it — \
-do NOT invent a different scheme. If no reference is provided, specify a \
-unique color palette and do NOT default to dark navy/slate.
+If a reference screenshot is provided, derive your entire color palette \
+from it — do NOT invent a different scheme. If no reference is provided, \
+choose a distinctive, cohesive palette that fits the product and industry. \
+Do NOT default to dark navy/slate.
 
-DATA DISPLAY — FOLLOW THE REFERENCE, AVOID DEFAULTING TO DATA TABLES:
+DATA DISPLAY — BE CREATIVE, MATCH THE REFERENCE:
 Your first instinct should be to match how the reference screenshot \
 displays its content. If the reference shows cards, use cards. If it shows \
-a kanban board, use a kanban board. If it shows a chart dashboard, use charts.
-DO NOT DEFAULT TO DATA TABLES. They are the most overused, generic display \
-pattern and produce apps that all look identical. Data tables are \
-appropriate ONLY when:
-  (a) the reference screenshot itself prominently features a data table, AND
-  (b) the skill explicitly requires row-based tabular interaction \
-(e.g. "aggregate across data grid rows", "paginate list").
-Even for skills mentioning "rows" or "list" — consider whether the data \
-could be displayed as card lists, accordion panels, or tile grids instead. \
-A "list" does not have to be a table.
-Prefer richer, more distinctive display formats:
-- Product catalogs → card grids with images/prices/ratings
-- Inventory/warehouse → product cards with stock badges, category filters
-- Project management → kanban boards, timeline views, ticket lists
-- CRM contacts → card lists with avatars and quick-action buttons
-- Analytics → chart dashboards with metric cards and sparklines
-- Real estate / listings → gallery cards with photos
-- Messaging → conversation threads, inbox panels
-- Invoicing / billing → invoice-style layouts, line items with totals
-- Incident management → ticket cards with severity badges, timeline
-- Monitoring → metric tiles, status grids, alert feeds
-Even when a data table IS the right choice, make it look distinctive — \
-custom row heights, inline status badges, row expansion, grouped sections, \
-colored category indicators. Never a plain default table.
+a kanban board, use a kanban board. If it shows a chart dashboard, use \
+charts. Think about what display format makes sense for the industry, \
+the data, and the product — and makes the app interesting and visually \
+distinctive. The display format should also ensure the sim genuinely \
+challenges the skill being tested. \
+A data table is your absolute last resort. Only reach for a data table \
+when the skill genuinely requires row-based tabular interaction, the \
+reference image features a data table, AND no other display format could \
+work as well — to the point where NOT having a data table would make the \
+sim worse. If even one good alternative exists, use it instead.
 
 VISUAL QUALITY:
 - Fill the viewport with rich, realistic content — not sparse placeholders.
@@ -158,10 +133,7 @@ dropdown-menu, select, checkbox, input, label, menubar, native-select, \
 popover, radio-group, scroll-area, separator, slider, switch, textarea, \
 toggle, toggle-group, tooltip, hover-card, alert, alert-dialog, \
 drawer, skeleton, spinner, sonner (toast), empty, collapsible, \
-context-menu, sidebar, table. \
-Note: sidebar and table are available but should NOT be your default — \
-use them only when the reference screenshot or skill specifically calls \
-for them.
+context-menu, sidebar, table.
 
 Database: PGlite (Postgres-in-browser) with Drizzle ORM. Define tables using \
 Drizzle schema syntax. The template already has an `items` table you can \
@@ -174,23 +146,23 @@ Respond with a JSON object (no markdown fencing):
 - "skill_tested": the exact skill name being tested
 - "description": 2-3 sentences explaining the view and why it tests the skill
 - "scenario": the specific industry and use case
-- "visual_identity": object with:
-  - "primary_color": the main brand color (used for app chrome background)
-  - "accent_color": for interactive elements and highlights
-  - "style_direction": 1 sentence describing the visual feel
-- "app_chrome": REQUIRED object describing the layout shell. Fields:
-  - "layout_type": the navigation structure — e.g. "top_navbar", \
-"top_header_with_tabs", "icon_rail", "split_panel", "full_width_header", \
-"header_and_sidebar", "left_sidebar". \
-If a reference screenshot is provided, this MUST match what the screenshot \
-shows. Do NOT default to "left_sidebar" — it is the most overused pattern. \
-Prefer top navigation, header bars, tab bars, or icon rails unless the \
-reference screenshot specifically shows a left sidebar.
-  - "product_name": display name shown in the chrome
-  - "subtitle": optional section label or tagline
-  - "nav_items": array of 2-5 navigation labels. Only one is active \
-(the page actually built). Others are decorative placeholders.
-  - "active_nav": which nav item is active (matches the built page)
+- "color_palette": a natural-language description of the entire color scheme \
+for the app — background tones, chrome/navigation colors, text colors, \
+accent/highlight colors, badge/status colors, hover states, etc. Describe \
+it as a cohesive palette. If a reference screenshot is provided, describe \
+the palette you observe in it. If not, describe a distinctive palette that \
+fits the product and industry.
+- "chrome_description": a natural-language description of the app's layout \
+shell — the navigation structure, its position, approximate dimensions, \
+styling, what elements it contains (product name, nav links, icons, \
+avatar, etc.), and how it relates to the main content area. This should \
+be primarily inspired by the reference screenshot if one is provided — \
+describe what you see in the screenshot's chrome and replicate it. If no \
+reference is provided, describe chrome that fits the product naturally. \
+You may make minor tweaks if absolutely necessary for the skill test, \
+but the reference screenshot's chrome is your primary guide. Include the \
+product name, 2-5 navigation labels (only one active, others decorative), \
+and which nav item is active.
 - "db_schema": Drizzle schema as a TypeScript code string defining all tables
 - "seed_data": TypeScript code string that inserts deterministic seed data. \
 Use ONLY ASCII characters in all string values.
@@ -199,8 +171,14 @@ Use ONLY ASCII characters in all string values.
   - "filename": file path relative to web/app/
   - "description": what this page contains and why it serves the skill test
   - "key_components": array of shadcn component names used
-  - "ui_spec": detailed description of the page layout, elements, and how \
-they relate to the skill test
+  - "ui_spec": a rich natural-language description of how this page displays \
+and organizes its data. Explain the display format (cards, kanban, \
+timeline, inbox, dashboard, gallery, etc.), how elements are arranged, \
+what information each element shows, how the layout serves the industry \
+and product, how it draws from the reference screenshot's content style, \
+and crucially how it ensures the sim challenges the skill being tested. \
+This is your creative canvas — design something interesting and visually \
+distinctive that makes sense for the domain.
 - "api_routes": array of API route specs, each with:
   - "route": API path
   - "methods": array of HTTP methods
@@ -229,35 +207,29 @@ Each key is a path relative to the `web/` directory (e.g. "db/schema.ts", \
 "app/page.tsx", "app/projects/page.tsx").
 
 CRITICAL #1 — APP CHROME AND LAYOUT (most important visual requirement):
-The spec includes an "app_chrome" field describing the layout shell. You \
-MUST generate app/layout.tsx with branded chrome — the structural UI that \
-makes the app look like a real product, NOT a bare data table on a white page.
-- If a reference screenshot is provided, base your layout shell on it \
-(see #1b below). Otherwise, follow the spec's layout_type exactly.
-- LAYOUT VARIETY: the spec's layout_type tells you the nav pattern — it \
-could be a top navbar, header with tabs, icon rail, split panel, full-width \
-header, or left sidebar. Implement EXACTLY what the spec says. If it says \
-"top_navbar", build a horizontal top navigation bar — do NOT build a sidebar. \
-If it says "icon_rail", build a slim vertical icon strip. Each layout_type \
-produces a VISUALLY DISTINCT app.
-- The chrome uses the primary_color from visual_identity as its background.
-- Non-active nav items are visible but greyed out (opacity-50, \
+The spec includes a "chrome_description" field — a natural-language \
+description of the app's navigation shell, its position, dimensions, \
+styling, and contents. You MUST generate app/layout.tsx that faithfully \
+implements this description. The chrome is what makes the app look like \
+a real product — not a bare page. \
+Read the chrome_description carefully and build exactly what it says. \
+If it describes a top navbar, build a top navbar. If it describes a slim \
+icon rail, build an icon rail. If it describes a header with tabs, build \
+that. The description tells you everything you need — dimensions, colors, \
+elements, position. Implement it faithfully. \
+- Non-active nav items should be visible but greyed out (opacity-50, \
 pointer-events-none) — they are purely decorative.
 - The product name must be prominent in the chrome.
 
 CRITICAL #1b — VISUAL REFERENCE (if provided):
 If a reference screenshot is included in the message, it is your VISUAL \
-BLUEPRINT for the app's chrome and layout. Your generated code should \
-look like it belongs to the same product as the screenshot:
-- LAYOUT CHROME FIRST: before writing any content, study the screenshot's \
-navigation structure. Replicate the sidebar/navbar/header dimensions, \
-position, and styling. A ~240px left sidebar stays a ~240px left sidebar. \
-A slim top header bar stays a slim top header bar. Do NOT swap a top \
-navbar for a sidebar or vice versa — the navigation chrome is the most \
-visually distinctive element.
-- MATCH the color scheme: extract and use the same primary, accent, and \
-background colors visible in the screenshot.
-- MATCH the typography density, spacing, and component styling.
+BLUEPRINT for the app's chrome and layout. The spec's chrome_description \
+and color_palette were derived from this screenshot — use both the \
+screenshot and those descriptions together to build a faithful replica:
+- MATCH the color scheme: the spec's color_palette describes the colors. \
+Apply them throughout.
+- MATCH the typography density, spacing, and component styling from the \
+screenshot.
 - The spec defines the industry, data, and skill-specific UI — follow the \
 spec for those. The reference image governs the visual shell, colors, and \
 layout structure. Do NOT copy specific text or data values from the image.
@@ -268,20 +240,16 @@ alone cannot convey — interaction patterns, button styles, spacing conventions
 default posture is to match the reference's chrome faithfully.
 
 CRITICAL #2 — Data display format and layout:
-- Follow the spec's display format and the reference screenshot. If the \
-spec describes card grids, build card grids. If it describes a kanban \
-board, build a kanban board. If it describes a list with detail panels, \
-build that.
-- DO NOT DEFAULT TO DATA TABLES. Data tables are the most overused pattern. \
-Only use a data table if the spec explicitly says "data table" or \
-"data grid" in the page descriptions, OR the skill literally requires \
-row-based tabular interaction (e.g. "aggregate across data grid rows"). \
-For all other cases, use the display format from the spec or reference: \
-card grids, card lists, kanban columns, timeline views, inbox panels, \
-metric dashboards, gallery layouts, conversation threads, detail panels, etc.
+- The spec's ui_spec field describes how each page should display and \
+organize its data. Follow it faithfully. If the ui_spec describes card \
+grids, build card grids. If it describes a kanban board, build a kanban \
+board. If it describes a timeline, build that. The ui_spec is your \
+primary guide for content layout.
+- The spec's color_palette describes the full color scheme. Use it for \
+chrome, backgrounds, accents, buttons, badges, status indicators, hover \
+states, and text colors throughout the app.
 - If the spec includes a "clone_target", use your knowledge of that product \
 to match its exact display conventions.
-- Apply accent_color for buttons, badges, links, and highlights.
 - Edit forms using Dialog or Sheet with labeled inputs and toast feedback (sonner).
 - Hover states on interactive elements. Colored status badges. Proper typography.
 - CRITICAL — FULL WIDTH: Page content MUST span the full available width. \
@@ -360,10 +328,9 @@ correct Tailwind CSS 4 imports. If you include it, it will be ignored.
 
 Layout rules:
 - You MUST include app/layout.tsx with branded chrome matching the spec's \
-layout_type (top navbar, header with tabs, icon rail, split panel, \
-full-width header, or sidebar). This is where the product name, navigation \
-items, and brand colors go. The layout_type in the spec is authoritative — \
-implement that exact pattern.
+chrome_description. This is where the product name, navigation items, \
+and brand colors go. The chrome_description is authoritative — implement \
+exactly what it describes.
 - The layout MUST import and use these template-provided modules:
   ```
   import type { Metadata } from "next";
@@ -415,7 +382,7 @@ Other rules:
 - ALWAYS include "db/seed.ts" with deterministic seed data insertion
 - ALWAYS include "drizzle/0000_zippy_changeling.sql" with CREATE TABLE SQL
 - ALWAYS include "app/page.tsx" as the main entry page
-- ALWAYS include "app/layout.tsx" with branded chrome matching the spec's layout_type (see CRITICAL #1)
+- ALWAYS include "app/layout.tsx" with branded chrome matching the spec's chrome_description (see CRITICAL #1)
 - ALWAYS include at least one API route in "app/api/" for data access
 - ALWAYS include "app/api/health/route.ts" unchanged (it uses getDb internally)
 - ALWAYS include at least one write API route (PUT/PATCH) for data mutation
