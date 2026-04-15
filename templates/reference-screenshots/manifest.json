@@ -1,53 +1,5 @@
 [
   {
-    "filename": "ref_000.png",
-    "site": "booking",
-    "original_name": "booking_000.png",
-    "content_type": "product grid",
-    "industry": "Travel",
-    "ui_patterns": [
-      "card layout",
-      "image carousel",
-      "rating system",
-      "pricing display",
-      "filtering",
-      "promotional banners",
-      "heart/favorite icons"
-    ],
-    "description": "This is a Booking.com homepage displaying accommodation listings in a card-based grid layout. Each property card shows photos, ratings, reviews, distance from center, and pricing in CAD. The page includes promotional banners at the top offering credit card deals and early booking discounts. Users can browse different types of accommodations like bed & breakfasts and guesthouses with heart icons to save favorites."
-  },
-  {
-    "filename": "ref_001.png",
-    "site": "booking",
-    "original_name": "booking_001.png",
-    "content_type": "footer",
-    "industry": "Travel",
-    "ui_patterns": [
-      "multi-column footer",
-      "hierarchical navigation",
-      "grouped links",
-      "corporate branding",
-      "partner logos",
-      "breadcrumb navigation"
-    ],
-    "description": "This is the footer section of a Booking.com flight booking page, specifically for San Francisco to New York flights. The footer contains organized link groups for Support, Discover, Terms and settings, Partners, and About sections. It includes corporate information, partner company logos, and various navigation options typical of a comprehensive travel booking website footer."
-  },
-  {
-    "filename": "ref_002.png",
-    "site": "booking",
-    "original_name": "booking_002.png",
-    "content_type": "sitemap page",
-    "industry": "Travel",
-    "ui_patterns": [
-      "hierarchical navigation",
-      "grouped links",
-      "breadcrumb navigation",
-      "footer links",
-      "categorized content"
-    ],
-    "description": "This is a comprehensive sitemap page for a travel booking website showing flight destinations organized by geographic regions. The page displays destinations grouped into sections like Oceania and Caribbean, with links to various countries, islands, and territories. At the bottom, there are footer links for different services and resources including accommodations, customer service, and business tools. The layout uses a simple hierarchical structure to help users navigate to specific flight destinations across the platform."
-  },
-  {
     "filename": "ref_003.png",
     "site": "booking",
     "original_name": "booking_003.png",
@@ -84,21 +36,6 @@
       "offers section"
     ],
     "description": "This is Booking.com's flight search interface featuring a prominent search form with options for round-trip, one-way, and multi-city flights. The page includes input fields for departure/arrival locations, travel dates, and passenger count, along with flight type preferences. Below the main search area, there's an offers section highlighting exclusive deals and partner airlines, with the overall design emphasizing ease of flight comparison and booking."
-  },
-  {
-    "filename": "ref_005.png",
-    "site": "booking",
-    "original_name": "booking_005.png",
-    "content_type": "help page",
-    "industry": "Travel",
-    "ui_patterns": [
-      "expandable sections",
-      "accordion interface",
-      "footer navigation",
-      "breadcrumb navigation",
-      "categorized content"
-    ],
-    "description": "This is a hotel booking website's FAQ page specifically for the New Yorker by Lotte Hotels property. The page features expandable accordion sections covering common guest questions about breakfast, room types, check-in/check-out times, pricing, amenities, and location. At the bottom, there's a comprehensive footer with links organized into categories like Support, Discover, Terms and settings, Partners, and About, providing easy access to various booking platform features and information."
   },
   {
     "filename": "ref_006.png",
@@ -220,22 +157,6 @@
     "description": "This is a search results page for New York attractions and activities on Booking.com. The interface features a filter sidebar on the left with location and category options, while the main content area displays attraction listings in a card format. Each result card includes an image, title, description, rating, price, and availability information with prominent 'See availability' buttons."
   },
   {
-    "filename": "ref_013.png",
-    "site": "booking",
-    "original_name": "booking_013.png",
-    "content_type": "terms page",
-    "industry": "Travel",
-    "ui_patterns": [
-      "sidebar navigation",
-      "hierarchical content structure",
-      "table of contents",
-      "print functionality",
-      "breadcrumb navigation",
-      "sectioned content"
-    ],
-    "description": "This is Booking.com's customer terms of service page, displaying legal information and agreements for users of the travel booking platform. The page features a sidebar navigation menu with various legal and informational sections, and the main content area shows detailed terms with a table of contents linking to different service categories like accommodations, flights, and car rentals. The layout includes standard website header elements with user account information and service navigation tabs."
-  },
-  {
     "filename": "ref_014.png",
     "site": "booking",
     "original_name": "booking_014.png",
@@ -250,22 +171,6 @@
       "user account dropdown"
     ],
     "description": "This is Booking.com's apartment search page featuring a prominent search form overlaid on a background image of apartment interiors. The page includes navigation tabs for different accommodation types, location and date input fields, guest selection options, and a section for recent searches. The interface uses a blue color scheme with clear call-to-action buttons and maintains the typical booking platform layout with user account access in the top right corner."
-  },
-  {
-    "filename": "ref_015.png",
-    "site": "booking",
-    "original_name": "booking_015.png",
-    "content_type": "help page",
-    "industry": "Travel",
-    "ui_patterns": [
-      "expandable sections",
-      "accordion interface",
-      "tabbed navigation",
-      "grid layout",
-      "card-based design",
-      "destination browsing"
-    ],
-    "description": "This is a car rental FAQ page from Booking.com focused on New York rentals. The page features an accordion-style interface with expandable questions about costs, car types, and rental policies. Below the FAQ section is a destination browsing area showing popular car rental cities with pricing information and location counts. The layout combines informational content with promotional elements to help users understand rental options and explore alternatives."
   },
   {
     "filename": "ref_016.png",
@@ -369,22 +274,6 @@
     "description": "This is an access denied error page that appears when a user attempts to visit a restricted Costco webpage for grocery and household items. The page displays a clear error message stating the user lacks permission to access the requested resource. It includes a reference number for troubleshooting purposes and follows a standard, minimal error page layout with basic text information."
   },
   {
-    "filename": "ref_022.png",
-    "site": "costco",
-    "original_name": "costco_022.png",
-    "content_type": "homepage",
-    "industry": "Retail",
-    "ui_patterns": [
-      "hero carousel",
-      "promotional banners",
-      "member benefits section",
-      "call-to-action buttons",
-      "navigation dots",
-      "branded content"
-    ],
-    "description": "This is Costco's homepage featuring a prominent carousel with promotional content, including a Bridgestone tire discount offer and member-only savings section. The page uses large hero banners to showcase deals and benefits, with navigation elements and branding throughout. The layout emphasizes promotional content and membership value propositions typical of a wholesale retailer's main landing page."
-  },
-  {
     "filename": "ref_023.png",
     "site": "etsy",
     "original_name": "etsy_023.png",
@@ -400,20 +289,6 @@
       "product thumbnails"
     ],
     "description": "This is an Etsy product browsing page showing a grid layout of handmade jewelry and accessories. The page displays product cards with images, titles, and pricing information, featuring items like pearl necklaces, bracelets, and evening bags. There's a 'Picks inspired by your shopping' section with personalized product recommendations displayed in a horizontal scrollable format."
-  },
-  {
-    "filename": "ref_024.png",
-    "site": "hubspot",
-    "original_name": "hubspot_043.png",
-    "content_type": "dashboard",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "bar chart",
-      "statistical summary",
-      "data visualization",
-      "outlier identification"
-    ],
-    "description": "This is a performance monitoring dashboard displaying a bar chart comparing Molmo versus actual distance measurements. The chart shows statistical data with a mean of 155px, median of 29px, and 14 outliers identified. Red bars indicate significant deviations from expected values, while green bars show measurements within normal ranges. The visualization helps identify performance discrepancies and outliers in the measurement system."
   },
   {
     "filename": "ref_025.png",
@@ -530,22 +405,6 @@
       "data visualization"
     ],
     "description": "A CRM deal creation modal overlaying a sales pipeline kanban board. The form contains fields for deal name, pipeline selection, deal stage, amount, and close date. The background shows a deal management interface with pipeline stages like 'Appointment Scheduled' and 'Decision Maker Bought-In', along with deal metrics and filtering options."
-  },
-  {
-    "filename": "ref_032.png",
-    "site": "hubspot",
-    "original_name": "hubspot_051.png",
-    "content_type": "login page",
-    "industry": "CRM",
-    "ui_patterns": [
-      "authentication form",
-      "session expiration notice",
-      "alternative sign-in options",
-      "remember me checkbox",
-      "password visibility toggle",
-      "forgot password link"
-    ],
-    "description": "This is a HubSpot login page showing a session expiration notice that requires the user to re-authenticate. The page displays a standard login form with email and password fields, along with options to remember the user and reset their password. Additional sign-in methods are available through alternative authentication options."
   },
   {
     "filename": "ref_033.jpg",
@@ -823,22 +682,6 @@
     "description": "This is a contact editing modal within a CRM system, showing form fields for managing contact information including account details, title, reporting structure, and contact information. The modal appears to be for editing a VP of Engineering contact at Acme Technologies Inc, with sections for basic info, description, and contact details like phone and email. The interface includes standard form elements and action buttons for saving or canceling changes."
   },
   {
-    "filename": "ref_048.png",
-    "site": "salesforce",
-    "original_name": "salesforce_067.png",
-    "content_type": "data table",
-    "industry": "CRM",
-    "ui_patterns": [
-      "tabbed navigation",
-      "search bar",
-      "sortable columns",
-      "radio button selection",
-      "action button",
-      "workspace/folder organization"
-    ],
-    "description": "This is an email template selection interface within a marketing automation platform. The page displays a Content Workspace containing email templates and marketing content in a tabular format with sortable columns for title, status, modification date, and last modified by. Users can select email templates using radio buttons and search through available content to choose layouts for their marketing campaigns."
-  },
-  {
     "filename": "ref_049.png",
     "site": "salesforce",
     "original_name": "salesforce_068.png",
@@ -926,22 +769,6 @@
     "description": "This is an email template selection modal within a CRM system. The interface allows users to choose between contacts and leads, browse available email templates through a searchable table format, and filter by template folders. The modal displays template names, descriptions, and folder locations, with options for both public and private email templates specifically designed for customer onboarding and other business communications."
   },
   {
-    "filename": "ref_054.png",
-    "site": "salesforce",
-    "original_name": "salesforce_073.png",
-    "content_type": "modal dialog",
-    "industry": "CRM",
-    "ui_patterns": [
-      "modal overlay",
-      "form fields",
-      "required field indicators",
-      "action buttons",
-      "cancel/save pattern",
-      "input validation"
-    ],
-    "description": "A folder creation dialog within a CRM system, specifically for organizing leads. The modal contains form fields for folder label and unique name, with required field indicators marked by red asterisks. The interface includes standard cancel and save buttons at the bottom, with the folder label field already containing 'Exp' as partial input."
-  },
-  {
     "filename": "ref_055.png",
     "site": "salesforce",
     "original_name": "salesforce_074.png",
@@ -977,19 +804,6 @@
       "action buttons"
     ],
     "description": "This is a Salesforce CRM settings page specifically for configuring Activity Reminders. The page allows users to customize reminder preferences including task and event notifications in Lightning Experience, default reminder times, and email notification settings. A success message indicates that settings have been saved, and the interface provides various configuration options through checkboxes and dropdown menus. The left sidebar shows different settings categories while the main content area focuses on reminder-specific configurations."
-  },
-  {
-    "filename": "ref_057.png",
-    "site": "salesforce",
-    "original_name": "salesforce_076.png",
-    "content_type": "help page",
-    "industry": "CRM",
-    "ui_patterns": [
-      "loading state",
-      "minimal interface",
-      "documentation layout"
-    ],
-    "description": "This appears to be a Salesforce Help article page that is currently loading or experiencing display issues. The page shows a mostly blank white interface with only the browser tab indicating it's a Salesforce Help article about external authentication. The URL suggests this is documentation related to external authentication configuration, but the content is not currently visible, indicating either a loading state or technical issue with the page rendering."
   },
   {
     "filename": "ref_058.png",
@@ -1362,22 +1176,6 @@
       "premium badge"
     ],
     "description": "This is a promotional modal dialog within Slack encouraging users to upgrade to a paid plan for unlimited canvas creation. The modal highlights premium collaboration tools and features like capturing notes, sharing across channels, and privacy controls. It appears over the main Slack messaging interface, with a clear call-to-action button to view upgrade options."
-  },
-  {
-    "filename": "ref_079.jpg",
-    "site": "slack",
-    "original_name": "slack_098.jpg",
-    "content_type": "file browser",
-    "industry": "Operating System",
-    "ui_patterns": [
-      "file explorer",
-      "hierarchical navigation",
-      "list view",
-      "sidebar navigation",
-      "breadcrumb navigation",
-      "file metadata display"
-    ],
-    "description": "This is a file browser interface showing a temporary directory with various system files and Google Chrome-related files. The interface displays files in a list format with columns for name, size, type, and modification time. A sidebar on the left provides quick access to common locations like Desktop, Documents, Downloads, and other system directories."
   },
   {
     "filename": "ref_080.jpg",
@@ -1773,24 +1571,6 @@
     "description": "This is a Stripe payment processing platform settings page for configuring site links. The page allows users to set up links for different components like Balances and Documents, with options to specify whether embedded components are used. It includes form validation, radio button selections, and a sidebar navigation menu with various payment-related sections like Transactions, Customers, and Billing."
   },
   {
-    "filename": "ref_102.png",
-    "site": "stripe",
-    "original_name": "stripe_121.png",
-    "content_type": "modal dialog",
-    "industry": "Financial Services",
-    "ui_patterns": [
-      "modal overlay",
-      "form layout",
-      "checkbox list",
-      "dropdown selection",
-      "date picker",
-      "progress indicator",
-      "sectioned content",
-      "action buttons"
-    ],
-    "description": "This is a configuration modal for adding revenue recognition rules in Stripe's payment platform. The interface allows users to select applicable categories (customers, products, invoices, etc.), configure revenue treatment and allocation settings, and set effective date periods. The modal is part of Stripe's sandbox environment for testing financial functionality before going live."
-  },
-  {
     "filename": "ref_103.jpg",
     "site": "stripe",
     "original_name": "stripe_122.jpg",
@@ -1936,22 +1716,6 @@
     "description": "This is the main homepage for Walgreens, a pharmacy and healthcare retailer. The page features multiple promotional sections including myWalgreens membership signup, mobile app download with discount codes, delivery/pickup services, and credit card rewards. Below the promotional banners is a featured categories section displaying product categories like Easter Shop, Allergy & Sinus, Grocery & Beverage, Vitamins & Supplements, Personal Care, Beauty, Household & Pet Essentials, Medicines & Treatments, and Contact Lenses in a grid layout."
   },
   {
-    "filename": "ref_112.png",
-    "site": "walgreens",
-    "original_name": "walgreens_131.png",
-    "content_type": "footer",
-    "industry": "Healthcare",
-    "ui_patterns": [
-      "multi-column footer",
-      "grouped navigation links",
-      "privacy policy links",
-      "company information section",
-      "newsletter signup",
-      "copyright notice"
-    ],
-    "description": "This is the footer section of the Walgreens website, displaying organized links across multiple columns for customer service, company information, terms and conditions, and advertising programs. The footer includes essential navigation elements like shipping, returns, help/FAQs, privacy policies, and affiliate programs. At the top of the visible area is a promotional banner encouraging users to sign up for deals and offers, with the Walgreens logo prominently displayed above the footer content."
-  },
-  {
     "filename": "ref_113.png",
     "site": "walmart",
     "original_name": "walmart_132.png",
@@ -1986,25 +1750,6 @@
       "shopping cart indicator"
     ],
     "description": "This is Walmart's flash deals page for beauty and personal care products. The page features a prominent Flash Deals promotional banner advertising up to 65% off with weekly finds and limited time offers. Users can filter results by various criteria including in-store availability, price, brand, and fulfillment speed. The interface includes standard e-commerce elements like a search bar, user account access, and shopping cart functionality."
-  },
-  {
-    "filename": "ref_115.png",
-    "site": "walmart",
-    "original_name": "walmart_134.png",
-    "content_type": "detail page",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "product image gallery",
-      "thumbnail navigation",
-      "image zoom",
-      "product carousel",
-      "breadcrumb navigation",
-      "search bar",
-      "shopping cart",
-      "user account menu",
-      "store pickup/delivery options"
-    ],
-    "description": "This is a Walmart product detail page showcasing a Lux Decor Queen Comforter bedding product. The page features a large product image gallery on the right with a white comforter displayed on a bed, accompanied by smaller thumbnail images on the left showing different views and details of the product. The standard Walmart e-commerce interface includes the blue header with search functionality, shopping cart, and account options, along with store location and pickup/delivery preferences."
   },
   {
     "filename": "ref_116.png",
@@ -2512,21 +2257,6 @@
     "description": "This is a campaign creation form for X Ads (formerly Twitter Ads) platform. The form is structured with a left sidebar showing campaign hierarchy and progress steps, while the main content area contains campaign configuration fields including objective selection, naming, and funding source setup. There's a prominent warning about missing payment methods and an action to add a credit card. The interface includes standard form navigation with Exit, Save draft, and Next buttons at the bottom."
   },
   {
-    "filename": "ref_144.png",
-    "site": "x",
-    "original_name": "x_ads_163.png",
-    "content_type": "help page",
-    "industry": "Social Media",
-    "ui_patterns": [
-      "breadcrumb navigation",
-      "cookie consent banner",
-      "help center layout",
-      "informational content",
-      "action buttons"
-    ],
-    "description": "This is a help center page from X (formerly Twitter) explaining their cookie policy. The page features a clean layout with breadcrumb navigation and informational content about how cookies are used on the platform. A cookie consent banner appears at the bottom with options to accept all cookies or refuse non-essential ones. The page is part of X's help documentation system, providing transparency about their data collection practices."
-  },
-  {
     "filename": "ref_145.png",
     "site": "x",
     "original_name": "x_ads_164.png",
@@ -2559,21 +2289,6 @@
       "action buttons"
     ],
     "description": "This is an advertising campaign setup form interface, specifically showing the budget and scheduling configuration step. The form includes fields for daily budget allocation, campaign start/end dates, and displays estimated audience reach metrics. The interface features a sidebar navigation showing the campaign structure and progress through different setup stages, with options to save drafts or proceed to the next step."
-  },
-  {
-    "filename": "ref_147.png",
-    "site": "x",
-    "original_name": "x_ads_166.png",
-    "content_type": "help page",
-    "industry": "Digital Marketing",
-    "ui_patterns": [
-      "header navigation",
-      "hero banner",
-      "cookie consent banner",
-      "multiple browser tabs",
-      "breadcrumb navigation"
-    ],
-    "description": "This is a help documentation page for X Business (formerly Twitter Business) focusing on device, carrier, and new mobile targeting features for advertising campaigns. The page features a dark hero section with blue-tinted imagery of mobile/communication equipment. A cookie consent banner appears at the bottom with options to accept or refuse non-essential cookies. The browser shows multiple tabs open related to campaign setup and targeting options."
   },
   {
     "filename": "ref_148.png",
@@ -3425,24 +3140,6 @@
     "description": "This is a Basecamp to-do list interface showing a project management view. The page displays task lists organized into two main categories - Design and Development - with individual tasks that can be checked off and assigned to team members. It's part of Basecamp's project collaboration platform for organizing team work and tracking progress."
   },
   {
-    "filename": "ref_192.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_8327dcb08648.jpg",
-    "content_type": "form",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "step indicator",
-      "text input field",
-      "textarea",
-      "form labels",
-      "link button",
-      "numbered section header",
-      "placeholder text",
-      "optional field labels"
-    ],
-    "description": "This is a project creation form for a business software application. The form shows step 1 of a multi-step process titled 'Start with the basics' where users can name their project, add an optional description, and set an optional schedule. There's also a link to choose from project templates."
-  },
-  {
     "filename": "ref_193.webp",
     "site": "ddg_search",
     "original_name": "ddg_ce06ecaabbae.webp",
@@ -3558,26 +3255,6 @@
     "description": "This is a Notion database displaying academic lectures organized in a kanban board format. The board shows lecture cards categorized by status (Not started, In progress, Done) with subject tags like Physics, Philosophy, Ancient History, Maths, and English. Each lecture card contains a title, date, and subject category, helping students or educators track their progress through course materials."
   },
   {
-    "filename": "ref_199.png",
-    "site": "ddg_search",
-    "original_name": "ddg_3cf07e22291b.png",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "kanban board",
-      "view switcher tabs",
-      "status columns with counts",
-      "card-based items",
-      "gallery view with image cards",
-      "calendar grid layout",
-      "list view with pages",
-      "add new item buttons",
-      "navigation breadcrumbs",
-      "monthly calendar picker"
-    ],
-    "description": "This appears to be a project management or database application that allows users to view and organize data in multiple formats. The interface shows different view options including a kanban-style board view with status columns, a gallery view with image cards, a list view, and a calendar view displaying September 2023. The application seems designed for flexible data visualization and task management across different viewing preferences."
-  },
-  {
     "filename": "ref_200.jpg",
     "site": "ddg_search",
     "original_name": "ddg_7df37b9b28e4.jpg",
@@ -3595,24 +3272,6 @@
       "search functionality"
     ],
     "description": "This is a Notion database table for managing academic lectures and coursework. The table shows lecture entries with columns for name, subject (Maths, Philosophy, Ancient History), due dates, text descriptions, and status tracking (Done, In progress, Not started). It appears to be used by a student to organize and track their academic assignments and lectures."
-  },
-  {
-    "filename": "ref_201.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_bff45806cf09.jpg",
-    "content_type": "template gallery",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "template cards",
-      "grid layout",
-      "search bar",
-      "category section",
-      "preview thumbnails",
-      "descriptive text",
-      "icons",
-      "close button"
-    ],
-    "description": "This is a template selection interface for a database or project management application. Users can choose from various pre-built templates including Empty database, Build with AI, Projects, Tasks Tracker, Document Hub, and Brainstorm Session. Each template card shows a preview of the structure and basic functionality it provides."
   },
   {
     "filename": "ref_202.jpg",
@@ -3826,24 +3485,6 @@
       "sidebar navigation"
     ],
     "description": "This is a team messaging interface, likely Slack or a similar collaboration platform, showing a conversation in the #team-design channel. The interface displays a message thread about design readiness with replies from team members Sara Parras, Zoe Maxwell, and Lee Hao, along with timestamps and reply counts. There's a message composer at the bottom for sending new messages to the thread."
-  },
-  {
-    "filename": "ref_213.webp",
-    "site": "ddg_search",
-    "original_name": "ddg_0148d0ed7ba5.webp",
-    "content_type": "messaging interface",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "left sidebar navigation",
-      "threaded conversation view",
-      "user avatars",
-      "channel/workspace selector",
-      "message timestamps",
-      "reply interface",
-      "typing indicator",
-      "message reactions/emojis"
-    ],
-    "description": "This screenshot shows the Slack messaging platform interface, displaying a threaded conversation in the #team-design channel. The image appears to be part of a tutorial or guide about how to reply to threads in Slack, as indicated by the overlay text 'How to reply to a thread in slack' and the SupTask branding."
   },
   {
     "filename": "ref_214.jpg",
@@ -4077,25 +3718,6 @@
       "user presence indicators"
     ],
     "description": "This is a Discord messaging interface showing a chat conversation in a gaming-focused server. The screenshot displays the main chat area with multiple users exchanging messages about gaming topics, including an embedded image. The left sidebar shows different channels and the right sidebar displays server members with their online/offline status."
-  },
-  {
-    "filename": "ref_226.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_163be7bbc250.jpg",
-    "content_type": "messaging interface",
-    "industry": "Social Media",
-    "ui_patterns": [
-      "channel sidebar",
-      "message thread",
-      "channel categories",
-      "user avatar",
-      "hashtag links",
-      "collapsible sections",
-      "text input field",
-      "toolbar buttons",
-      "server/community selector"
-    ],
-    "description": "This is a Discord server interface for a shoe enthusiast community called 'Shoegazing Discord'. The screenshot shows the rules and guidelines channel with detailed descriptions of various shoe-related discussion channels, including general discussions, sizing questions, bespoke shoes, shoe care, and marketplace sections. The left sidebar displays organized channel categories for shoe discussions and off-topic conversations."
   },
   {
     "filename": "ref_227.webp",
@@ -4657,23 +4279,6 @@
     "description": "This appears to be a Pipedrive CRM dashboard showing various data visualizations and analytics. The interface displays multiple chart types including pie charts and bar charts with green and purple color schemes, likely representing sales or pipeline metrics. The left sidebar contains the typical CRM navigation icons for deals, contacts, activities, and other core functions."
   },
   {
-    "filename": "ref_256.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_ee1a9be52ce9.jpg",
-    "content_type": "landing page",
-    "industry": "CRM",
-    "ui_patterns": [
-      "hero section with large headline",
-      "brand logo in top corner",
-      "decorative background graphics",
-      "large typography overlay",
-      "abstract icon illustrations",
-      "colorful gradient background",
-      "promotional messaging"
-    ],
-    "description": "This is a landing page for Pipedrive, a CRM (Customer Relationship Management) software platform. The page features a prominent headline promoting Pipedrive as \"your next best CRM\" with decorative business-related icons scattered around the Pipedrive logo. The design uses vibrant colors and abstract graphics to create an engaging promotional layout."
-  },
-  {
     "filename": "ref_257.png",
     "site": "ddg_search",
     "original_name": "ddg_d62219918d1f.png",
@@ -5036,24 +4641,6 @@
     "description": "This is a WooCommerce analytics dashboard showing revenue metrics and performance data. The page displays key financial metrics like gross revenue, refunds, coupons, and net revenue with period-over-period comparisons, along with a line chart tracking revenue trends and a detailed data table below."
   },
   {
-    "filename": "ref_276.png",
-    "site": "ddg_search",
-    "original_name": "ddg_16a5de9bea6e.png",
-    "content_type": "dashboard",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "metric cards with KPIs",
-      "progress bars for goal tracking",
-      "line and bar chart combination",
-      "data table with campaign performance",
-      "integration icons/logos",
-      "time period selector",
-      "sidebar with connected services",
-      "percentage change indicators"
-    ],
-    "description": "This is an e-commerce analytics dashboard showing key business metrics and performance data. The interface displays customer count, sales goals progress, transaction vs session comparisons, and campaign performance metrics. It integrates with multiple data sources including WooCommerce, Google Analytics, Mailchimp, HubSpot, and Google Ads to provide a comprehensive view of e-commerce performance over a 30-day period."
-  },
-  {
     "filename": "ref_277.png",
     "site": "ddg_search",
     "original_name": "ddg_31e48c17bdd3.png",
@@ -5089,25 +4676,6 @@
       "toolbar with action buttons"
     ],
     "description": "This is a WooCommerce analytics revenue dashboard within WordPress. The page displays key revenue metrics including gross revenue, refunds, coupons, taxes, shipping, and net revenue for the last month compared to the previous year. It features metric cards at the top, a line chart showing revenue trends over time, and a detailed data table breaking down daily revenue figures."
-  },
-  {
-    "filename": "ref_279.png",
-    "site": "ddg_search",
-    "original_name": "ddg_15fbbc627200.png",
-    "content_type": "dashboard",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "metric cards",
-      "line chart",
-      "donut chart",
-      "data table",
-      "product showcase",
-      "percentage indicators",
-      "color-coded segments",
-      "time-based filtering",
-      "performance metrics grid"
-    ],
-    "description": "This is a WooCommerce e-commerce dashboard showing key business metrics and analytics. The interface displays conversion rates, engagement numbers, sales trends over time, revenue breakdown by device type, top performing products, and performance data by geographic cities. It appears to be a template editing interface for creating dashboard views."
   },
   {
     "filename": "ref_280.png",
@@ -5462,24 +5030,6 @@
     "description": "This is Amazon Seller Central's product listing interface where sellers can add new products to their inventory. The page shows multiple options for listing products including by keywords, product image, product IDs, web URL, blank form, or bulk template, with a prominent web URL input field for generating listings from existing product pages."
   },
   {
-    "filename": "ref_299.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_66b85a386215.jpg",
-    "content_type": "dashboard",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "search form",
-      "navigation menu",
-      "hero section with illustration",
-      "information cards",
-      "help links",
-      "language selector",
-      "magnifying glass overlay",
-      "call-to-action buttons"
-    ],
-    "description": "This is Amazon Seller Central, a platform for Amazon sellers to manage their products and inventory. The screenshot shows the product addition workflow, with a search interface to find products in Amazon's catalog and options for adding new products not currently sold on Amazon."
-  },
-  {
     "filename": "ref_300.png",
     "site": "ddg_search",
     "original_name": "ddg_93890feceebf.png",
@@ -5635,22 +5185,6 @@
       "trust indicators"
     ],
     "description": "This is an eBay auction page for a white vanity set furniture item. The page shows a large product image with thumbnail previews, current bid amount of $61.00, bidding controls, and detailed seller and shipping information. The listing includes typical eBay features like bid history, watchlist options, and seller ratings."
-  },
-  {
-    "filename": "ref_308.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_7c8d0e2a0599.jpg",
-    "content_type": "homepage",
-    "industry": "E-commerce",
-    "ui_patterns": [
-      "colorful logo",
-      "search bar",
-      "category navigation",
-      "browser address bar",
-      "welcome message",
-      "product category link"
-    ],
-    "description": "This is a screenshot of eBay's homepage displayed in a web browser. The image shows eBay's distinctive colorful logo and appears to feature a search interface with \"mobile phones\" as a search term or category. The page includes the classic eBay branding and layout elements that would allow users to browse and search for products on the e-commerce marketplace."
   },
   {
     "filename": "ref_309.png",
@@ -5887,26 +5421,6 @@
       "country-based user statistics"
     ],
     "description": "This appears to be a Google Analytics dashboard showing website performance metrics. The interface displays key statistics like total users (74K), new users (64K), average engagement time (2m 45s), and total revenue ($309K), along with a line chart showing user trends over time and geographic breakdowns of user locations."
-  },
-  {
-    "filename": "ref_321.webp",
-    "site": "ddg_search",
-    "original_name": "ddg_9bb53b4d0a55.webp",
-    "content_type": "dashboard",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "metric cards with KPI values",
-      "gradient header banner",
-      "line chart with time series data",
-      "horizontal bar charts",
-      "pie chart visualization",
-      "data table with device analytics",
-      "tabbed interface for data filtering",
-      "color-coded legend",
-      "percentage metrics display",
-      "multi-column layout"
-    ],
-    "description": "This is a Google Analytics Performance dashboard showing comprehensive website analytics data. The interface displays key metrics like sessions, users, bounce rate, and session duration in card format, along with various charts showing traffic patterns by channel, device, and geographic location. The dashboard provides a complete overview of website performance metrics and visitor behavior analytics."
   },
   {
     "filename": "ref_322.png",
@@ -6606,24 +6120,6 @@
     "description": "This is a Microsoft Power BI executive finance dashboard showing financial performance data. The interface displays profit analysis through multiple visualizations including bar charts showing profit by quarter and month, a world map showing profit distribution by country, and segmented sales data by product categories. The left sidebar contains expandable date filters for 2013-2014 data."
   },
   {
-    "filename": "ref_358.png",
-    "site": "ddg_search",
-    "original_name": "ddg_8515b891887f.png",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "metric cards",
-      "horizontal bar chart",
-      "donut chart",
-      "highlighted summary card",
-      "key performance indicators",
-      "data visualization widgets",
-      "grid layout",
-      "legend indicators"
-    ],
-    "description": "This is a Purchases Overview dashboard for a company called Cronus, displaying comprehensive purchasing analytics. The interface shows key metrics like total purchases, outstanding orders, and amounts not yet invoiced, along with visualizations breaking down purchase quantities by warehouse location and item categories. The dashboard includes charts showing vendor performance and purchase distributions across different business locations."
-  },
-  {
     "filename": "ref_359.png",
     "site": "ddg_search",
     "original_name": "ddg_69100ece2e14.png",
@@ -6759,25 +6255,6 @@
     "description": "This is a Stripe payment processing mobile app interface showing a payment amount entry form. The screen displays a $50.00 payment amount with an optional description field and a numeric keypad for input. This appears to be part of Stripe's mobile payment solution for quick transaction processing."
   },
   {
-    "filename": "ref_366.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_e52bb6a3e653.jpg",
-    "content_type": "form",
-    "industry": "Financial Services",
-    "ui_patterns": [
-      "Mobile payment interface",
-      "Credit card form fields",
-      "Payment method selection",
-      "Apple Pay integration",
-      "Google Pay integration",
-      "Branded payment logos",
-      "Order summary display",
-      "Secure checkout indicator",
-      "Card brand recognition icons"
-    ],
-    "description": "This is a Stripe Payments checkout form displayed on a mobile device. The interface shows a payment form for an order totaling $46.80, with options for Apple Pay, Google Pay, or traditional card payment. The form includes fields for email, card information, expiry date, CVC, and billing details, along with various payment method logos and security indicators."
-  },
-  {
     "filename": "ref_367.jpg",
     "site": "ddg_search",
     "original_name": "ddg_dd48008c6d7d.jpg",
@@ -6796,62 +6273,6 @@
       "Powered by Stripe branding"
     ],
     "description": "This is a checkout page for Web Dev Simplified, LLC selling online programming courses. The page shows an order for two courses - 'Learn React Today' and 'Learn CSS Today' - totaling $350.00. The payment form includes options for Google Pay or credit card payment with standard billing information fields."
-  },
-  {
-    "filename": "ref_368.png",
-    "site": "ddg_search",
-    "original_name": "ddg_0670e00575e1.png",
-    "content_type": "landing page",
-    "industry": "Financial Services",
-    "ui_patterns": [
-      "hero section",
-      "product showcase",
-      "verification badge",
-      "checkout form preview",
-      "payment method icons",
-      "branded logo",
-      "diagonal design element",
-      "multi-step form interface"
-    ],
-    "description": "This is a marketing landing page for Stripe Payments, showcasing their payment processing services. The page features the Stripe logo and 'Verified Partner' badge on the left, with a preview of their checkout interface on the right showing a sample purchase flow for skincare products. The design demonstrates Stripe's payment form capabilities including Apple Pay integration and shipping details collection."
-  },
-  {
-    "filename": "ref_369.png",
-    "site": "ddg_search",
-    "original_name": "ddg_3215b9d4dcd9.png",
-    "content_type": "landing page",
-    "industry": "Financial Services",
-    "ui_patterns": [
-      "hero section",
-      "mobile mockup illustration",
-      "brand logo",
-      "product announcement header",
-      "payment interface mockup",
-      "contactless payment visualization",
-      "merchant name display",
-      "payment total display"
-    ],
-    "description": "This is a Stripe landing page announcing the launch of Tap to Pay on Android. The page features a mobile phone mockup showing the contactless payment interface for a ride-sharing service called Rocket Rides, with a payment total of $36.20 and NFC tap-to-pay functionality."
-  },
-  {
-    "filename": "ref_370.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_95bfad9f77ab.jpg",
-    "content_type": "dashboard",
-    "industry": "Web Analytics",
-    "ui_patterns": [
-      "grid layout with multiple widgets",
-      "line charts showing trends over time",
-      "bar charts displaying metrics",
-      "pie charts for data breakdown",
-      "circular progress indicators",
-      "gauge/meter visualizations",
-      "world map with data points",
-      "radar/spider chart",
-      "dark theme interface",
-      "colorful data visualization"
-    ],
-    "description": "This is an analytics dashboard displaying various data visualizations and key performance indicators. The interface shows multiple charts, graphs, and metrics in a grid layout with a dark blue theme, including line charts, bar charts, pie charts, progress rings, and a world map. This appears to be a comprehensive business intelligence or web analytics platform for monitoring and analyzing various performance metrics."
   },
   {
     "filename": "ref_371.png",
@@ -6892,24 +6313,6 @@
       "action buttons"
     ],
     "description": "This is a QuickBooks business dashboard showing financial overview for a company called E Mark. The dashboard displays key financial metrics including profit and loss, expenses breakdown with a donut chart, income summary, sales trends with a line graph, and bank account balances, all with various time period filters for the last 30 days."
-  },
-  {
-    "filename": "ref_373.png",
-    "site": "ddg_search",
-    "original_name": "ddg_25d3be3de15f.png",
-    "content_type": "form wizard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "breadcrumb navigation",
-      "two-column layout",
-      "dropdown selector",
-      "app selection interface",
-      "source and destination workflow",
-      "progress button",
-      "icon-labeled options",
-      "multi-step form"
-    ],
-    "description": "This is a data integration or import tool that allows users to connect different applications for data transfer. The interface shows a form wizard where users select QuickBooks as their data source and can choose from destinations like Google Sheets, Microsoft Excel, or BigQuery. It appears to be part of a data import/export workflow system."
   },
   {
     "filename": "ref_374.png",
@@ -7164,24 +6567,6 @@
     "description": "This is a PayPal account dashboard showing transaction history and activity. The interface displays a data table with payment transactions, including details like dates, payment status, recipient emails, and transaction types. The left sidebar provides navigation to various account features like overview, history, and settings."
   },
   {
-    "filename": "ref_387.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_abcc86d682d7.jpg",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "mobile app interface",
-      "bar chart visualization",
-      "metrics cards",
-      "navigation header",
-      "percentage indicators",
-      "revenue display",
-      "bottom navigation tabs",
-      "brand logo placement"
-    ],
-    "description": "This is Square Dashboard, a business analytics mobile app that helps merchants track their sales and business performance. The screenshot shows the dashboard interface on a mobile device displaying revenue metrics, a blue bar chart showing sales trends, and key performance indicators with percentage changes for a business called 'Leaf & Lemon'."
-  },
-  {
     "filename": "ref_388.jpg",
     "site": "ddg_search",
     "original_name": "ddg_02d2020788c7.jpg",
@@ -7198,25 +6583,6 @@
       "green/red color coding for metrics"
     ],
     "description": "This is a mobile business analytics dashboard showing sales reporting across multiple locations. The interface displays net sales metrics with a 3.65% increase, featuring a weekly bar chart comparison and detailed weekly breakdowns. The app appears to be designed for multi-location business performance tracking with live reporting capabilities."
-  },
-  {
-    "filename": "ref_389.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_0ced5c822952.jpg",
-    "content_type": "landing page",
-    "industry": "Web Development",
-    "ui_patterns": [
-      "Hero section with product branding",
-      "Feature list with checkmarks",
-      "Product screenshots/mockups",
-      "Call-to-action button",
-      "Dashboard previews",
-      "Metrics visualization",
-      "Chart components",
-      "Card layouts",
-      "Multi-screen showcase"
-    ],
-    "description": "This is a landing page for Square, a SaaS dashboard template product. The page showcases fully-coded dashboard templates with over 40 responsive screens, featuring production-ready templates optimized for mobile with clean code. Multiple dashboard interface mockups are displayed showing various analytics, charts, and team management features."
   },
   {
     "filename": "ref_390.png",
@@ -7275,24 +6641,6 @@
     "description": "This is a customer relationship management (CRM) system showing a modal dialog for creating a new customer. The form includes fields for basic contact information like name, phone number, email, and address, with country selection dropdowns for phone and address fields. The interface appears to be part of a broader customer management platform with navigation elements visible in the background."
   },
   {
-    "filename": "ref_393.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_759735d783c1.jpg",
-    "content_type": "landing page",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "hero section",
-      "company logos",
-      "event announcement",
-      "date display",
-      "headline text",
-      "subheading text",
-      "illustrative graphics",
-      "brand positioning"
-    ],
-    "description": "This is a landing page for Brex, a corporate expense management platform, announcing a virtual wine tasting session event. The page features the Common Sense Conferences and Brex logos, with a focus on \"Automating Corporate Expense Management\" scheduled for May 30th, 2024. The design includes colorful illustrations showing business technology, security, and wine-related imagery to represent the event theme."
-  },
-  {
     "filename": "ref_394.png",
     "site": "ddg_search",
     "original_name": "ddg_660e70a2d252.png",
@@ -7309,24 +6657,6 @@
       "breadcrumb navigation"
     ],
     "description": "This appears to be an accounting or financial management software interface showing a data table with transaction records. The interface displays various financial entries with details like dates, amounts, merchants, and account categories, along with sidebar navigation for different accounting functions and progress tracking indicators at the top."
-  },
-  {
-    "filename": "ref_395.png",
-    "site": "ddg_search",
-    "original_name": "ddg_67847c9439d2.png",
-    "content_type": "detail page",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "Alert banner with warning flag",
-      "Receipt image display",
-      "Compliance badge/status indicator",
-      "Itemized expense breakdown",
-      "Warning icon for flagged items",
-      "Total amount prominently displayed",
-      "Auto-generated label",
-      "Receipt scanning interface"
-    ],
-    "description": "This is an expense detail page from Brex, a business expense management platform. The screenshot shows a flagged expense receipt for $213.75 that was automatically processed by Brex AI, which detected alcohol (Chardonnay) as a high-risk item. The interface displays the scanned receipt image, itemized breakdown, and compliance status."
   },
   {
     "filename": "ref_396.png",
@@ -7347,44 +6677,6 @@
     "description": "This appears to be a financial management dashboard showing a Brex corporate credit card with Q3 commercial spending details. The interface displays available credit ($120,300.05) against a limit of $280,000.00, along with status indicators for budget compliance, policy adherence, and pre-approval status. The left sidebar shows different expense categories like shipping, software, T&E, advertising, and equipment."
   },
   {
-    "filename": "ref_397.png",
-    "site": "ddg_search",
-    "original_name": "ddg_759f9b285226.png",
-    "content_type": "landing page",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "hero illustration",
-      "mobile device mockup",
-      "security shield icons",
-      "password field visualization",
-      "cloud computing graphics",
-      "character illustration",
-      "credit card imagery",
-      "globe/world map element",
-      "data server visualization",
-      "AI chip icon"
-    ],
-    "description": "This appears to be a cybersecurity or digital security service landing page featuring an illustrated design. The image shows various security-related elements including a mobile phone with login interface, security shields, password fields, cloud AI services, and a businessman character, all suggesting a comprehensive digital security solution or platform."
-  },
-  {
-    "filename": "ref_398.png",
-    "site": "ddg_search",
-    "original_name": "ddg_e561e9949faf.png",
-    "content_type": "modal dialog",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "notification card",
-      "modal overlay",
-      "status badge",
-      "icon with text",
-      "currency display",
-      "approval status indicator",
-      "contextual information",
-      "AI assistant interface"
-    ],
-    "description": "This is a notification modal from Brex Assistant, a business expense management tool. The modal shows an automated update about a memo being updated based on budget information, displaying details about a Carbone restaurant expense for $253.24 that was approved for a Design Q4 Planning Offsite dinner event. The interface demonstrates AI-powered expense tracking and calendar integration features."
-  },
-  {
     "filename": "ref_399.png",
     "site": "ddg_search",
     "original_name": "ddg_2dd94892ad42.png",
@@ -7403,38 +6695,6 @@
       "co-author selection"
     ],
     "description": "This is GitHub Desktop, a Git version control client showing a code diff view. The interface displays changes to TypeScript files with syntax highlighting, line-by-line diffs showing additions and modifications to React component code. The left sidebar shows changed files and commit preparation tools, while the main area shows the detailed code differences with green highlighting for additions."
-  },
-  {
-    "filename": "ref_400.png",
-    "site": "ddg_search",
-    "original_name": "ddg_2c6cf3163259.png",
-    "content_type": "landing page",
-    "industry": "Developer Tools",
-    "ui_patterns": [
-      "company logo",
-      "product branding",
-      "minimalist design",
-      "website URL display",
-      "centered layout",
-      "monochrome color scheme"
-    ],
-    "description": "This appears to be a landing page or promotional image for GitHub Repository, featuring the iconic GitHub logo (cat silhouette) prominently displayed. The page has a clean, minimalist design with the GitHub branding and the word \"REPOSITORY\" below it, along with a website URL for softwaretestingo.com in the top right corner."
-  },
-  {
-    "filename": "ref_401.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_8c98668732d5.jpg",
-    "content_type": "landing page",
-    "industry": "Developer Tools",
-    "ui_patterns": [
-      "hero section with background image",
-      "large typography heading",
-      "descriptive tagline",
-      "minimalist text overlay",
-      "attribution text",
-      "single call-to-action focus"
-    ],
-    "description": "This is a landing page for pforret/screenshots, a developer tool that automatically captures screenshots of websites. The page features a simple hero design with large white text overlaid on a scenic ocean and rocks background image, emphasizing the tool's main functionality with the tagline 'Automatically make screenshots of all your websites'."
   },
   {
     "filename": "ref_402.png",
@@ -7476,24 +6736,6 @@
     "description": "This is a GitHub organization page for CHIME/FRB Collaboration showing their repositories. The page displays a list of private repositories including frb-master, guidelines, and baseband-analysis, each with metadata like programming languages (Python), licensing (MIT), star counts, and recent update times. Small activity graphs are visible for each repository showing commit activity over time."
   },
   {
-    "filename": "ref_404.png",
-    "site": "ddg_search",
-    "original_name": "ddg_d40ad3feb849.png",
-    "content_type": "detail page",
-    "industry": "Web Development",
-    "ui_patterns": [
-      "file browser",
-      "commit history list",
-      "tabbed content",
-      "form input field",
-      "action button",
-      "calculation results display",
-      "colored content sections",
-      "example text display"
-    ],
-    "description": "This is a GitHub repository page for a web development project called 'sea-b20-day16hw-MeanMedianModeBackbone'. The page shows a file browser with commit history at the top and displays the README content below, which describes a statistical calculator application that computes mean, median, and mode values. The interface includes a yellow form section for entering comma-separated numbers and displays calculated results."
-  },
-  {
     "filename": "ref_405.png",
     "site": "ddg_search",
     "original_name": "ddg_fe0182034acb.png",
@@ -7514,72 +6756,6 @@
     "description": "This is GitHub's pull request creation form, allowing developers to propose changes by comparing code across different branches. The interface shows fields for adding a title and description, with a rich text editor that supports markdown formatting and file attachments. The form includes options for maintainer edit permissions and displays merge compatibility information."
   },
   {
-    "filename": "ref_406.png",
-    "site": "ddg_search",
-    "original_name": "ddg_33e463a92fa7.png",
-    "content_type": "landing page",
-    "industry": "Developer Tools",
-    "ui_patterns": [
-      "gradient background",
-      "centered logo",
-      "minimalist design",
-      "geometric icon design",
-      "code brackets symbol",
-      "monochromatic color scheme"
-    ],
-    "description": "This appears to be a landing page or splash screen for a developer-focused product or service. The page features a stylized logo with code brackets (</>) set against a purple-to-blue gradient background, suggesting it's related to programming, web development, or coding tools."
-  },
-  {
-    "filename": "ref_407.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_aa0a8a69b52b.jpg",
-    "content_type": "landing page",
-    "industry": "Developer Tools",
-    "ui_patterns": [
-      "3D logo presentation",
-      "Minimalist design",
-      "Brand icon display",
-      "Monochromatic color scheme",
-      "Isometric perspective",
-      "Centered composition"
-    ],
-    "description": "This appears to be a promotional or branding image for GitHub, the popular code hosting and version control platform. The screenshot shows a 3D rendered white rounded square icon with the GitHub logo (Octocat symbol and 'GitHub' text) displayed in an isometric perspective against a neutral gray background."
-  },
-  {
-    "filename": "ref_408.png",
-    "site": "ddg_search",
-    "original_name": "ddg_5560f35d2cd7.png",
-    "content_type": "dashboard",
-    "industry": "Developer Tools",
-    "ui_patterns": [
-      "status message",
-      "call-to-action button",
-      "informational text block",
-      "keyboard shortcut display",
-      "branch indicator",
-      "highlighted button",
-      "contextual help text"
-    ],
-    "description": "This appears to be a GitHub Desktop or similar Git interface showing a repository status page. The interface displays that there are no uncommitted changes and provides suggestions for next actions, including previewing a pull request from the current branch called 'show-errored-log'. A prominent blue 'Preview Pull Request' button is highlighted for the user to take action."
-  },
-  {
-    "filename": "ref_409.png",
-    "site": "ddg_search",
-    "original_name": "ddg_04132ded6221.png",
-    "content_type": "editor",
-    "industry": "Developer Tools",
-    "ui_patterns": [
-      "line numbers",
-      "syntax highlighting",
-      "diff view with additions/deletions",
-      "merge conflict indicator",
-      "code folding",
-      "error notification banner",
-      "split pane layout"
-    ],
-    "description": "This is a code editor interface showing a version control diff view with merge conflicts. The editor displays line numbers, syntax-highlighted code (appears to be JavaScript/JSX), and shows additions/deletions with green and other colored backgrounds. There's an error notification at the bottom indicating that automatic merging cannot be performed, suggesting this is part of a Git-based development workflow."
-  },
-  {
     "filename": "ref_410.png",
     "site": "ddg_search",
     "original_name": "ddg_9611277da9a0.png",
@@ -7596,24 +6772,6 @@
       "keyboard shortcut indicators"
     ],
     "description": "This is GitHub Desktop, a Git version control client application. The screenshot shows a dropdown menu from the Branch menu bar item, displaying various branch-related actions like creating new branches, merging, comparing, and viewing pull requests. The menu includes keyboard shortcuts for quick access to common Git operations."
-  },
-  {
-    "filename": "ref_411.png",
-    "site": "ddg_search",
-    "original_name": "ddg_4e93215d166d.png",
-    "content_type": "landing page",
-    "industry": "Developer Tools",
-    "ui_patterns": [
-      "hero section",
-      "pipeline diagram",
-      "brand logo placement",
-      "flowchart visualization",
-      "technical illustration",
-      "gradient background",
-      "geometric decorative elements",
-      "centered layout"
-    ],
-    "description": "This is a landing page for Containerize, focusing on GitLab CI/CD continuous deployment pipelines. The page features a prominent title about setting up deployment pipelines and includes a visual flowchart showing the stages from Build through Test 1, Test 2, Staging, to Production, with the GitLab logo prominently displayed in the center of the pipeline diagram."
   },
   {
     "filename": "ref_412.png",
@@ -7634,74 +6792,6 @@
       "notification counters"
     ],
     "description": "This is a GitLab CI/CD pipeline view showing the execution status of Pipeline #1970. The interface displays build, test, and deploy stages with individual job statuses, and includes navigation to related pipeline features like jobs, tests, and needs. The pipeline was triggered by Ariel Del Campo 17 minutes ago and is currently running."
-  },
-  {
-    "filename": "ref_413.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_3ece654bd9d1.jpg",
-    "content_type": "template gallery",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "dramatic lighting effects",
-      "futuristic aesthetic",
-      "team collaboration visual",
-      "technology workspace",
-      "holographic interface elements",
-      "blue and orange color scheme",
-      "professional business attire",
-      "high-tech environment"
-    ],
-    "description": "This appears to be a stock photo or promotional image showing a team of business professionals in suits working together around what appears to be a futuristic holographic interface or advanced technology display. The image features dramatic blue and orange lighting effects in what looks like a high-tech control room or data center environment, suggesting themes of innovation, teamwork, and cutting-edge technology solutions."
-  },
-  {
-    "filename": "ref_414.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_fac23f92b7ef.jpg",
-    "content_type": "kanban board",
-    "industry": "Developer Tools",
-    "ui_patterns": [
-      "flowchart diagram",
-      "pipeline stages",
-      "service icons",
-      "directional arrows",
-      "labeled containers",
-      "grouped components",
-      "workflow visualization",
-      "technology stack diagram"
-    ],
-    "description": "This is a technical architecture diagram showing a CI/CD pipeline workflow using GitLab. The diagram illustrates the flow from code commit through build/push, test, and deploy stages, including integration with Docker containers, private registry, GitLab runners, and deployment infrastructure. It appears to be documentation or a reference diagram for a development team's deployment process."
-  },
-  {
-    "filename": "ref_415.webp",
-    "site": "ddg_search",
-    "original_name": "ddg_96c9ac8f897f.webp",
-    "content_type": "loading page",
-    "industry": "Unknown",
-    "ui_patterns": [
-      "minimal layout",
-      "centered content",
-      "abstract graphic element",
-      "neutral color scheme"
-    ],
-    "description": "This appears to be a loading screen or placeholder page featuring an abstract black brush stroke or calligraphic design element centered on a light beige background. The minimal design suggests this could be a splash screen, loading state, or artistic branding element for a website or application."
-  },
-  {
-    "filename": "ref_416.png",
-    "site": "ddg_search",
-    "original_name": "ddg_87cd8bff7d1b.png",
-    "content_type": "kanban board",
-    "industry": "Developer Tools",
-    "ui_patterns": [
-      "workflow diagram",
-      "sequential pipeline stages",
-      "icon-based representations",
-      "process flow arrows",
-      "job status indicators",
-      "CI/CD visualization",
-      "stage labels",
-      "developer persona illustration"
-    ],
-    "description": "This is a GitLab CI/CD pipeline visualization showing the continuous integration and deployment workflow. The diagram illustrates how code changes flow from a git repository through three sequential jobs: Test, Build, and Deploy, with a developer pushing code changes to trigger the pipeline process."
   },
   {
     "filename": "ref_417.png",
@@ -8128,25 +7218,6 @@
       "announcement banner"
     ],
     "description": "This is an HR management system dashboard showing employee information and activities. The interface displays time-off balances, upcoming absences, company announcements, and employee benefits information. It appears to be a comprehensive HR platform for managing employee requests, notifications, and benefit enrollments."
-  },
-  {
-    "filename": "ref_439.png",
-    "site": "ddg_search",
-    "original_name": "ddg_281ce546808b.png",
-    "content_type": "dashboard",
-    "industry": "HR",
-    "ui_patterns": [
-      "metric cards",
-      "donut charts",
-      "pie charts",
-      "data table",
-      "budget allocation visualization",
-      "percentage indicators",
-      "color-coded segments",
-      "salary range visualization",
-      "decorative arrow elements"
-    ],
-    "description": "This is an HR compensation and rewards dashboard showing budget allocation, total rewards breakdown, and customer success team salary information. The interface displays a $500,000 total budget with 92% allocated to salary, alongside detailed compensation breakdowns and a table of customer success positions with their locations and pay rates."
   },
   {
     "filename": "ref_440.png",
@@ -8595,26 +7666,6 @@
     "description": "This is a patient profile page from MedC, a healthcare management system. The interface shows detailed patient information for Helen Voizhicki including personal details, insurance information, and comprehensive medical data organized into sections for appointments, medical records, medical bills, and medications. The layout includes a left sidebar navigation and multiple data tables displaying the patient's complete healthcare history."
   },
   {
-    "filename": "ref_463.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_014ee972fd8b.jpg",
-    "content_type": "dashboard",
-    "industry": "Healthcare",
-    "ui_patterns": [
-      "metric cards",
-      "donut chart",
-      "calendar widget",
-      "appointment list",
-      "task cards",
-      "activity feed",
-      "patient analytics visualization",
-      "sidebar navigation",
-      "status indicators",
-      "profile avatars"
-    ],
-    "description": "This is an electronic health record (EHR) dashboard for patient management. The interface displays key metrics like total patients (120) and today's appointments (15), along with patient analytics shown in a donut chart, a daily schedule of patient visits, upcoming tasks, a July 2025 calendar, and recent updates from staff members."
-  },
-  {
     "filename": "ref_464.png",
     "site": "ddg_search",
     "original_name": "ddg_8149c66e96aa.png",
@@ -8748,25 +7799,6 @@
     "description": "This is a role and permissions management page for PharmacyCo, a pharmacy management system. The interface shows a role creation form with the name 'Ex:admin' and a detailed permissions matrix below, allowing administrators to configure access rights for different modules like Dashboard, User, Customer, Supplier, Unit, and Category with various permission levels (Index, Create, Update, Delete, Store, Edit, etc.)."
   },
   {
-    "filename": "ref_471.png",
-    "site": "ddg_search",
-    "original_name": "ddg_32e1f71b1656.png",
-    "content_type": "form",
-    "industry": "Healthcare",
-    "ui_patterns": [
-      "Split-screen layout",
-      "Registration form",
-      "Medical iconography",
-      "Input fields with placeholders",
-      "Primary action button",
-      "Login link",
-      "Gradient background",
-      "Brand header",
-      "Form validation fields"
-    ],
-    "description": "This is a patient portal registration page for a healthcare system. The left side features medical-themed illustrations with a stethoscope and mobile device icon, while the right side contains a patient sign-up form with fields for email, password, and personal information. The interface is designed for patients to create accounts to access their healthcare information online."
-  },
-  {
     "filename": "ref_472.png",
     "site": "ddg_search",
     "original_name": "ddg_ba6cd274a0e1.png",
@@ -8803,24 +7835,6 @@
       "sidebar menu"
     ],
     "description": "This is MyChart, a patient portal dashboard for Epic's healthcare system. The interface shows a patient's upcoming appointment, messages from healthcare providers, outstanding balance information, and their care team contacts. The dashboard provides quick access to common patient actions like checking in for appointments, viewing test results, and managing healthcare communications."
-  },
-  {
-    "filename": "ref_474.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_321c8bad88fd.jpg",
-    "content_type": "homepage",
-    "industry": "Healthcare",
-    "ui_patterns": [
-      "Card-based navigation",
-      "Icon buttons with labels",
-      "Grid layout",
-      "Call-to-action button",
-      "Gradient background",
-      "Prominent heading",
-      "Descriptive tagline",
-      "Four main feature tiles"
-    ],
-    "description": "This is a patient portal homepage for a healthcare provider that allows patients to manage their medical care remotely. The interface displays four main navigation options in a card grid layout: Health Record, Medications, Billing, and Profile. There's a prominent call-to-action button encouraging users to log in or learn more about the service."
   },
   {
     "filename": "ref_475.png",
@@ -8916,25 +7930,6 @@
       "time-based metrics"
     ],
     "description": "This is a customer service dashboard showing real-time metrics across Chat, Talk, and Support channels. The interface displays key performance indicators like active chats, calls in queue, ticket volumes, agent availability, wait times, and customer satisfaction scores. It appears to be a comprehensive contact center management tool for monitoring multi-channel customer support operations."
-  },
-  {
-    "filename": "ref_480.png",
-    "site": "ddg_search",
-    "original_name": "ddg_b0a6f0c88799.png",
-    "content_type": "dashboard",
-    "industry": "CRM",
-    "ui_patterns": [
-      "Gauge charts/meters",
-      "Bar charts",
-      "Metric cards with numbers",
-      "Performance indicators",
-      "Data tables/leaderboards",
-      "Status badges",
-      "Time-based metrics",
-      "Dark theme interface",
-      "Grouped data sections"
-    ],
-    "description": "This is a Zendesk Support dashboard showing customer service metrics and performance indicators. The dashboard displays key metrics like customer satisfaction (96%), ticket volumes, response times, and agent performance rankings. Yellow callout annotations highlight specific features like customer feedback, bottleneck identification, agent motivation through competition, and live metrics integration."
   },
   {
     "filename": "ref_481.png",
@@ -9054,26 +8049,6 @@
     "description": "This appears to be a customer support or CRM messaging interface, likely Intercom or similar platform. The screen shows a conversation inbox with multiple customer conversations in the left panel and a detailed message thread on the right. A customer profile panel for Elizabeth McGuane is visible on the far right with contact details and conversation history."
   },
   {
-    "filename": "ref_487.png",
-    "site": "ddg_search",
-    "original_name": "ddg_31b2da6b0ed9.png",
-    "content_type": "messaging interface",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "email list view",
-      "action menu overlay",
-      "user avatar",
-      "badge notifications",
-      "details panel",
-      "dropdown menus",
-      "button groups",
-      "timestamp display",
-      "keyboard shortcut hint"
-    ],
-    "description": "This is a customer support or messaging interface for Screendesk, a screen recording and sharing service. The screenshot shows an inbox view with customer emails and a modal overlay displaying screen recording action options including live screen sharing, recording requests, and sending recordings. The interface appears to be designed for customer support teams to manage screen recording-related inquiries."
-  },
-  {
     "filename": "ref_488.png",
     "site": "ddg_search",
     "original_name": "ddg_f4e0f88569b2.png",
@@ -9132,24 +8107,6 @@
       "card view toggle"
     ],
     "description": "This is a customer support ticket management interface showing a list of new support tickets. The interface displays ticket details including customer names, issue descriptions, priority levels, assigned support agents, and response times. A comprehensive filtering sidebar on the right allows filtering by various criteria like agents, groups, priority, and status."
-  },
-  {
-    "filename": "ref_491.png",
-    "site": "ddg_search",
-    "original_name": "ddg_c8a84320d07f.png",
-    "content_type": "help page",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "left sidebar navigation",
-      "branded header",
-      "tutorial/guide layout",
-      "icon-based navigation menu",
-      "instructional video thumbnail",
-      "quick start section",
-      "step-by-step guide format",
-      "product logo placement"
-    ],
-    "description": "This is a help page for Freshdesk, a customer support software platform. The page shows a tutorial titled 'How to Create a Ticket in Freshdesk' with a green branded design and sidebar navigation. It includes a quick start section with instructions and appears to have an embedded video tutorial to guide users through the ticket creation process."
   },
   {
     "filename": "ref_492.webp",
@@ -9416,24 +8373,6 @@
     "description": "This is a Google Ads dashboard showing campaign performance metrics and analytics. The interface displays key metrics like clicks (39.7K), conversions (1.70), cost per conversion ($3.25), and total cost ($6.45) in colored metric cards, along with a line chart showing performance trends over time. The left sidebar contains navigation for campaigns, assets, insights, and other advertising management tools."
   },
   {
-    "filename": "ref_506.png",
-    "site": "ddg_search",
-    "original_name": "ddg_0a7b0d2aa1d2.png",
-    "content_type": "dashboard",
-    "industry": "Digital Marketing",
-    "ui_patterns": [
-      "metrics cards",
-      "line charts",
-      "KPI indicators",
-      "color-coded performance indicators",
-      "time series visualization",
-      "tabular data display",
-      "dark theme interface",
-      "multi-panel layout"
-    ],
-    "description": "This is a Google Ads campaign performance dashboard displaying advertising metrics and analytics. The interface shows key performance indicators like spend, conversions, and campaign performance across different time periods with line charts tracking trends for brand campaigns, red boots, and green boots campaigns."
-  },
-  {
     "filename": "ref_507.jpg",
     "site": "ddg_search",
     "original_name": "ddg_eb32145a7f95.jpg",
@@ -9583,25 +8522,6 @@
       "Share button"
     ],
     "description": "This is Canva's design editor interface showing the media upload and selection panel. The left sidebar displays a grid of stock photos and user uploads with categories for Images, Videos, and Audio. The main canvas area shows a beach photo being edited, with the characteristic Canva editor layout for creating visual designs."
-  },
-  {
-    "filename": "ref_515.png",
-    "site": "ddg_search",
-    "original_name": "ddg_7f5fe59f3822.png",
-    "content_type": "template gallery",
-    "industry": "Web Development",
-    "ui_patterns": [
-      "Modal dialog overlay",
-      "Search bar",
-      "Category navigation sidebar",
-      "Tool icon grid",
-      "Photo thumbnails",
-      "Upload interface",
-      "Tabbed navigation",
-      "Badge labels",
-      "Close button"
-    ],
-    "description": "This is Canva's design creation interface showing a modal dialog for creating new designs. The interface displays various design tools and templates including photo editing options, with a sidebar menu for different content types like sheets, docs, whiteboards, and presentations. Users can search for templates and access various photo editing tools through the displayed icon grid."
   },
   {
     "filename": "ref_516.jpg",
@@ -9837,25 +8757,6 @@
     "description": "This is a shipment tracking interface for a logistics management platform. The page displays multiple shipments with their tracking progress shown as horizontal timelines, including departure and arrival information for various ports and cities. Each shipment card shows status indicators, shipping IDs, and estimated delivery times, with options to view the data in map or list format."
   },
   {
-    "filename": "ref_528.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_1cb5e9613da1.jpg",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "sidebar navigation",
-      "tracking cards with status indicators",
-      "interactive map view",
-      "search bar with filters",
-      "timeline tracking display",
-      "status badges and labels",
-      "feature highlight cards",
-      "progress indicators",
-      "location markers on map"
-    ],
-    "description": "This is a shipment tracking dashboard called Flows that simplifies logistics management with a clean interface. The screenshot shows multiple package tracking cards with real-time status updates, delivery timelines, and location information. On the right side is an interactive map showing shipment locations in Indonesia, with live tracking capabilities for monitoring packages in transit."
-  },
-  {
     "filename": "ref_529.jpg",
     "site": "ddg_search",
     "original_name": "ddg_db233661ccc5.jpg",
@@ -9969,24 +8870,6 @@
       "user profile avatar in header"
     ],
     "description": "This is a logistics and supply chain management application dashboard showing transportation KPIs. The interface displays various metrics including shipment counts, freight costs, on-time delivery percentages, and channel performance with visualizations like charts and maps to track shipment destinations and trends."
-  },
-  {
-    "filename": "ref_535.jpg",
-    "site": "ddg_search",
-    "original_name": "ddg_1a76f6084624.jpg",
-    "content_type": "listing page",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "numbered ranking list",
-      "company logos with branding",
-      "circular numbered badges",
-      "centered product showcase",
-      "laptop mockup display",
-      "dashboard screenshot preview",
-      "grid layout of competitors",
-      "colorful ranking indicators"
-    ],
-    "description": "This is a comparison or ranking page showcasing the top 10 supply chain management software solutions. The page features a laptop displaying a dashboard interface in the center, surrounded by numbered rankings of various software companies including INCIFLO, SAP, Oracle, Zoho Inventory, and others. It appears to be a software comparison or review site helping businesses evaluate supply chain management tools."
   },
   {
     "filename": "ref_536.png",
@@ -10245,26 +9128,6 @@
     "description": "This is a LeanKit kanban board interface showing project management workflow across different phases including Design/Triage, Development, and Review. The board displays various task cards organized in columns with progress tracking, team member assignments, and color-coded project categories for managing software development and IT operations tasks."
   },
   {
-    "filename": "ref_549.png",
-    "site": "ddg_search",
-    "original_name": "ddg_7588e13dad63.png",
-    "content_type": "kanban board",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "column-based layout",
-      "task cards",
-      "status labels",
-      "priority tags",
-      "task counters",
-      "drag-and-drop interface",
-      "collapsible sections",
-      "user avatars",
-      "task IDs",
-      "color-coded categories"
-    ],
-    "description": "This is a project management kanban board showing tasks organized in four columns: TO DO, IN PROGRESS, IN REVIEW, and DONE. The tasks appear to be related to a space travel or Mars colonization project, with various features like flight booking systems, office registration, and travel partnerships. Each task card includes labels, priority indicators, and task IDs."
-  },
-  {
     "filename": "ref_550.jpg",
     "site": "ddg_search",
     "original_name": "ddg_fb33e0fb3130.jpg",
@@ -10302,24 +9165,6 @@
       "left sidebar navigation menu"
     ],
     "description": "This is SwiftKanban, a project management tool showing a kanban board for UI development projects. The interface displays task cards organized in columns by development status (Ready, In Progress, Design Plan, Testing, Done) with progress tracking bars and user assignments. The board shows various development tasks like AI implementation, integration tools, and UI modifications with different priority levels and status indicators."
-  },
-  {
-    "filename": "ref_552.webp",
-    "site": "ddg_search",
-    "original_name": "ddg_d712d9a23772.webp",
-    "content_type": "landing page",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "three-column feature showcase",
-      "mobile app mockups",
-      "feature headlines with descriptions",
-      "calendar interface mockups",
-      "event planning workflow demonstration",
-      "color-coded calendar views",
-      "navigation tabs",
-      "form interfaces"
-    ],
-    "description": "This is a landing page for a calendar and event planning mobile application. The screenshot shows three key features: events and reminders management, collaborative event planning, and comprehensive calendar views across different time periods. Each feature is demonstrated through realistic mobile app interface mockups showing calendar layouts, event details, and scheduling functionality."
   },
   {
     "filename": "ref_553.png",
@@ -10530,23 +9375,6 @@
       "search bar with icon"
     ],
     "description": "This is a file management dashboard for a business software application. The interface shows cloud storage integrations (Dropbox, Google Drive, OneDrive) with usage percentages, quick access to file types, recent files list, and storage analytics. The dashboard provides an overview of file organization and storage utilization across multiple cloud services."
-  },
-  {
-    "filename": "ref_564.png",
-    "site": "ddg_search",
-    "original_name": "ddg_3b3fe57659f8.png",
-    "content_type": "settings page",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "back arrow navigation",
-      "search bar",
-      "menu list with icons",
-      "chevron navigation arrows",
-      "grouped settings categories",
-      "minimal clean design",
-      "card-based layout"
-    ],
-    "description": "This is a settings page for a mobile or web application with a clean, organized interface. The page features a search function at the top and categorized settings options including Account, Notifications, Appearance, Privacy & Security, Help and Support, and About. Each setting category is presented as a clickable row with an icon and chevron arrow indicating navigation to sub-settings."
   },
   {
     "filename": "ref_565.png",
