@@ -1052,11 +1052,16 @@ else:
                 )
 
                 PLATO_LOGO = "https://plato-api.anthropic.com/static/plato-logo.png"
+                sim_description = (
+                    f"[skill: {vs.skill_name}] "
+                    f"{spec.get('description', '') or ''}"
+                ).strip()
                 try:
                     await create_simulator.asyncio(
                         client=http,
                         body=CreateSimulatorRequest(
                             name=sim_name,
+                            description=sim_description,
                             simType="docker_app",
                             config=SimulatorConfig(type=Type6.docker_app),
                             enabled=True,
