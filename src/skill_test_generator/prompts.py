@@ -24,9 +24,22 @@ The app should feel like you opened one tab of a real polished SaaS product.
 APP CHROME — EVERY APP NEEDS A REALISTIC LAYOUT SHELL:
 The generated app must NOT be a bare data table on a white page. It must \
 have application chrome — the structural UI elements that make it look \
-like a real product. Design your own layout shell — sidebars, top navbars, \
-branded headers, split panels, or any combination that fits the product. \
-Be creative and vary across variants. \
+like a real product.
+LAYOUT VARIETY IS CRITICAL — do NOT default to a left sidebar. Real web \
+apps use wildly different navigation patterns. Consider ALL of these with \
+equal weight:
+- Top navigation bar (horizontal nav, like Stripe, GitHub, Booking.com)
+- Slim top header + tab bar below (like Jira, Notion, Linear)
+- Full-width header with breadcrumbs (like Shopify Admin, AWS Console)
+- Compact icon rail on the left (like Slack, VS Code, Figma)
+- Split panel layout (like email clients, messaging apps)
+- Top header with a secondary side panel (like Google Analytics)
+- No sidebar at all — just a branded top bar (like most e-commerce sites)
+A left sidebar is only ONE of many options and should NOT be the default. \
+If a reference screenshot is provided, match its exact navigation pattern. \
+If no reference is provided, choose a pattern that fits the product type — \
+and AVOID left_sidebar unless the product genuinely calls for it (like an \
+admin panel or IDE). \
 Non-active navigation links do NOT need to go anywhere — they exist only \
 for visual realism. They should look clickable but be inactive/greyed. \
 The chrome MUST use the primary brand color. It must be defined in the \
@@ -84,21 +97,29 @@ DATA DISPLAY — FOLLOW THE REFERENCE, AVOID DEFAULTING TO DATA TABLES:
 Your first instinct should be to match how the reference screenshot \
 displays its content. If the reference shows cards, use cards. If it shows \
 a kanban board, use a kanban board. If it shows a chart dashboard, use charts.
-Data tables are appropriate ONLY when:
-  (a) the reference screenshot itself prominently features a data table, OR
+DO NOT DEFAULT TO DATA TABLES. They are the most overused, generic display \
+pattern and produce apps that all look identical. Data tables are \
+appropriate ONLY when:
+  (a) the reference screenshot itself prominently features a data table, AND
   (b) the skill explicitly requires row-based tabular interaction \
-(e.g. "aggregate across data grid rows").
-Otherwise, prefer richer display formats that fit the industry:
+(e.g. "aggregate across data grid rows", "paginate list").
+Even for skills mentioning "rows" or "list" — consider whether the data \
+could be displayed as card lists, accordion panels, or tile grids instead. \
+A "list" does not have to be a table.
+Prefer richer, more distinctive display formats:
 - Product catalogs → card grids with images/prices/ratings
 - Inventory/warehouse → product cards with stock badges, category filters
-- Project management → kanban boards, timeline views
+- Project management → kanban boards, timeline views, ticket lists
 - CRM contacts → card lists with avatars and quick-action buttons
-- Analytics → chart dashboards with summary cards
-- Real estate / listings → gallery cards with photos, map views
+- Analytics → chart dashboards with metric cards and sparklines
+- Real estate / listings → gallery cards with photos
 - Messaging → conversation threads, inbox panels
-Even when a data table IS appropriate, consider whether the reference \
-screenshot suggests a styled/decorated table (with row actions, status \
-badges, expandable rows) rather than a plain grid.
+- Invoicing / billing → invoice-style layouts, line items with totals
+- Incident management → ticket cards with severity badges, timeline
+- Monitoring → metric tiles, status grids, alert feeds
+Even when a data table IS the right choice, make it look distinctive — \
+custom row heights, inline status badges, row expansion, grouped sections, \
+colored category indicators. Never a plain default table.
 
 VISUAL QUALITY:
 - Fill the viewport with rich, realistic content — not sparse placeholders.
@@ -131,12 +152,16 @@ arrow characters, "-" instead of em-dash).
 (dialog or sheet) for the primary entity.
 
 Available shadcn/ui components (all pre-installed):
-sidebar, table, tabs, select, dropdown-menu, navigation-menu, pagination, \
-dialog, sheet, command, combobox, accordion, breadcrumb, calendar, card, \
-checkbox, collapsible, context-menu, input, label, menubar, native-select, \
+card, tabs, navigation-menu, breadcrumb, badge, avatar, button, \
+dialog, sheet, command, combobox, accordion, calendar, pagination, \
+dropdown-menu, select, checkbox, input, label, menubar, native-select, \
 popover, radio-group, scroll-area, separator, slider, switch, textarea, \
-toggle, toggle-group, tooltip, hover-card, alert, alert-dialog, avatar, \
-badge, button, drawer, skeleton, spinner, sonner (toast), empty.
+toggle, toggle-group, tooltip, hover-card, alert, alert-dialog, \
+drawer, skeleton, spinner, sonner (toast), empty, collapsible, \
+context-menu, sidebar, table. \
+Note: sidebar and table are available but should NOT be your default — \
+use them only when the reference screenshot or skill specifically calls \
+for them.
 
 Database: PGlite (Postgres-in-browser) with Drizzle ORM. Define tables using \
 Drizzle schema syntax. The template already has an `items` table you can \
@@ -154,10 +179,13 @@ Respond with a JSON object (no markdown fencing):
   - "accent_color": for interactive elements and highlights
   - "style_direction": 1 sentence describing the visual feel
 - "app_chrome": REQUIRED object describing the layout shell. Fields:
-  - "layout_type": the navigation structure — e.g. "left_sidebar", \
-"top_navbar", "top_header_with_tabs", "icon_rail", "header_and_sidebar". \
+  - "layout_type": the navigation structure — e.g. "top_navbar", \
+"top_header_with_tabs", "icon_rail", "split_panel", "full_width_header", \
+"header_and_sidebar", "left_sidebar". \
 If a reference screenshot is provided, this MUST match what the screenshot \
-shows. Do not default to "left_sidebar" unless the reference has one.
+shows. Do NOT default to "left_sidebar" — it is the most overused pattern. \
+Prefer top navigation, header bars, tab bars, or icon rails unless the \
+reference screenshot specifically shows a left sidebar.
   - "product_name": display name shown in the chrome
   - "subtitle": optional section label or tagline
   - "nav_items": array of 2-5 navigation labels. Only one is active \
@@ -205,8 +233,13 @@ The spec includes an "app_chrome" field describing the layout shell. You \
 MUST generate app/layout.tsx with branded chrome — the structural UI that \
 makes the app look like a real product, NOT a bare data table on a white page.
 - If a reference screenshot is provided, base your layout shell on it \
-(see #1b below). Otherwise, design your own layout shell — sidebars, top \
-navigation bars, branded headers, split panels, or any combination.
+(see #1b below). Otherwise, follow the spec's layout_type exactly.
+- LAYOUT VARIETY: the spec's layout_type tells you the nav pattern — it \
+could be a top navbar, header with tabs, icon rail, split panel, full-width \
+header, or left sidebar. Implement EXACTLY what the spec says. If it says \
+"top_navbar", build a horizontal top navigation bar — do NOT build a sidebar. \
+If it says "icon_rail", build a slim vertical icon strip. Each layout_type \
+produces a VISUALLY DISTINCT app.
 - The chrome uses the primary_color from visual_identity as its background.
 - Non-active nav items are visible but greyed out (opacity-50, \
 pointer-events-none) — they are purely decorative.
@@ -237,9 +270,15 @@ default posture is to match the reference's chrome faithfully.
 CRITICAL #2 — Data display format and layout:
 - Follow the spec's display format and the reference screenshot. If the \
 spec describes card grids, build card grids. If it describes a kanban \
-board, build a kanban board.
-- Avoid data tables unless the spec or reference screenshot specifically \
-calls for one. Prefer the display format the reference image uses.
+board, build a kanban board. If it describes a list with detail panels, \
+build that.
+- DO NOT DEFAULT TO DATA TABLES. Data tables are the most overused pattern. \
+Only use a data table if the spec explicitly says "data table" or \
+"data grid" in the page descriptions, OR the skill literally requires \
+row-based tabular interaction (e.g. "aggregate across data grid rows"). \
+For all other cases, use the display format from the spec or reference: \
+card grids, card lists, kanban columns, timeline views, inbox panels, \
+metric dashboards, gallery layouts, conversation threads, detail panels, etc.
 - If the spec includes a "clone_target", use your knowledge of that product \
 to match its exact display conventions.
 - Apply accent_color for buttons, badges, links, and highlights.
@@ -320,9 +359,11 @@ CSS rules:
 correct Tailwind CSS 4 imports. If you include it, it will be ignored.
 
 Layout rules:
-- You MUST include app/layout.tsx with branded chrome (sidebar, top navbar, \
-header strip, or any creative layout shell). This is where the product \
-name, navigation items, and brand colors go.
+- You MUST include app/layout.tsx with branded chrome matching the spec's \
+layout_type (top navbar, header with tabs, icon rail, split panel, \
+full-width header, or sidebar). This is where the product name, navigation \
+items, and brand colors go. The layout_type in the spec is authoritative — \
+implement that exact pattern.
 - The layout MUST import and use these template-provided modules:
   ```
   import type { Metadata } from "next";
@@ -374,7 +415,7 @@ Other rules:
 - ALWAYS include "db/seed.ts" with deterministic seed data insertion
 - ALWAYS include "drizzle/0000_zippy_changeling.sql" with CREATE TABLE SQL
 - ALWAYS include "app/page.tsx" as the main entry page
-- ALWAYS include "app/layout.tsx" with branded chrome (see CRITICAL #1)
+- ALWAYS include "app/layout.tsx" with branded chrome matching the spec's layout_type (see CRITICAL #1)
 - ALWAYS include at least one API route in "app/api/" for data access
 - ALWAYS include "app/api/health/route.ts" unchanged (it uses getDb internally)
 - ALWAYS include at least one write API route (PUT/PATCH) for data mutation

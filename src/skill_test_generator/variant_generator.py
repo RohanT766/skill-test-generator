@@ -71,9 +71,12 @@ skill definition. You will be given a skill name and description, plus the \
 full list of available content_type and industry labels.
 
 Pick 1-4 content_type values that would make good visual inspiration for an \
-app testing this skill. Choose types where the skill would naturally occur — \
-e.g. a pagination skill fits "data table", "product grid", "listing page"; \
-a truncation skill fits "data table", "detail page".
+app testing this skill. IMPORTANT: strongly prefer DIVERSE content types — \
+dashboards, kanban boards, card grids, detail pages, form views, inbox \
+panels, calendar views, listing pages, settings panels, etc. Only include \
+"data table" if the skill EXPLICITLY requires row-based tabular interaction \
+(like "aggregate across data grid rows"). Most skills can be tested in \
+non-table UIs — prefer those.
 
 Optionally pick 0-2 industry values if the skill strongly implies a domain. \
 If any industry could work, return an empty array for industries.
