@@ -309,6 +309,12 @@ arrays — never return early or skip inserts.
 - The `db/client.ts` manages the PGlite singleton — do NOT modify it.
 - The `db/index.ts` re-exports from client/bootstrap — do NOT modify it.
 
+JSX rules:
+- NEVER use raw `<` or `>` characters inside JSX text content. They cause \
+build failures ("Unexpected token"). Always use `{'<'}` or `{'>'}` or the \
+HTML entities `&lt;` / `&gt;`. For example, breadcrumb separators must be \
+`{'>'}`  not `>`. This applies to ALL text nodes in JSX — not just props.
+
 CSS rules:
 - Do NOT generate "app/globals.css". The template already provides it with \
 correct Tailwind CSS 4 imports. If you include it, it will be ignored.

@@ -127,12 +127,16 @@ If anything fails — 500 errors, empty data, missing routes — kill the server
 fix the code in /tmp/work-{slug}/, rebuild with `next build`, and restart.
 
 Common issues:
+- Raw `<` or `>` in JSX text content causes "Unexpected token" build errors. \
+Replace with `{{'>'}}` or `&gt;` / `&lt;`. Check breadcrumb separators, \
+comparison text, and any text node containing angle brackets.
 - db/schema.ts columns don't match drizzle/0000_zippy_changeling.sql
 - db/seed.ts references non-existent schema columns
 - API routes import tables not exported by db/schema.ts
 - Missing --> statement-breakpoint between CREATE TABLE statements
 - Missing lazy seedDatabase() call in GET API routes
 - Using bare `db` import instead of `const db = await getDb()`
+- Redefining apiGet/apiPost/apiPut/apiDelete instead of importing from @/lib/api
 
 DO NOT modify these protected template files:
   {_PROTECTED_FILES}
