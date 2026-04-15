@@ -764,6 +764,18 @@ class SkillTestGeneratorWorld(
                 )
                 logger.info("  [%s] bun install: %s", vs.slug, out[-300:])
 
+                # Verify critical dependency is installed; force-install if missing
+                chk, _ = await _exec(
+                    f"test -d {app_dir}/node_modules/@electric-sql/pglite && echo OK || echo MISSING",
+                    timeout=10,
+                )
+                if "MISSING" in chk:
+                    logger.warning("  [%s] @electric-sql/pglite missing, reinstalling …", vs.slug)
+                    await _exec(
+                        f"{preamble} && cd {app_dir} && bun install --no-save @electric-sql/pglite 2>&1 | tail -5",
+                        timeout=120,
+                    )
+
                 await _exec(
                     f"""python3 -c "
 import pathlib, re

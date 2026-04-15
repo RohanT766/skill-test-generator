@@ -714,9 +714,12 @@ def _post_process_code(code_files: dict[str, str]) -> dict[str, str]:
 _TEMPLATE_PROTECTED = frozenset(
     {
         "package.json",
+        "package-lock.json",
+        "bun.lockb",
         "tsconfig.json",
         "next.config.ts",
         "next.config.js",
+        "next.config.mjs",
         "postcss.config.mjs",
         "tailwind.config.ts",
         "db/client.ts",
