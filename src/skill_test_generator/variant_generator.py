@@ -21,6 +21,22 @@ from .skill_ingestion import _slugify
 logger = logging.getLogger(__name__)
 
 
+def _detect_media_type(data: bytes, filename: str = "") -> str:
+    """Detect image media type from magic bytes, falling back to extension."""
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        return "image/png"
+    if data[:2] == b"\xff\xd8":
+        return "image/jpeg"
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        return "image/webp"
+    if data[:6] in (b"GIF87a", b"GIF89a"):
+        return "image/gif"
+    ext = filename.rsplit(".", 1)[-1].lower() if filename else ""
+    if ext in ("jpg", "jpeg"):
+        return "image/jpeg"
+    return "image/png"
+
+
 def _resolve_reference_screenshots_dir() -> Path | None:
     """Find the reference-screenshots directory (bundled in container or local dev)."""
     bundled = Path("/world/templates/reference-screenshots")
@@ -314,8 +330,7 @@ async def design_variant(
 
     if ref:
         ref_meta, ref_bytes = ref
-        ext = ref_meta.get("filename", "ref.png").rsplit(".", 1)[-1]
-        media_type = "image/jpeg" if ext in ("jpg", "jpeg") else "image/png"
+        media_type = _detect_media_type(ref_bytes, ref_meta.get("filename", ""))
         content_blocks.append({
             "type": "image",
             "source": {
@@ -417,8 +432,7 @@ async def generate_variant_code(
 
     if reference_screenshot:
         ref_meta, ref_bytes = reference_screenshot
-        ext = ref_meta.get("filename", "ref.png").rsplit(".", 1)[-1]
-        media_type = "image/jpeg" if ext in ("jpg", "jpeg") else "image/png"
+        media_type = _detect_media_type(ref_bytes, ref_meta.get("filename", ""))
         content_blocks.append({
             "type": "image",
             "source": {

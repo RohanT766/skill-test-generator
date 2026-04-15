@@ -996,9 +996,9 @@
     "description": "This is Jira Software's backlog view for the Twine project. The screenshot shows a sprint planning interface with a list of user stories and issues organized in a backlog format, including story points, assignees, and priority levels for agile project management."
   },
   {
-    "filename": "ref_164.jpg",
+    "filename": "ref_164.png",
     "site": "ddg_search",
-    "original_name": "ddg_817152cc2ac8.jpg",
+    "original_name": "ref_164.jpg",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -1015,9 +1015,9 @@
     "description": "This is an Asana project dashboard showing customer stories for Q4. The dashboard displays key task metrics including completed, incomplete, overdue, and total tasks with counts. It features various charts showing task breakdown by section, completion status, and assignees, providing a comprehensive overview of project progress and team performance."
   },
   {
-    "filename": "ref_165.webp",
+    "filename": "ref_165.png",
     "site": "ddg_search",
-    "original_name": "ddg_e3f30effeab0.webp",
+    "original_name": "ref_165.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -1369,9 +1369,9 @@
     "description": "This is a ClickUp dashboard showing project management metrics and analytics. The interface displays various widgets including a Sprint 1 burndown chart, task completion statistics with bar charts, goal progress tracking, and an upcoming features roadmap. The dashboard provides an overview of project status, completed versus remaining tasks, and development milestones."
   },
   {
-    "filename": "ref_193.webp",
+    "filename": "ref_193.png",
     "site": "ddg_search",
-    "original_name": "ddg_ce06ecaabbae.webp",
+    "original_name": "ref_193.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -1874,9 +1874,9 @@
     "description": "This is a Salesforce CRM contacts management page showing a data table of all contacts. The interface displays contact information including names, account associations, titles, phone numbers, emails, and birthdates in a sortable grid format. Users can perform various actions like creating new contacts, importing data, adding contacts to campaigns, and managing contact lists."
   },
   {
-    "filename": "ref_241.jpg",
+    "filename": "ref_241.png",
     "site": "ddg_search",
-    "original_name": "ddg_1c2581190136.jpg",
+    "original_name": "ref_241.jpg",
     "content_type": "data table",
     "industry": "CRM",
     "ui_patterns": [
@@ -1933,9 +1933,9 @@
     "description": "This is a Salesforce CRM contact detail page showing information for Mrs. Mary Smith. The page displays contact details, account information, and communication preferences in an organized layout with editable fields. Additional sidebar components show contact funding details and marketing activities, along with a chatter/activity feed at the bottom."
   },
   {
-    "filename": "ref_244.jpg",
+    "filename": "ref_244.png",
     "site": "ddg_search",
-    "original_name": "ddg_5b78c1a2929a.jpg",
+    "original_name": "ref_244.jpg",
     "content_type": "dashboard",
     "industry": "CRM",
     "ui_patterns": [
@@ -2009,9 +2009,9 @@
     "description": "This is a HubSpot Lead Generation dashboard showing marketing analytics and performance metrics. The dashboard displays various widgets including contact creation trends, lead sources, lifecycle stage totals, blog post views, landing page views, and marketing qualified leads breakdown with both numerical data and visual charts."
   },
   {
-    "filename": "ref_248.webp",
+    "filename": "ref_248.png",
     "site": "ddg_search",
-    "original_name": "ddg_c8faa95c45a6.webp",
+    "original_name": "ref_248.webp",
     "content_type": "dashboard",
     "industry": "CRM",
     "ui_patterns": [
@@ -2029,9 +2029,9 @@
     "description": "This is a HubSpot sales forecast dashboard showing key performance metrics and analytics. The interface displays sales data including won deals, pipeline generation, coverage metrics, and yearly forecasts with interactive charts and team performance leaderboards. The dashboard includes filtering options for region, team, deal type, and person to analyze sales performance across different dimensions."
   },
   {
-    "filename": "ref_249.webp",
+    "filename": "ref_249.png",
     "site": "ddg_search",
-    "original_name": "ddg_659aea23f756.webp",
+    "original_name": "ref_249.webp",
     "content_type": "dashboard",
     "industry": "CRM",
     "ui_patterns": [
@@ -2185,9 +2185,9 @@
     "description": "This is a CRM dashboard for Zillum Inc. showing sales analytics and performance metrics. The interface displays charts for leads by source, potentials probability, and opportunities sources, with a sidebar navigation menu containing various CRM modules like SalesIQ, Campaigns, and Reports. The dashboard welcomes user Patricia B and provides visual insights into sales pipeline data."
   },
   {
-    "filename": "ref_263.webp",
+    "filename": "ref_263.png",
     "site": "ddg_search",
-    "original_name": "ddg_4f97297a05bb.webp",
+    "original_name": "ref_263.webp",
     "content_type": "form",
     "industry": "CRM",
     "ui_patterns": [
@@ -2588,7 +2588,7 @@
   {
     "filename": "ref_294.png",
     "site": "ddg_search",
-    "original_name": "ddg_84b93d080870.png",
+    "original_name": "ref_294.png",
     "content_type": "dashboard",
     "industry": "E-commerce",
     "ui_patterns": [
@@ -2861,9 +2861,9 @@
     "description": "This is a content analytics dashboard showing a leaderboard of the top-performing articles from PictureShow Magazine over the past 7 days. The interface displays article titles with their corresponding view counts, ranging from 44K to 12.2K views. On the left side is a control panel with filtering options for display, visualization type, time period, and labels."
   },
   {
-    "filename": "ref_323.webp",
+    "filename": "ref_323.png",
     "site": "ddg_search",
-    "original_name": "ddg_57d432b90ce6.webp",
+    "original_name": "ref_323.webp",
     "content_type": "dashboard",
     "industry": "Web Analytics",
     "ui_patterns": [
@@ -3247,9 +3247,9 @@
     "description": "This is a business operations dashboard for Looker, displaying key metrics and analytics for order management and inventory tracking. The interface shows KPIs like total orders (36,605), open orders (158), and inventory levels (1,457), along with visualizations for orders by region, shipment status, and inventory by category. Users can filter data by distribution centers (Chicago, Houston, Memphis, Savannah) and adjust date ranges to analyze performance."
   },
   {
-    "filename": "ref_352.jpg",
+    "filename": "ref_352.png",
     "site": "ddg_search",
-    "original_name": "ddg_52c3272da433.jpg",
+    "original_name": "ref_352.jpg",
     "content_type": "dashboard",
     "industry": "Web Analytics",
     "ui_patterns": [
@@ -3677,9 +3677,9 @@
     "description": "This is an AWS EC2 instance management interface showing detailed information about a specific EC2 instance named 'AWS Tutorial'. The page displays instance configuration details, network settings, IP addresses, and other technical specifications in a tabbed layout. The interface provides typical cloud infrastructure management capabilities for monitoring and managing virtual server instances."
   },
   {
-    "filename": "ref_423.webp",
+    "filename": "ref_423.png",
     "site": "ddg_search",
-    "original_name": "ddg_17febd105c30.webp",
+    "original_name": "ref_423.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -3792,9 +3792,9 @@
     "description": "This is a Sentry error monitoring dashboard showing a list of application errors and exceptions. The interface displays various error types like AttributeError, PluginError, and HTTPError with details including frequency graphs, occurrence counts, and timestamps. It appears to be the Issues page of Sentry, a popular application monitoring and error tracking platform used by developers."
   },
   {
-    "filename": "ref_431.jpg",
+    "filename": "ref_431.png",
     "site": "ddg_search",
-    "original_name": "ddg_c605104ee585.jpg",
+    "original_name": "ref_431.jpg",
     "content_type": "detail page",
     "industry": "Web Development",
     "ui_patterns": [
@@ -4531,9 +4531,9 @@
     "description": "This is a customer support ticket management interface showing a list of new support tickets. The interface displays ticket details including customer names, issue descriptions, priority levels, assigned support agents, and response times. A comprehensive filtering sidebar on the right allows filtering by various criteria like agents, groups, priority, and status."
   },
   {
-    "filename": "ref_492.webp",
+    "filename": "ref_492.png",
     "site": "ddg_search",
-    "original_name": "ddg_c455068d349b.webp",
+    "original_name": "ref_492.webp",
     "content_type": "detail page",
     "industry": "CRM",
     "ui_patterns": [
@@ -4703,9 +4703,9 @@
     "description": "This is a digital marketing dashboard for audience management and email marketing. The interface shows audience growth metrics, contact statistics, subscription data, and demographic insights. It appears to be focused on organizing and targeting marketing audiences with features for tagging, segmentation, and analytics."
   },
   {
-    "filename": "ref_502.webp",
+    "filename": "ref_502.png",
     "site": "ddg_search",
-    "original_name": "ddg_d820f1f6f894.webp",
+    "original_name": "ref_502.webp",
     "content_type": "dashboard",
     "industry": "Digital Marketing",
     "ui_patterns": [
@@ -4951,28 +4951,9 @@
     "description": "This is an inventory management dashboard showing on-hand inventory quantities, spending categories, and various inventory metrics. The interface displays charts for inventory analysis, a breakdown of issued spend categories totaling $25,484, and provides quick actions for inventory management tasks like creating stock requests and picking lists."
   },
   {
-    "filename": "ref_522.png",
+    "filename": "ref_526.png",
     "site": "ddg_search",
-    "original_name": "ddg_68ddbf2c65b8.png",
-    "content_type": "dashboard",
-    "industry": "Business Software",
-    "ui_patterns": [
-      "navigation sidebar",
-      "tabbed interface",
-      "KPI cards with metrics",
-      "horizontal bar charts",
-      "stacked bar charts",
-      "data table with sorting",
-      "filter dropdowns",
-      "breadcrumb navigation",
-      "multi-column layout"
-    ],
-    "description": "This is a Microsoft Dynamics 365 Intelligent Order Management dashboard showing an inventory overview. The page displays key performance indicators like physical available stock, soft reserved items, and return rates, along with various charts analyzing supply by product name and location, and a detailed product inventory table at the bottom."
-  },
-  {
-    "filename": "ref_526.webp",
-    "site": "ddg_search",
-    "original_name": "ddg_31503e5500cc.webp",
+    "original_name": "ref_526.webp",
     "content_type": "dashboard",
     "industry": "Retail",
     "ui_patterns": [
@@ -5146,9 +5127,9 @@
     "description": "This is a ZenKit Projects kanban board showing a Global Kanban view for project management. The interface displays tasks organized in columns (To-Do, In Progress, Done, Ongoing Appointments) with cards showing task details, assignees, due dates, and status labels. It appears to be managing a Product Launch project with various marketing, analytics, and development tasks across different stages of completion."
   },
   {
-    "filename": "ref_551.webp",
+    "filename": "ref_551.png",
     "site": "ddg_search",
-    "original_name": "ddg_17b593a03e34.webp",
+    "original_name": "ref_551.webp",
     "content_type": "kanban board",
     "industry": "Web Development",
     "ui_patterns": [
@@ -5165,9 +5146,9 @@
     "description": "This is SwiftKanban, a project management tool showing a kanban board for UI development projects. The interface displays task cards organized in columns by development status (Ready, In Progress, Design Plan, Testing, Done) with progress tracking bars and user assignments. The board shows various development tasks like AI implementation, integration tools, and UI modifications with different priority levels and status indicators."
   },
   {
-    "filename": "ref_555.webp",
+    "filename": "ref_555.png",
     "site": "ddg_search",
-    "original_name": "ddg_2908ed7ff46a.webp",
+    "original_name": "ref_555.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -5357,9 +5338,9 @@
     "description": "This is a booking management dashboard for ShopHappy, an e-commerce platform. The interface displays booking analytics with key metrics (confirmed, pending, cancelled, successful bookings), weekly booking trends in a bar chart, and a detailed data table showing individual booking records with customer information, dates, status, and payment methods."
   },
   {
-    "filename": "ref_593.webp",
+    "filename": "ref_593.png",
     "site": "ddg_search",
-    "original_name": "ddg_52894e2b9db3.webp",
+    "original_name": "ref_593.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -5531,9 +5512,9 @@
     "description": "This is a compliance dashboard for S Fitness, showing task management and performance metrics. The interface displays completion statistics through pie charts and a detailed user performance table with on-time completion rates, late submissions, and rejections. The dashboard provides oversight of monthly reporting processes with visual indicators for task status and individual performance tracking."
   },
   {
-    "filename": "ref_614.jpg",
+    "filename": "ref_614.png",
     "site": "ddg_search",
-    "original_name": "ddg_472cc761c0e1.jpg",
+    "original_name": "ref_614.jpg",
     "content_type": "kanban board",
     "industry": "CRM",
     "ui_patterns": [
@@ -5609,9 +5590,9 @@
     "description": "This is a CRM dashboard showing team sales pipelines organized by region (America and Europe). The interface displays various metrics including open opportunities, quotations, and revenue figures, along with time-series charts tracking performance across different date ranges. Each region shows pipeline status, invoicing data, and specific business metrics like point of sale and website performance."
   },
   {
-    "filename": "ref_622.jpg",
+    "filename": "ref_622.png",
     "site": "ddg_search",
-    "original_name": "ddg_ca7420626e47.jpg",
+    "original_name": "ref_622.jpg",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -5628,9 +5609,9 @@
     "description": "This is an inventory management dashboard showing various operational modules including receipts, internal transfers, picks, deliveries, packing, and manufacturing operations. The interface displays status cards with counts for different workflow stages like 'TO RECEIVE', 'TRANSFERS', 'TO DO', 'Waiting', and 'Late' across multiple company locations including YourCompany and My Company, Chicago."
   },
   {
-    "filename": "ref_624.jpg",
+    "filename": "ref_624.png",
     "site": "ddg_search",
-    "original_name": "ddg_54649eae6157.jpg",
+    "original_name": "ref_624.jpg",
     "content_type": "product grid",
     "industry": "Business Software",
     "ui_patterns": [
@@ -5668,9 +5649,9 @@
     "description": "This is an inventory management dashboard showing various operational metrics and status cards. The interface displays different inventory processes like receipts, returns, delivery orders, and subcontractor operations with their respective counts and statuses. A settings dropdown menu is open showing various configuration options for warehouse management, products, and delivery settings."
   },
   {
-    "filename": "ref_626.webp",
+    "filename": "ref_626.png",
     "site": "ddg_search",
-    "original_name": "ddg_0f3af814a0d3.webp",
+    "original_name": "ref_626.webp",
     "content_type": "data table",
     "industry": "Business Software",
     "ui_patterns": [
@@ -5687,9 +5668,9 @@
     "description": "This is an inventory management system showing a product replenishment table. The interface displays inventory data for various furniture and office items with columns for location, stock quantities, forecasts, and ordering actions. Users can filter by location categories and trigger types, with options to order, automate, or snooze replenishment actions for selected items."
   },
   {
-    "filename": "ref_627.jpg",
+    "filename": "ref_627.png",
     "site": "ddg_search",
-    "original_name": "ddg_370b9434a32c.jpg",
+    "original_name": "ref_627.jpg",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -6138,9 +6119,9 @@
     "description": "This is a FreshBooks expense management dashboard showing recently updated expenses in card format and a detailed expense table below. The interface allows users to track, categorize, and manage business expenses with features like search, filtering, and the ability to add new expenses."
   },
   {
-    "filename": "ref_660.webp",
+    "filename": "ref_660.png",
     "site": "ddg_search",
-    "original_name": "ddg_6ff4fe57d7e1.webp",
+    "original_name": "ref_660.webp",
     "content_type": "modal dialog",
     "industry": "Business Software",
     "ui_patterns": [
@@ -6392,9 +6373,9 @@
     "description": "This is Bill.com's invoice and document management interface showing an inbox view. The screenshot displays a grid of financial documents (bills, credits, payments) from Palotalt Consulting with preview thumbnails, status indicators, and action buttons. Users can manage payables, receivables, and various financial documents through the organized sidebar navigation and document grid layout."
   },
   {
-    "filename": "ref_683.webp",
+    "filename": "ref_683.png",
     "site": "ddg_search",
-    "original_name": "ddg_d236d505e32a.webp",
+    "original_name": "ref_683.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -6413,7 +6394,7 @@
   {
     "filename": "ref_686.png",
     "site": "ddg_search",
-    "original_name": "ddg_5ac665c342d4.png",
+    "original_name": "ref_686.png",
     "content_type": "form",
     "industry": "Financial Services",
     "ui_patterns": [
@@ -6606,9 +6587,9 @@
     "description": "This is a vendor management dashboard showing a comprehensive table of 158 vendors with their associated costs, payment schedules, and ownership details. The interface displays key metrics like total spend, last 30 days activity, next payment dates, and frequency for each vendor. It appears to be part of a business expense or procurement management system that helps organizations track and manage their vendor relationships and spending patterns."
   },
   {
-    "filename": "ref_699.webp",
+    "filename": "ref_699.png",
     "site": "ddg_search",
-    "original_name": "ddg_33a1a7a01bae.webp",
+    "original_name": "ref_699.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -6625,9 +6606,9 @@
     "description": "This is a business reporting dashboard showing key metrics across four main areas: Operational Efficiency, Money Saved, Compliance, and Employee Experience. The interface displays various KPIs with circular progress indicators, filter controls for payment types and date ranges, and options to view detailed reports for automation gaps, policy gaps, and efficiency improvements."
   },
   {
-    "filename": "ref_701.webp",
+    "filename": "ref_701.png",
     "site": "ddg_search",
-    "original_name": "ddg_62b7fec34560.webp",
+    "original_name": "ref_701.webp",
     "content_type": "dashboard",
     "industry": "Financial Services",
     "ui_patterns": [
@@ -7360,9 +7341,9 @@
     "description": "This is a project management interface showing an annual conference planning timeline. The screenshot displays a Gantt chart-style timeline view with various conference-related tasks like finalizing event details, recruiting speakers, and scheduling sessions. Tasks are organized by categories like Foundational, Travel + lodging, Vendors, Event content, and other planning phases, with each task showing assignees, due dates, and progress status."
   },
   {
-    "filename": "ref_768.jpg",
+    "filename": "ref_768.png",
     "site": "ddg_search",
-    "original_name": "ddg_979ae7d2014f.jpg",
+    "original_name": "ref_768.jpg",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -7380,9 +7361,9 @@
     "description": "This is a project management timeline view for a 'Weekly meeting' project. The interface shows a calendar-based timeline with various tasks and topics scheduled across November and December, including website design samples, customer research, and planning activities. The left sidebar organizes tasks into categories like 'New topics', 'Follow up', 'Next week', and 'Notes', while color-coded blocks represent different tasks assigned to team members on the timeline."
   },
   {
-    "filename": "ref_769.webp",
+    "filename": "ref_769.png",
     "site": "ddg_search",
-    "original_name": "ddg_767009409194.webp",
+    "original_name": "ref_769.webp",
     "content_type": "dashboard",
     "industry": "Web Development",
     "ui_patterns": [
@@ -7399,9 +7380,9 @@
     "description": "This is a project management tool showing a timeline view for a website launch project. The interface displays tasks and milestones connected by dependency lines, with team member assignments and due dates spanning from July to August. Tasks include design assets, website development, code review, and launch marketing activities."
   },
   {
-    "filename": "ref_770.webp",
+    "filename": "ref_770.png",
     "site": "ddg_search",
-    "original_name": "ddg_3b4b6240857e.webp",
+    "original_name": "ref_770.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -7533,9 +7514,9 @@
     "description": "This is a project management dashboard showing upcoming events and task analytics. The interface displays key metrics like total tasks (464), completed tasks (43), and incomplete tasks (421) in card format, along with various charts showing project status, task distribution by assignee and owner, and incomplete tasks by project."
   },
   {
-    "filename": "ref_778.webp",
+    "filename": "ref_778.png",
     "site": "ddg_search",
-    "original_name": "ddg_841a6c65d7f6.webp",
+    "original_name": "ref_778.webp",
     "content_type": "data table",
     "industry": "Digital Marketing",
     "ui_patterns": [
@@ -7612,9 +7593,9 @@
     "description": "This is a ClickUp product backlog view showing a prioritized list of development tasks. The interface displays tasks organized by priority levels with columns for squad assignment, goals, value estimates, and progress indicators. Each task has color-coded priority levels and status badges indicating different goals like 'Increase CSAT', 'Capability Gap', and 'Increase Paid Trials'."
   },
   {
-    "filename": "ref_791.jpg",
+    "filename": "ref_791.png",
     "site": "ddg_search",
-    "original_name": "ddg_46784f7a37e4.jpg",
+    "original_name": "ref_791.jpg",
     "content_type": "data table",
     "industry": "Business Software",
     "ui_patterns": [
@@ -9505,9 +9486,9 @@
     "description": "This is Indeed's Hiring Insights dashboard, a recruitment analytics tool that helps employers analyze job market data. The screenshot shows filters for country, job title, and location (Accountant jobs in Austin, TX), along with panel controls for various insights including market insights, trends, and competition scores. An insights map is displayed showing job data visualization across different locations."
   },
   {
-    "filename": "ref_1049.jpg",
+    "filename": "ref_1049.png",
     "site": "ddg_search",
-    "original_name": "ddg_15d3e45caa41.jpg",
+    "original_name": "ref_1049.jpg",
     "content_type": "dashboard",
     "industry": "Web Analytics",
     "ui_patterns": [
@@ -10186,9 +10167,9 @@
     "description": "This is a SEMrush domain overview dashboard showing comprehensive SEO analytics for prosperopedia.com. The interface displays key metrics like Authority Score, organic search traffic, paid search traffic, backlinks, and display advertising data. Multiple charts show traffic trends over time and keyword performance, along with detailed breakdowns by country and SERP features."
   },
   {
-    "filename": "ref_1115.webp",
+    "filename": "ref_1115.png",
     "site": "ddg_search",
-    "original_name": "ddg_f6e7e8156a82.webp",
+    "original_name": "ref_1115.webp",
     "content_type": "dashboard",
     "industry": "Web Analytics",
     "ui_patterns": [
@@ -10473,7 +10454,7 @@
   {
     "filename": "ref_1156.png",
     "site": "ddg_search",
-    "original_name": "ddg_950437fc91f8.png",
+    "original_name": "ref_1156.png",
     "content_type": "kanban board",
     "industry": "Developer Tools",
     "ui_patterns": [
@@ -10510,9 +10491,9 @@
     "description": "This is a GitLab CI/CD pipeline detail page showing the status of Pipeline #9418 which has failed. The interface displays pipeline execution details including job statuses (Lint passed, Test failed), execution times, and provides options to retry or delete the pipeline. The page shows typical GitLab project navigation with sections for repository, issues, merge requests, and CI/CD operations."
   },
   {
-    "filename": "ref_1168.webp",
+    "filename": "ref_1168.png",
     "site": "ddg_search",
-    "original_name": "ddg_44407f664484.webp",
+    "original_name": "ref_1168.webp",
     "content_type": "kanban board",
     "industry": "Developer Tools",
     "ui_patterns": [
@@ -10568,9 +10549,9 @@
     "description": "This is a CircleCI pipeline dashboard showing the status of a CI/CD pipeline for a machine learning project called 'circleci-ml-pipeline'. The interface displays a successful pipeline run with multiple jobs like build-deploy, install-build, train, test, package, and deploy, along with their execution times and status indicators."
   },
   {
-    "filename": "ref_1172.webp",
+    "filename": "ref_1172.png",
     "site": "ddg_search",
-    "original_name": "ddg_18443fc958f0.webp",
+    "original_name": "ref_1172.webp",
     "content_type": "kanban board",
     "industry": "Developer Tools",
     "ui_patterns": [
@@ -10668,9 +10649,9 @@
     "description": "This is an Application Performance Monitoring (APM) dashboard showing distributed tracing data. The interface displays real-time traces with charts for requests, errors, and latency metrics over time, along with a detailed table of service spans including duration, HTTP methods, and status codes."
   },
   {
-    "filename": "ref_1177.webp",
+    "filename": "ref_1177.png",
     "site": "ddg_search",
-    "original_name": "ddg_6a4ce97cdbb5.webp",
+    "original_name": "ref_1177.webp",
     "content_type": "data table",
     "industry": "Developer Tools",
     "ui_patterns": [
@@ -10747,9 +10728,9 @@
     "description": "This is a monitoring and alerting platform for Kubernetes infrastructure. The screenshot shows a form for configuring a Pod memory usage monitor, including a time series chart displaying memory metrics over the past hour and a multi-step wizard for setting up threshold alerts, defining metrics, and configuring alert conditions."
   },
   {
-    "filename": "ref_1183.webp",
+    "filename": "ref_1183.png",
     "site": "ddg_search",
-    "original_name": "ddg_1ee324aa1d25.webp",
+    "original_name": "ref_1183.webp",
     "content_type": "dashboard",
     "industry": "Developer Tools",
     "ui_patterns": [
@@ -10766,9 +10747,9 @@
     "description": "This is a New Relic Kubernetes monitoring dashboard showing cluster health and performance metrics. The interface displays real-time data about pods, nodes, services, containers, and deployments with color-coded status indicators, time-series charts tracking various metrics over time, and detailed tables for pod and container information."
   },
   {
-    "filename": "ref_1184.webp",
+    "filename": "ref_1184.png",
     "site": "ddg_search",
-    "original_name": "ddg_2420557eb0ea.webp",
+    "original_name": "ref_1184.webp",
     "content_type": "dashboard",
     "industry": "Developer Tools",
     "ui_patterns": [
@@ -10786,9 +10767,9 @@
     "description": "This is a New Relic Kubernetes monitoring dashboard that provides an overview of Kubernetes platform health. The dashboard displays various metrics including resource usage (cores and memory), number of K8s objects, namespaces per cluster, pods by namespace, container restarts, and CPU/memory usage statistics. Users can apply filters to focus on specific clusters or namespaces for detailed monitoring."
   },
   {
-    "filename": "ref_1185.webp",
+    "filename": "ref_1185.png",
     "site": "ddg_search",
-    "original_name": "ddg_db0ab12949e7.webp",
+    "original_name": "ref_1185.webp",
     "content_type": "dashboard",
     "industry": "Developer Tools",
     "ui_patterns": [
@@ -11742,9 +11723,9 @@
     "description": "This is a project management interface for Seabear Construction Company showing a data table view of construction projects. The table displays project details including names, status, descriptions, clients, budgets, and deadlines for various construction projects like coffee houses, beach shops, and resorts. The interface includes typical database view controls for filtering, sorting, and organizing project data."
   },
   {
-    "filename": "ref_1297.webp",
+    "filename": "ref_1297.png",
     "site": "ddg_search",
-    "original_name": "ddg_6360e5fe8b66.webp",
+    "original_name": "ref_1297.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -11761,9 +11742,9 @@
     "description": "This is Airtable's dashboard interface showing the main workspace view. The screenshot displays the user's interfaces and recently opened bases, with a sidebar containing workspaces, help resources, and navigation options. The main content area shows a grid of database bases with colorful icons representing different projects and templates."
   },
   {
-    "filename": "ref_1299.webp",
+    "filename": "ref_1299.png",
     "site": "ddg_search",
-    "original_name": "ddg_22e6072c290e.webp",
+    "original_name": "ref_1299.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -12113,9 +12094,9 @@
     "description": "This is Google Drive's 'Shared with me' view, showing files and folders that have been shared with the user by other collaborators. The interface displays a quick access section with recently shared items from specific users, followed by a detailed table listing all shared files with information about who shared them and when."
   },
   {
-    "filename": "ref_1406.jpg",
+    "filename": "ref_1406.png",
     "site": "ddg_search",
-    "original_name": "ddg_5d3c5a0b2562.jpg",
+    "original_name": "ref_1406.jpg",
     "content_type": "listing page",
     "industry": "Business Software",
     "ui_patterns": [
@@ -12486,9 +12467,9 @@
     "description": "This is Splunk Cloud's Incident Review dashboard for Enterprise Security. The interface shows security incident monitoring with four donut charts displaying urgency, status, owner, and domain metrics at the top, and a detailed data table below showing 548 security notables with various network activity incidents that can be filtered, sorted, and managed."
   },
   {
-    "filename": "ref_1440.webp",
+    "filename": "ref_1440.png",
     "site": "ddg_search",
-    "original_name": "ddg_4faed923b069.webp",
+    "original_name": "ref_1440.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -12603,9 +12584,9 @@
     "description": "This is a cybersecurity dashboard showing threat detection and endpoint security monitoring. The interface displays unresolved threats, mitigated threats, and endpoint status with detailed detection results in a data table format. The dashboard appears to be part of a security information and event management (SIEM) or endpoint detection and response (EDR) platform."
   },
   {
-    "filename": "ref_1450.webp",
+    "filename": "ref_1450.png",
     "site": "ddg_search",
-    "original_name": "ddg_fc5b700daf2c.webp",
+    "original_name": "ref_1450.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -12682,9 +12663,9 @@
     "description": "This is a Calendly dashboard showing the 'My Calendly' section where users can manage their scheduling events. The interface displays different event types including 'Introductory Call', 'Second Call', and 'Closing Call', each showing duration and format details. Users can view booking pages, copy links, and share their calendar events from this management interface."
   },
   {
-    "filename": "ref_1464.webp",
+    "filename": "ref_1464.png",
     "site": "ddg_search",
-    "original_name": "ddg_eef1775a618d.webp",
+    "original_name": "ref_1464.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -12719,9 +12700,9 @@
     "description": "This is Calendly, a meeting scheduling platform, showing the Event Types settings page. The interface displays different meeting duration options (15, 30, and 60 minutes) with toggle switches to enable/disable each type and settings icons for configuration. Users can manage their available meeting types and add new ones through this interface."
   },
   {
-    "filename": "ref_1467.webp",
+    "filename": "ref_1467.png",
     "site": "ddg_search",
-    "original_name": "ddg_30e17597f3b5.webp",
+    "original_name": "ref_1467.webp",
     "content_type": "settings page",
     "industry": "Business Software",
     "ui_patterns": [
@@ -13278,9 +13259,9 @@
     "description": "This is a project management dashboard showing comprehensive insights across multiple project categories including RFIs, Submittals, Punch Items, Observations, Inspections, Schedule, and Budget. The interface displays various metrics, status breakdowns, trend charts, and project performance data with color-coded visualizations and percentage tracking."
   },
   {
-    "filename": "ref_1561.webp",
+    "filename": "ref_1561.png",
     "site": "ddg_search",
-    "original_name": "ddg_c776d77ba5bd.webp",
+    "original_name": "ref_1561.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -13452,9 +13433,9 @@
     "description": "FreightPOP is a logistics platform that provides shipment tracking services. The screenshot shows a tracking search page where users can enter tracking numbers to find shipment details, with results displayed in a tabular format showing recent shipments with details like dates, companies, carriers, and tracking numbers."
   },
   {
-    "filename": "ref_1597.webp",
+    "filename": "ref_1597.png",
     "site": "ddg_search",
-    "original_name": "ddg_730a88b65044.webp",
+    "original_name": "ref_1597.webp",
     "content_type": "form",
     "industry": "Business Software",
     "ui_patterns": [
@@ -13669,9 +13650,9 @@
     "description": "This is a Zillow Premier Agent lead report dashboard showing analytics for real estate agent performance. The interface displays lead metrics through various charts including total leads breakdown, answer rates, leads by ZIP code, and leads over time, along with a team profile sidebar featuring agent contact information."
   },
   {
-    "filename": "ref_1619.webp",
+    "filename": "ref_1619.png",
     "site": "ddg_search",
-    "original_name": "ddg_113da267751f.webp",
+    "original_name": "ref_1619.webp",
     "content_type": "detail page",
     "industry": "Business Software",
     "ui_patterns": [
@@ -13708,9 +13689,9 @@
     "description": "This is a Zillow Premier Agent CRM interface showing a contact detail page for Ian Jones. The page displays contact information, buyer status, and recent activity including property views and saves. The right side shows an activity feed with property cards showing homes the contact has viewed or saved, while the left sidebar contains activity metrics and recent engagement summary."
   },
   {
-    "filename": "ref_1623.webp",
+    "filename": "ref_1623.png",
     "site": "ddg_search",
-    "original_name": "ddg_389016c57271.webp",
+    "original_name": "ref_1623.webp",
     "content_type": "messaging interface",
     "industry": "Business Software",
     "ui_patterns": [
@@ -13728,9 +13709,9 @@
     "description": "This is a Premier Agent real estate CRM messaging interface showing an inbox with client conversations. The main view displays a message from John Morgan about a property listing at 1234 Elm Street, with a property photo and details including price ($1,350,000) and location. The interface includes contact management features and insights about the lead."
   },
   {
-    "filename": "ref_1626.webp",
+    "filename": "ref_1626.png",
     "site": "ddg_search",
-    "original_name": "ddg_3b7e0d0233b9.webp",
+    "original_name": "ref_1626.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -14037,9 +14018,9 @@
     "description": "This is a comprehensive analytics dashboard for XM for IT, showing various satisfaction metrics and survey data. The interface displays multiple visualizations including satisfaction scores, employee effort metrics, departmental breakdowns, and text analysis topics, along with a customer feedback section showing recent comments and ratings."
   },
   {
-    "filename": "ref_1688.webp",
+    "filename": "ref_1688.png",
     "site": "ddg_search",
-    "original_name": "ddg_342a3c1d6902.webp",
+    "original_name": "ref_1688.webp",
     "content_type": "dashboard",
     "industry": "Business Software",
     "ui_patterns": [
@@ -14515,9 +14496,9 @@
     "description": "This is the Google Ads interface for creating and editing ad campaigns. The screenshot shows an ad group creation form for a beauty/skincare company called c'Balm, with sections for headlines, descriptions, and images. The interface includes a preview pane on the right showing how the ad will appear, along with ad strength indicators and help features."
   },
   {
-    "filename": "ref_1782.webp",
+    "filename": "ref_1782.png",
     "site": "ddg_search",
-    "original_name": "ddg_b875f442c254.webp",
+    "original_name": "ref_1782.webp",
     "content_type": "form",
     "industry": "Digital Marketing",
     "ui_patterns": [
@@ -14535,9 +14516,9 @@
     "description": "This is the Google Ads interface for creating and managing ad campaigns. The screenshot shows the ad group creation form where users can upload images, write headlines and descriptions for their ads, with a live preview panel on the right showing how the ad will appear. The interface is focused on beauty/skincare products based on the visible content and images."
   },
   {
-    "filename": "ref_1783.webp",
+    "filename": "ref_1783.png",
     "site": "ddg_search",
-    "original_name": "ddg_5ad8f863c0f5.webp",
+    "original_name": "ref_1783.webp",
     "content_type": "form",
     "industry": "Digital Marketing",
     "ui_patterns": [
@@ -14726,9 +14707,9 @@
     "description": "This is a Twitter Ads analytics dashboard showing tweet activity and performance metrics. The interface displays impression data over a 28-day period with a bar chart, along with detailed tweet performance metrics including impressions, engagements, and engagement rates. The dashboard also shows engagement trends and link click statistics for monitoring social media campaign effectiveness."
   },
   {
-    "filename": "ref_1811.jpg",
+    "filename": "ref_1811.png",
     "site": "ddg_search",
-    "original_name": "ddg_a6dc9adea08f.jpg",
+    "original_name": "ref_1811.jpg",
     "content_type": "dashboard",
     "industry": "Digital Marketing",
     "ui_patterns": [
@@ -14746,9 +14727,9 @@
     "description": "This is a Twitter Ads dashboard for The Barista Bar (@baristabar) showing campaign performance analytics. The interface displays spend and impressions charts, a detailed campaign data table with budget information, and various time period filtering options including a calendar widget for date selection."
   },
   {
-    "filename": "ref_1812.webp",
+    "filename": "ref_1812.png",
     "site": "ddg_search",
-    "original_name": "ddg_2788fd0ff996.webp",
+    "original_name": "ref_1812.webp",
     "content_type": "dashboard",
     "industry": "Digital Marketing",
     "ui_patterns": [

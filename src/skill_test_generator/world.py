@@ -481,7 +481,7 @@ class SkillTestGeneratorWorld(
             artifact_id: str | None = None
             last_checks: list[dict] = []
 
-            for attempt in range(2):
+            for attempt in range(3):
                 tarball = self._tar_variant(variant_dir, sim_name)
                 url = self._upload_to_s3(
                     tarball,
@@ -501,13 +501,16 @@ class SkillTestGeneratorWorld(
                         )
                     except Exception as e:
                         logger.error("  [%s] Pipeline VM error: %s", vs.slug, e)
-                        result = {"artifact_id": None, "verified": False, "checks": []}
+                        result = {
+                            "artifact_id": None, "verified": False,
+                            "checks": [], "failure_type": "infra",
+                        }
 
                 last_checks = result.get("checks", [])
+                failure_type = result.get("failure_type", "infra")
 
                 if result.get("artifact_id"):
                     artifact_id = result["artifact_id"]
-                    # Collect tasks generated inside the VM phase
                     vm_tasks = result.get("tasks", [])
                     if vm_tasks:
                         self._all_tasks[vs.slug] = vm_tasks
@@ -519,8 +522,8 @@ class SkillTestGeneratorWorld(
                         )
                     break
 
-                if attempt == 0 and config.coder_agent and not result.get("verified"):
-                    logger.info("  [%s] Verify failed, launching agent fix …", vs.slug)
+                if failure_type == "code" and attempt == 0 and config.coder_agent:
+                    logger.info("  [%s] Code error, launching agent fix …", vs.slug)
                     try:
                         instruction = build_codegen_instruction(
                             spec=spec,
@@ -542,6 +545,12 @@ class SkillTestGeneratorWorld(
                     except Exception as e:
                         logger.error("  [%s] Agent fix error: %s", vs.slug, e)
                         break
+                elif failure_type == "infra":
+                    logger.info(
+                        "  [%s] Infra error (attempt %d), retrying VM …",
+                        vs.slug, attempt + 1,
+                    )
+                    continue
                 else:
                     break
 
@@ -788,7 +797,7 @@ else:
                         }
                     )
                     logger.error("  [%s] %s", vs.slug, err)
-                    return {"artifact_id": None, "verified": False, "checks": checks}
+                    return {"artifact_id": None, "verified": False, "checks": checks, "failure_type": "code"}
                 checks.append({"name": "production_build", "pass": True, "error": ""})
 
                 # ── VERIFY (production server) ────────────────────────
@@ -823,7 +832,7 @@ else:
                             "error": f"Production server never healthy. Log: {log_tail[-500:]}",
                         }
                     )
-                    return {"artifact_id": None, "verified": False, "checks": checks}
+                    return {"artifact_id": None, "verified": False, "checks": checks, "failure_type": "code"}
 
                 checks.append({"name": "server_startup", "pass": True, "error": ""})
                 checks.append({"name": "GET /api/health", "pass": True, "error": ""})
@@ -878,7 +887,7 @@ else:
                 )
 
                 if not all(c["pass"] for c in checks):
-                    return {"artifact_id": None, "verified": False, "checks": checks}
+                    return {"artifact_id": None, "verified": False, "checks": checks, "failure_type": "code"}
 
                 # ── TASK GEN + VALIDATION (app is live on localhost) ──
                 generated_tasks: list[dict] = []
@@ -941,6 +950,10 @@ else:
                             len(live_api_data),
                         )
 
+                    # Kill the server to free memory while the LLM thinks.
+                    # Taskgen only needs the API data we already fetched.
+                    await _exec("fuser -k 3000/tcp 2>/dev/null", timeout=10)
+
                     gen_coro = generate_tasks_for_variant(
                         llm_client,
                         spec,
@@ -961,67 +974,36 @@ else:
                         len(generated_tasks),
                     )
 
-                    # Validation removed — string-match validation incorrectly
-                    # dropped tasks whose expected_output required aggregation
-                    # or computation across rows (sums, maxes, etc.).
-
-                # ── SERVE (for snapshot) ──────────────────────────────
-                # Reuse the production server already running from verify.
-                # Quick health re-check to confirm it's still alive.
-                out, _ = await _exec(
-                    "curl -sf http://127.0.0.1:3000/api/health -o /dev/null "
-                    "&& echo OK || echo FAIL",
-                    timeout=10,
+                # ── RESTART SERVER (for seed + snapshot) ──────────────
+                await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
+                start_cmd = (
+                    "node ./node_modules/next/dist/bin/next start "
+                    "--hostname 0.0.0.0 -p 3000"
                 )
-                if "OK" not in out:
-                    # Server died between verify and snapshot — restart once.
-                    logger.warning(
-                        "  [%s] Prod server died after verify, restarting …",
-                        vs.slug,
+                await _exec(
+                    f"{preamble} && cd {app_dir} && mkdir -p /tmp/pglite-data && "
+                    f"NEXT_DIST_DIR=.next NODE_ENV=production PORT=3000 APP_PORT=3000 "
+                    f"nohup {start_cmd} > /tmp/next.log 2>&1 &",
+                    timeout=30,
+                )
+                for health_i in range(30):
+                    out, _ = await _exec(
+                        "curl -sf http://127.0.0.1:3000/api/health -o /dev/null "
+                        "&& echo OK || echo FAIL",
+                        timeout=10,
                     )
-                    await _exec(
-                        "fuser -k 3000/tcp 2>/dev/null; sleep 3",
-                        timeout=15,
+                    if "OK" in out:
+                        break
+                    await asyncio.sleep(3)
+                else:
+                    log_tail, _ = await _exec(
+                        "tail -80 /tmp/next.log 2>/dev/null || echo 'no log'",
+                        timeout=10,
                     )
-                    start_cmd = (
-                        "node ./node_modules/next/dist/bin/next start "
-                        "--hostname 0.0.0.0 -p 3000"
+                    raise RuntimeError(
+                        f"Server unhealthy after restart for snapshot. "
+                        f"next.log tail: {log_tail[-2000:]}"
                     )
-                    await _exec(
-                        f"{preamble} && cd {app_dir} && mkdir -p /tmp/pglite-data && "
-                        f"NEXT_DIST_DIR=.next PORT=3000 APP_PORT=3000 "
-                        f"nohup {start_cmd} > /tmp/next.log 2>&1 &",
-                        timeout=30,
-                    )
-                    for health_i in range(40):
-                        out, _ = await _exec(
-                            "curl -sf http://127.0.0.1:3000/api/health -o /dev/null || "
-                            "curl -sf http://127.0.0.1:3000/ -o /dev/null "
-                            "&& echo OK || echo FAIL",
-                            timeout=10,
-                        )
-                        if "OK" in out:
-                            break
-                        if health_i == 10:
-                            log_tail, _ = await _exec(
-                                "tail -60 /tmp/next.log 2>/dev/null || echo 'no log'",
-                                timeout=10,
-                            )
-                            logger.warning(
-                                "  [%s] Server not healthy after %d checks. "
-                                "next.log tail:\n%s",
-                                vs.slug, health_i, log_tail[-1500:],
-                            )
-                        await asyncio.sleep(5)
-                    else:
-                        log_tail, _ = await _exec(
-                            "tail -80 /tmp/next.log 2>/dev/null || echo 'no log'",
-                            timeout=10,
-                        )
-                        raise RuntimeError(
-                            f"Server unhealthy after build. "
-                            f"next.log tail: {log_tail[-2000:]}"
-                        )
 
                 await asyncio.sleep(3)
 
