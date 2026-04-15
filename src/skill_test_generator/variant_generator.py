@@ -525,6 +525,27 @@ def _post_process_code(code_files: dict[str, str]) -> dict[str, str]:
     for path, content in list(code_files.items()):
         if path.endswith("layout.tsx"):
             content = _re.sub(r"</html>\s*;", "</html>", content)
+            if path == "app/layout.tsx" and 'id="app-root"' not in content:
+                content = _re.sub(
+                    r"(<Providers[^>]*>)(.*?)(</Providers>)",
+                    r'\1<main id="app-root">\2</main>\3',
+                    content,
+                    flags=_re.DOTALL,
+                )
+            if path == "app/layout.tsx" and 'id="app-root"' not in content:
+                content = content.replace(
+                    "{children}",
+                    '<main id="app-root">{children}</main>',
+                    1,
+                )
+            if path == "app/layout.tsx" and 'id="app-root"' not in content:
+                content = _re.sub(
+                    r"(<body[^>]*>)",
+                    r'\1<main id="app-root">',
+                    content,
+                    count=1,
+                )
+                content = content.replace("</body>", "</main></body>", 1)
 
         if path == "db/seed.ts":
             if "from './db'" in content or 'from "./db"' in content:

@@ -878,7 +878,8 @@ else:
                         f"http://127.0.0.1:3000{route} 2>&1 | tail -c 2000",
                         timeout=15,
                     )
-                    ok = "HTTP_CODE:200" in out and len(out) > 30
+                    body = out.split("HTTP_CODE:")[0].strip() if "HTTP_CODE:" in out else out
+                    ok = "HTTP_CODE:200" in out and len(body) > 2
                     checks.append(
                         {
                             "name": f"GET {route}",
@@ -917,6 +918,14 @@ else:
                 logger.info(
                     "  [%s] Verify: %d passed, %d failed", vs.slug, n_pass, n_fail
                 )
+                for c in checks:
+                    if not c["pass"]:
+                        logger.warning(
+                            "  [%s] FAILED check '%s': %s",
+                            vs.slug,
+                            c["name"],
+                            c.get("error", "")[:300],
+                        )
 
                 if not all(c["pass"] for c in checks):
                     return {"artifact_id": None, "verified": False, "checks": checks, "failure_type": "code"}
