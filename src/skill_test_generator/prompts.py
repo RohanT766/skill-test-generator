@@ -452,10 +452,19 @@ threshold, WITHOUT making them impossible or testing unrelated skills.
 - `sessions/` — one directory per session with trajectory data
 - `results.json` — pass/fail/error per session with scores
 - `sim/` — the simulator source code (Next.js app)
+- `target.json` — identifies which testcase to focus on
+- `prior_iterations.json` (if present) — summaries from previous hillclimb \
+  attempts on this testcase. Read this FIRST to avoid repeating failed strategies.
 
 ## Your Process
 
-### Step 1: Diagnose
+### Step 1: Check prior attempts
+
+If `prior_iterations.json` exists, read it first. It contains summaries of \
+what previous iterations tried and why they didn't work. Do NOT repeat \
+strategies that already failed. Build on what was learned.
+
+### Step 2: Diagnose
 
 Read ALL session trajectories carefully. For each session, determine:
 
@@ -464,7 +473,7 @@ Read ALL session trajectories carefully. For each session, determine:
 2. If it passed — was the task too easy? What made it easy?
 3. If it failed — was it a genuine skill failure or an unrelated issue?
 
-### Step 2: Plan difficulty adjustments
+### Step 3: Plan difficulty adjustments
 
 Decide what to change. Your options, IN ORDER OF PREFERENCE:
 
@@ -482,20 +491,42 @@ Decide what to change. Your options, IN ORDER OF PREFERENCE:
    MUST update ALL testcase scoring configs and expected values to match \
    the new data.
 
+### IMPORTANT: What does NOT work
+
+- **Small added conditionals are NOT enough.** Adding a single extra \
+  WHERE clause or filter (e.g. "count active dogs" instead of "count dogs") \
+  almost never reduces the pass rate. Agents handle simple compound \
+  conditions trivially.
+- **Keyword-swapping alone is NOT enough.** Replacing one domain term with \
+  another rarely confuses agents if the UI still has obvious labels.
+- You need STRUCTURAL difficulty: require the agent to cross-reference \
+  multiple pages, aggregate data across tabs, navigate pagination that \
+  isn't obvious, distinguish visually similar items, or reason about \
+  implicit relationships not directly shown in the UI.
+- Think about what would trip up a fast but careless reader. What requires \
+  CAREFUL attention vs. surface-level scanning?
+
+### IMPORTANT: Do NOT overcorrect
+
+- Going from 100% pass to 0% pass means you made it too hard or broke it.
+- The target is the sweet spot — some agents should pass, some should fail.
+- Make sure an expert human can still complete the task in a reasonable time.
+- If you're making sim code changes, ensure the app still builds and runs.
+
 CRITICAL RULES:
 - Do NOT make the task impossible. An expert human should still be able to \
   complete it.
 - Do NOT test different skills. Stay focused on the EXACT skill defined.
 - Do NOT change the fundamental nature of the app or its chrome/layout.
-- Keep changes minimal and targeted. Prefer one surgical change over many.
+- Prefer bold structural changes over many small tweaks.
 
-### Step 3: Execute edits
+### Step 4: Execute edits
 
 Write your changes to the workspace. For each file you modify:
 - Testcase files: edit in `testcases/` directory
 - Sim code: edit in `sim/` directory
 
-### Step 4: Output manifest
+### Step 5: Output manifest
 
 After making all edits, write `edits.json` to the workspace root with \
 this structure:
@@ -515,7 +546,10 @@ this structure:
       "change": "description of what was made harder",
       "mechanism": "How this targets the specific skill"
     }
-  ]
+  ],
+  "iteration_summary": "A 2-3 paragraph summary of: (1) what you diagnosed, \
+(2) what you changed and why, (3) what you predict will happen. This will be \
+shown to the next hillclimb agent if your changes don't achieve the target."
 }
 ```
 
@@ -523,5 +557,7 @@ The `edit_type` field determines how changes are published:
 - `testcase_only`: new testcases linked to existing snapshot
 - `sim_and_testcase` or `sim_only`: new snapshot + all testcases refreshed
 
-IMPORTANT: You MUST write `edits.json` when you are done.\
+IMPORTANT: You MUST write `edits.json` when you are done. The \
+`iteration_summary` field is critical — it will be passed to subsequent \
+iterations so they can learn from your attempt.\
 """

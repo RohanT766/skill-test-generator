@@ -879,100 +879,10 @@ else:
                     timeout=30,
                 )
 
-                prod_ok = False
-                for _ in range(40):
-                    out, _ = await _exec(
-                        "curl -sf http://127.0.0.1:3000/api/health -o /dev/null "
-                        "&& echo OK || echo FAIL",
-                        timeout=10,
-                    )
-                    if "OK" in out:
-                        prod_ok = True
-                        break
-                    await asyncio.sleep(3)
-
-                if not prod_ok:
-                    log_tail, _ = await _exec(
-                        "tail -50 /tmp/dev.log 2>/dev/null", timeout=10
-                    )
-                    checks.append(
-                        {
-                            "name": "server_startup",
-                            "pass": False,
-                            "error": f"Production server never healthy. Log: {log_tail[-500:]}",
-                        }
-                    )
-                    return {
-                        "artifact_id": None,
-                        "verified": False,
-                        "checks": checks,
-                        "failure_type": "code",
-                    }
-
-                checks.append({"name": "server_startup", "pass": True, "error": ""})
-                checks.append({"name": "GET /api/health", "pass": True, "error": ""})
-
-                for r in api_routes:
-                    route = r.get("route", "")
-                    if not route or "[" in route or "/health" in route:
-                        continue
-                    out, _ = await _exec(
-                        f"curl -s -w '\\nHTTP_CODE:%{{http_code}}' "
-                        f"http://127.0.0.1:3000{route} 2>&1 | tail -c 2000",
-                        timeout=15,
-                    )
-                    body = (
-                        out.split("HTTP_CODE:")[0].strip()
-                        if "HTTP_CODE:" in out
-                        else out
-                    )
-                    ok = "HTTP_CODE:200" in out and len(body) >= 2
-                    checks.append(
-                        {
-                            "name": f"GET {route}",
-                            "pass": ok,
-                            "error": "" if ok else out[:300],
-                        }
-                    )
-
-                page_html, _ = await _exec(
-                    "curl -s http://127.0.0.1:3000/ 2>&1 | head -c 50000",
-                    timeout=15,
+                verify_checks = await self._verify_sim_on_vm(
+                    _exec, api_routes, vs.slug
                 )
-                has_localhost = (
-                    "localhost:3000/api" in page_html
-                    or "127.0.0.1:3000/api" in page_html
-                )
-                if has_localhost:
-                    checks.append(
-                        {
-                            "name": "no_localhost_urls",
-                            "pass": False,
-                            "error": "Page HTML contains hardcoded localhost API URLs",
-                        }
-                    )
-                    logger.warning(
-                        "  [%s] Frontend has localhost URLs in HTML — will break behind proxy",
-                        vs.slug,
-                    )
-                else:
-                    checks.append(
-                        {"name": "no_localhost_urls", "pass": True, "error": ""}
-                    )
-
-                n_pass = sum(1 for c in checks if c["pass"])
-                n_fail = sum(1 for c in checks if not c["pass"])
-                logger.info(
-                    "  [%s] Verify: %d passed, %d failed", vs.slug, n_pass, n_fail
-                )
-                for c in checks:
-                    if not c["pass"]:
-                        logger.warning(
-                            "  [%s] FAILED check '%s': %s",
-                            vs.slug,
-                            c["name"],
-                            c.get("error", "")[:300],
-                        )
+                checks.extend(verify_checks)
 
                 if not all(c["pass"] for c in checks):
                     return {
@@ -1239,6 +1149,99 @@ else:
         so this is guaranteed to appear once the page hydrates.
         """
         return "#app-root"
+
+    @staticmethod
+    async def _verify_sim_on_vm(
+        _exec,
+        api_routes: list[dict],
+        label: str,
+    ) -> list[dict]:
+        """Verify a running sim on a VM: health check, route checks, localhost check.
+
+        Assumes the production server is already started on port 3000.
+        Returns a list of check dicts with 'name', 'pass', 'error'.
+        """
+        checks: list[dict] = []
+
+        prod_ok = False
+        for _ in range(40):
+            out, _ = await _exec(
+                "curl -sf http://127.0.0.1:3000/api/health -o /dev/null "
+                "&& echo OK || echo FAIL",
+                timeout=10,
+            )
+            if "OK" in out:
+                prod_ok = True
+                break
+            await asyncio.sleep(3)
+
+        if not prod_ok:
+            log_tail, _ = await _exec(
+                "tail -50 /tmp/dev.log 2>/dev/null", timeout=10
+            )
+            checks.append({
+                "name": "server_startup",
+                "pass": False,
+                "error": f"Production server never healthy. Log: {log_tail[-500:]}",
+            })
+            return checks
+
+        checks.append({"name": "server_startup", "pass": True, "error": ""})
+        checks.append({"name": "GET /api/health", "pass": True, "error": ""})
+
+        for r in api_routes:
+            route = r.get("route", "")
+            if not route or "[" in route or "/health" in route:
+                continue
+            out, _ = await _exec(
+                f"curl -s -w '\\nHTTP_CODE:%{{http_code}}' "
+                f"http://127.0.0.1:3000{route} 2>&1 | tail -c 2000",
+                timeout=15,
+            )
+            body = (
+                out.split("HTTP_CODE:")[0].strip()
+                if "HTTP_CODE:" in out
+                else out
+            )
+            ok = "HTTP_CODE:200" in out and len(body) >= 2
+            checks.append({
+                "name": f"GET {route}",
+                "pass": ok,
+                "error": "" if ok else out[:300],
+            })
+
+        page_html, _ = await _exec(
+            "curl -s http://127.0.0.1:3000/ 2>&1 | head -c 50000",
+            timeout=15,
+        )
+        has_localhost = (
+            "localhost:3000/api" in page_html
+            or "127.0.0.1:3000/api" in page_html
+        )
+        if has_localhost:
+            checks.append({
+                "name": "no_localhost_urls",
+                "pass": False,
+                "error": "Page HTML contains hardcoded localhost API URLs",
+            })
+        else:
+            checks.append({"name": "no_localhost_urls", "pass": True, "error": ""})
+
+        n_pass = sum(1 for c in checks if c["pass"])
+        n_fail = sum(1 for c in checks if not c["pass"])
+        logger.info(
+            "  [%s] Verify: %d passed, %d failed", label, n_pass, n_fail
+        )
+        for c in checks:
+            if not c["pass"]:
+                logger.warning(
+                    "  [%s] FAILED check '%s': %s",
+                    label,
+                    c["name"],
+                    c.get("error", "")[:300],
+                )
+
+        return checks
 
     def _tar_variant(self, variant_dir: Path, name: str) -> bytes:
         """Create a tarball of the variant directory, excluding heavy dirs.
@@ -2040,6 +2043,18 @@ else:
         if not self._variant_specs:
             self._load_variant_specs_from_disk()
 
+        # API fallback: fetch testcase data if local tasks.json missing (resume)
+        missing = [
+            vs for vs in self.state.variants
+            if vs.testcase_ids and not self._all_tasks.get(vs.slug)
+        ]
+        if missing:
+            logger.info(
+                "HILLCLIMB: %d variants missing local tasks, fetching from API",
+                len(missing),
+            )
+            await self._load_tasks_from_api()
+
         # Seed per-testcase state and variant-level iteration-0
         variants_with_work: list[VariantStatus] = []
         for vs in self.state.variants:
@@ -2221,7 +2236,10 @@ else:
                     )
                     continue
 
-                edits_summary = edits.get("rationale", "")[:200]
+                edits_summary = (
+                    edits.get("iteration_summary")
+                    or edits.get("rationale", "")
+                )[:500]
                 edit_type = edits.get("edit_type", "testcase_only")
                 sim_changed = edits.get("sim_changed", False) or edit_type in (
                     "sim_and_testcase",
@@ -2437,6 +2455,28 @@ else:
                 )
             )
 
+        # Prior iteration summaries (for subsequent retries)
+        tc_state = vs.testcase_hillclimb_state.get(target_tc_id)
+        if tc_state and len(tc_state.iterations) > 1:
+            prior = []
+            for it in tc_state.iterations:
+                if it.iteration == 0:
+                    prior.append({
+                        "iteration": 0,
+                        "pass_rate": it.pass_rate,
+                        "note": "Original baseline — no edits applied.",
+                    })
+                else:
+                    prior.append({
+                        "iteration": it.iteration,
+                        "pass_rate": it.pass_rate,
+                        "edit_type": it.edit_type,
+                        "edits_summary": it.edits_summary,
+                    })
+            (workspace_dir / "prior_iterations.json").write_text(
+                json.dumps(prior, indent=2)
+            )
+
         # Session trajectories (only for the target testcase)
         sess_dir = workspace_dir / "sessions"
         sess_dir.mkdir(exist_ok=True)
@@ -2503,6 +2543,17 @@ else:
                 f"them if you change the sim.\n"
             )
 
+        prior_note = ""
+        tc_state = vs.testcase_hillclimb_state.get(
+            vs.testcase_ids[target_tc_idx] if target_tc_idx >= 0 else "", None
+        )
+        if tc_state and len(tc_state.iterations) > 1:
+            prior_note = (
+                f"- IMPORTANT: This is iteration {iteration}. Read "
+                f"prior_iterations.json FIRST to see what previous "
+                f"attempts tried and why they didn't work.\n"
+            )
+
         instruction = (
             f"{HILLCLIMB_AGENT_PROMPT}\n\n"
             f"## Current State\n"
@@ -2512,6 +2563,7 @@ else:
             f"- Working directory: {mount_path}\n"
             f"- First: cd {mount_path}\n"
             f"{tc_focus}"
+            f"{prior_note}"
             f"- Read skill.json, spec.json, target.json, results.json, "
             f"testcases/, and sessions/ in that directory.\n"
             f"- Write your edits directly to testcases/ and/or sim/ "
@@ -2570,9 +2622,10 @@ else:
         current_artifact_id: str,
         edits: dict,
     ) -> str | None:
-        """Boot from existing snapshot, apply sim edits, re-snapshot.
+        """Boot from existing snapshot, apply sim edits, verify, re-snapshot.
 
-        Returns new artifact_id or None on failure.
+        Includes the same verification + claude-code fallback as the
+        initial CODEGEN pipeline. Returns new artifact_id or None on failure.
         """
         from plato._generated.api.v2.sessions import (
             close as sessions_close,
@@ -2599,6 +2652,13 @@ else:
         if not sim_dir.is_dir():
             logger.error("HILLCLIMB [%s] no sim/ directory for edits", vs.slug)
             return None
+
+        spec = next(
+            (s for s in self._variant_specs if s.get("slug") == vs.slug), {}
+        )
+        api_routes = [
+            r for r in spec.get("api_routes", []) if isinstance(r, dict)
+        ]
 
         async with httpx.AsyncClient(
             base_url=api_url,
@@ -2656,15 +2716,15 @@ else:
                     raise RuntimeError("VM never reached running state")
                 logger.info("HILLCLIMB [%s] snapshot VM running", vs.slug)
 
+                app_dir = "/tmp/variant/web"
+                preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
+
                 # Upload edited sim code as tarball
                 tarball = self._tar_variant(sim_dir.parent, f"hc-{vs.slug}")
                 url = self._upload_to_s3(
                     tarball,
                     f"{S3_PREFIX}/{vs.sim_name}-hc-{len(vs.hillclimb_iterations)}.tar.gz",
                 )
-
-                app_dir = "/tmp/variant/web"
-                preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
 
                 await _exec(
                     f"curl -sfL '{url}' -o /tmp/hc-variant.tar.gz && "
@@ -2673,6 +2733,7 @@ else:
                     timeout=180,
                 )
 
+                # ── BUILD if code changed ──────────────────────────────
                 needs_rebuild = edits.get("sim_code_changed", False)
                 if needs_rebuild:
                     await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
@@ -2695,42 +2756,144 @@ else:
                         )
                         return None
 
-                # Re-seed if data changed
-                if edits.get("sim_data_changed", False):
-                    await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
-                    await _exec(
-                        f"{preamble} && cd {app_dir} && mkdir -p /tmp/pglite-data && "
-                        "NEXT_DIST_DIR=.next NODE_ENV=production PORT=3000 "
-                        "nohup node ./node_modules/next/dist/bin/next start "
-                        "--hostname 0.0.0.0 -p 3000 > /tmp/dev.log 2>&1 &",
-                        timeout=30,
-                    )
-                    for _ in range(20):
-                        out, _ = await _exec(
-                            "curl -sf http://127.0.0.1:3000/api/health && echo OK || echo FAIL",
-                            timeout=10,
+                # ── Start server + verify ──────────────────────────────
+                await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
+                await _exec(
+                    f"{preamble} && cd {app_dir} && mkdir -p /tmp/pglite-data && "
+                    "NEXT_DIST_DIR=.next NODE_ENV=production PORT=3000 "
+                    "nohup node ./node_modules/next/dist/bin/next start "
+                    "--hostname 0.0.0.0 -p 3000 > /tmp/dev.log 2>&1 &",
+                    timeout=30,
+                )
+
+                verify_checks = await self._verify_sim_on_vm(
+                    _exec, api_routes, f"hc-{vs.slug}"
+                )
+
+                if not all(c["pass"] for c in verify_checks):
+                    # ── Claude-code fallback: let agent fix the issues ─
+                    if config.coder_agent:
+                        failed_names = [
+                            c["name"] for c in verify_checks if not c["pass"]
+                        ]
+                        logger.info(
+                            "HILLCLIMB [%s] verify failed (%s), launching fix agent",
+                            vs.slug,
+                            ", ".join(failed_names),
                         )
-                        if "OK" in out:
-                            break
-                        await asyncio.sleep(3)
+                        try:
+                            from .codegen_agent import build_codegen_instruction
 
-                    spec = next(
-                        (s for s in self._variant_specs if s.get("slug") == vs.slug),
-                        {},
-                    )
-                    api_routes = [
-                        r for r in spec.get("api_routes", []) if isinstance(r, dict)
-                    ]
-                    for r in api_routes:
-                        route = r.get("route", "")
-                        if route and "/health" not in route and "[" not in route:
-                            await _exec(
-                                f"curl -s http://127.0.0.1:3000{route} > /dev/null",
-                                timeout=15,
+                            fix_instruction = build_codegen_instruction(
+                                spec=spec,
+                                slug=vs.slug,
+                                variant_dir=f"/workspace/output/hillclimb/{vs.slug}",
+                                verify_port=config.codegen_verify_port,
+                                files_written=[],
+                                validation_errors=[],
+                                deps_installed=True,
+                                check_results=verify_checks,
                             )
-                    await asyncio.sleep(3)
+                            runner = self.agent(
+                                config.coder_agent,
+                                display_name=f"hc-fix-{vs.slug}",
+                                workspaces=[self.workspace("output")],
+                            )
+                            await runner.run(instruction=fix_instruction)
+                            logger.info(
+                                "HILLCLIMB [%s] fix agent complete, re-uploading",
+                                vs.slug,
+                            )
 
-                # Snapshot
+                            tarball = self._tar_variant(
+                                sim_dir.parent, f"hc-fix-{vs.slug}"
+                            )
+                            url = self._upload_to_s3(
+                                tarball,
+                                f"{S3_PREFIX}/{vs.sim_name}-hc-fix.tar.gz",
+                            )
+                            await _exec(
+                                f"curl -sfL '{url}' -o /tmp/hc-fix.tar.gz && "
+                                "tar xzf /tmp/hc-fix.tar.gz -C /tmp/variant "
+                                "--strip-components=0",
+                                timeout=180,
+                            )
+
+                            if needs_rebuild:
+                                await _exec(
+                                    "fuser -k 3000/tcp 2>/dev/null; sleep 1",
+                                    timeout=10,
+                                )
+                                await _exec(
+                                    f"rm -rf {app_dir}/.next", timeout=10
+                                )
+                                build_out, build_ok = await _exec(
+                                    f"{preamble} && cd {app_dir} && "
+                                    "bun install 2>&1 | tail -5 && "
+                                    "NODE_ENV=production NEXT_DIST_DIR=.next "
+                                    "node ./node_modules/next/dist/bin/next "
+                                    "build 2>&1 | tail -20",
+                                    timeout=300,
+                                )
+                                if not build_ok:
+                                    logger.error(
+                                        "HILLCLIMB [%s] fix-rebuild failed",
+                                        vs.slug,
+                                    )
+                                    return None
+
+                            await _exec(
+                                "fuser -k 3000/tcp 2>/dev/null; sleep 1",
+                                timeout=10,
+                            )
+                            await _exec(
+                                f"{preamble} && cd {app_dir} && "
+                                "mkdir -p /tmp/pglite-data && "
+                                "NEXT_DIST_DIR=.next NODE_ENV=production "
+                                "PORT=3000 nohup node "
+                                "./node_modules/next/dist/bin/next start "
+                                "--hostname 0.0.0.0 -p 3000 "
+                                "> /tmp/dev.log 2>&1 &",
+                                timeout=30,
+                            )
+
+                            retry_checks = await self._verify_sim_on_vm(
+                                _exec, api_routes, f"hc-fix-{vs.slug}"
+                            )
+                            if not all(c["pass"] for c in retry_checks):
+                                logger.error(
+                                    "HILLCLIMB [%s] still failing after fix agent",
+                                    vs.slug,
+                                )
+                                return None
+                        except Exception as e:
+                            logger.error(
+                                "HILLCLIMB [%s] fix agent error: %s", vs.slug, e
+                            )
+                            return None
+                    else:
+                        logger.error(
+                            "HILLCLIMB [%s] verify failed, no coder_agent configured",
+                            vs.slug,
+                        )
+                        return None
+
+                # ── Seed API routes before snapshot ────────────────────
+                seed_routes = [
+                    r.get("route", "")
+                    for r in api_routes
+                    if r.get("route")
+                    and "/health" not in r.get("route", "")
+                    and "[" not in r.get("route", "")
+                ]
+                for route in seed_routes:
+                    await _exec(
+                        f"curl -s http://127.0.0.1:3000{route} > /dev/null",
+                        timeout=15,
+                    )
+                await asyncio.sleep(3)
+
+                # ── Snapshot ───────────────────────────────────────────
                 wait_selector = self._derive_wait_selector(vs.slug)
                 flows_yaml = (
                     "flows:\n"
@@ -3147,6 +3310,71 @@ else:
             p = self.config.output / slug / "tasks.json"
             if p.exists():
                 self._all_tasks[slug] = json.loads(p.read_text()).get("tasks", [])
+
+    async def _load_tasks_from_api(self) -> None:
+        """Fetch testcase details from Plato API for variants missing local tasks.
+
+        Fallback for resume_variants where tasks.json doesn't exist on disk.
+        """
+        from plato._generated.api.v1.testcases import get_testcases
+
+        config = self.config
+        if not config.plato_api_key:
+            return
+
+        async with httpx.AsyncClient(
+            base_url=config.plato_api_url,
+            timeout=httpx.Timeout(30.0),
+        ) as http:
+            for vs in self.state.variants:
+                if vs.slug in self._all_tasks and self._all_tasks[vs.slug]:
+                    continue
+                if not vs.testcase_ids:
+                    continue
+
+                tasks: list[dict] = []
+                for tc_id in vs.testcase_ids:
+                    try:
+                        resp = await get_testcases.asyncio(
+                            client=http,
+                            test_case_public_id=tc_id,
+                            x_api_key=config.plato_api_key,
+                            page_size=1,
+                        )
+                        testcases = resp.get("testcases", [])
+                        if not testcases:
+                            tasks.append({"_testcase_id": tc_id})
+                            continue
+                        tc = testcases[0]
+                        scoring_config = tc.get("defaultScoringConfig", {})
+                        v2_config = tc.get("v2ScoringConfig")
+                        if v2_config:
+                            scoring_config["v2_scoring_config"] = v2_config
+                        tasks.append({
+                            "_testcase_id": tc_id,
+                            "name": tc.get("name", ""),
+                            "instruction": tc.get("prompt", ""),
+                            "start_url": tc.get("startUrl", "/"),
+                            "scoring_type": (
+                                tc.get("scoringTypes", ["output"])[0]
+                                if tc.get("scoringTypes")
+                                else "output"
+                            ),
+                            "expected_output": tc.get("expectedOutput"),
+                            "output_schema": tc.get("outputSchema"),
+                            "scoring_config": scoring_config,
+                        })
+                    except Exception as e:
+                        logger.warning(
+                            "Failed to fetch testcase %s from API: %s", tc_id, e
+                        )
+                        tasks.append({"_testcase_id": tc_id})
+
+                if tasks:
+                    self._all_tasks[vs.slug] = tasks
+                    logger.info(
+                        "Loaded %d tasks from API for %s", len(tasks), vs.slug
+                    )
 
     def _build_summary(self) -> str:
         lines = [
