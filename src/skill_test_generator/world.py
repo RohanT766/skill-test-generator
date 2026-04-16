@@ -1457,7 +1457,6 @@ else:
             logger.error("  [%s] sim_name not set, cannot create testcases", vs.variant_key)
             return []
 
-        from plato._generated.api.v1.simulator import get_simulator_id
         from plato._generated.api.v2.testcases import create_testcase
         from plato._generated.models import CreateTestCaseRequest
 
@@ -1471,20 +1470,6 @@ else:
             base_url=config.plato_api_url,
             timeout=httpx.Timeout(60.0),
         ) as http:
-            simulator_id: int | None = None
-            try:
-                sid_resp = await get_simulator_id.asyncio(
-                    client=http,
-                    simulator_name=sim_name,
-                    x_api_key=config.plato_api_key,
-                )
-                simulator_id = sid_resp.simulator_id
-                logger.info("  Resolved sim '%s' -> id %d", sim_name, simulator_id)
-            except Exception as e:
-                logger.warning(
-                    "  Could not resolve simulator_id for '%s': %s", sim_name, e
-                )
-
             for task in tasks:
                 scoring_type = task.get("scoring_type", "output")
                 v2_scoring_config = _build_v2_scoring_config(task, sim_name)
@@ -1504,7 +1489,6 @@ else:
                     prompt=task.get("instruction", ""),
                     start_url=task.get("start_url", "/"),
                     simulator_artifact_ids=[artifact_id],
-                    simulator_id=simulator_id,
                     tags=tc_tags,
                 )
 
