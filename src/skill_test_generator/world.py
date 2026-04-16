@@ -763,7 +763,11 @@ class SkillTestGeneratorWorld(
                 )
 
                 app_dir = "/tmp/variant/web"
-                preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
+                preamble = (
+                    'for d in /home/*/.nvm/versions/node/*/bin; do '
+                    '[ -d "$d" ] && export PATH="$d:$PATH"; done; '
+                    'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
+                )
 
                 out, _ = await _exec(
                     f"{preamble} && cd {app_dir} && bun install 2>&1 | tail -10",
@@ -2804,7 +2808,11 @@ else:
                 )
 
                 app_dir = "/tmp/variant/web"
-                preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
+                preamble = (
+                    'for d in /home/*/.nvm/versions/node/*/bin; do '
+                    '[ -d "$d" ] && export PATH="$d:$PATH"; done; '
+                    'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
+                )
 
                 # Upload edited sim code as tarball
                 tarball = self._tar_variant(sim_dir.parent, f"hc-{vs.slug}")
