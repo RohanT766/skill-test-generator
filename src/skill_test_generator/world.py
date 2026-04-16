@@ -352,7 +352,7 @@ class SkillTestGeneratorWorld(
                 app_name = match[0].get("app_name", "").strip()
                 app_name = re.sub(r"[^a-z0-9-]", "", app_name.lower().replace(" ", "-"))
                 app_name = app_name or config.sim_name_prefix
-                vs.sim_name = f"{app_name}-{vs.slug}"
+                vs.sim_name = f"{app_name}-{vs.skill_slug}"
 
     # ------------------------------------------------------------------
     # CODEGEN — parallel claude-code agent sessions on Chronos VMs
@@ -452,7 +452,7 @@ class SkillTestGeneratorWorld(
                 app_name = spec.get("app_name", "").strip()
                 app_name = re.sub(r"[^a-z0-9-]", "", app_name.lower().replace(" ", "-"))
                 app_name = app_name or config.sim_name_prefix
-                sim_name = f"{app_name}-{vs.slug}"
+                sim_name = f"{app_name}-{vs.skill_slug}"
             vs.sim_name = sim_name
 
             # ── Phase 1: LLM codegen ──────────────────────────────────
@@ -1492,7 +1492,7 @@ else:
                         task.get("name", "unnamed"),
                     )
 
-                tc_name = f"{vs.slug}-{task.get('name', 'unnamed')}"
+                tc_name = f"{vs.skill_slug}-{task.get('name', 'unnamed')}"
                 req = CreateTestCaseRequest(
                     name=tc_name,
                     prompt=task.get("instruction", ""),

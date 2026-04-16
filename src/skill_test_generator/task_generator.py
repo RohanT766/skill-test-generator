@@ -479,7 +479,8 @@ def build_plato_task_configs(
         app_name = spec.get("app_name", "").strip()
         app_name = re.sub(r"[^a-z0-9-]", "", app_name.lower().replace(" ", "-"))
         app_name = app_name or sim_name_prefix
-        sim_name = f"{app_name}-{slug}"
+        skill_slug = re.sub(r"-v\d+$", "", slug)
+        sim_name = f"{app_name}-{skill_slug}"
         tasks = all_tasks.get(slug, [])
 
         for task in tasks:
@@ -488,7 +489,7 @@ def build_plato_task_configs(
 
             config: dict = {
                 "sim": sim_name,
-                "task_name": f"{slug}-{task.get('name', 'unnamed')}",
+                "task_name": f"{skill_slug}-{task.get('name', 'unnamed')}",
                 "title": task.get("title", ""),
                 "instruction": task.get("instruction", ""),
                 "start_url": task.get("start_url", "/"),
