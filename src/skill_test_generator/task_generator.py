@@ -470,11 +470,16 @@ def build_plato_task_configs(
     Each task config can be used to create a Plato test case via the API,
     including V2ScoringConfig for automated evaluation.
     """
+    import re
+
     configs: list[dict] = []
 
     for spec in variant_specs:
         slug = spec.get("slug", spec.get("_generation", {}).get("slug", "unknown"))
-        sim_name = f"{sim_name_prefix}-{slug}"
+        app_name = spec.get("app_name", "").strip()
+        app_name = re.sub(r"[^a-z0-9-]", "", app_name.lower().replace(" ", "-"))
+        app_name = app_name or sim_name_prefix
+        sim_name = f"{app_name}-{slug}"
         tasks = all_tasks.get(slug, [])
 
         for task in tasks:

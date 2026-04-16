@@ -7,6 +7,7 @@ import importlib.resources
 import io
 import json
 import logging
+import re
 import tarfile
 import time
 from pathlib import Path
@@ -344,12 +345,14 @@ class SkillTestGeneratorWorld(
         (config.output / "variant_specs.json").write_text(
             json.dumps(self._variant_specs, indent=2, default=str)
         )
-        run_suffix = hex(int(time.time()))[2:]
         for vs in self.state.variants:
             match = [s for s in self._variant_specs if s.get("slug") == vs.slug]
             vs.stage = "designed" if match else "design_failed"
             if match:
-                vs.sim_name = f"{config.sim_name_prefix}-{vs.slug}-{run_suffix}"
+                app_name = match[0].get("app_name", "").strip()
+                app_name = re.sub(r"[^a-z0-9-]", "", app_name.lower().replace(" ", "-"))
+                app_name = app_name or config.sim_name_prefix
+                vs.sim_name = f"{app_name}-{vs.slug}"
 
     # ------------------------------------------------------------------
     # CODEGEN — parallel claude-code agent sessions on Chronos VMs
@@ -444,7 +447,12 @@ class SkillTestGeneratorWorld(
 
         async def _single_pipeline_inner(vs: VariantStatus, spec: dict) -> None:
             variant_dir = variants_dir / vs.slug
-            sim_name = vs.sim_name or f"{config.sim_name_prefix}-{vs.slug}"
+            sim_name = vs.sim_name
+            if not sim_name:
+                app_name = spec.get("app_name", "").strip()
+                app_name = re.sub(r"[^a-z0-9-]", "", app_name.lower().replace(" ", "-"))
+                app_name = app_name or config.sim_name_prefix
+                sim_name = f"{app_name}-{vs.slug}"
             vs.sim_name = sim_name
 
             # ── Phase 1: LLM codegen ──────────────────────────────────
@@ -1413,7 +1421,10 @@ else:
         from .task_generator import _build_v2_scoring_config
 
         config = self.config
-        sim_name = vs.sim_name or f"{config.sim_name_prefix}-{vs.slug}"
+        sim_name = vs.sim_name
+        if not sim_name:
+            logger.error("  [%s] sim_name not set, cannot create testcases", vs.slug)
+            return []
 
         from plato._generated.api.v1.simulator import get_simulator_id
         from plato._generated.api.v2.testcases import create_testcase
@@ -3015,7 +3026,7 @@ else:
                     SimulatorConfig,
                 )
 
-                base = re.sub(r"-[a-f0-9]{6,}$", "", base_sim_name)
+                base = re.sub(r"-v\d+$", "", base_sim_name)
                 hc_sim_name = base
                 for v in range(1, 100):
                     candidate = f"{base}-v{v}"
