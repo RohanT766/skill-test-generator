@@ -6,7 +6,7 @@
       "vm": {
         "cpus": 2,
         "memory": 4096,
-        "disk": 10240,
+        "disk": 20480,
         "timeout": 14400
       }
     },

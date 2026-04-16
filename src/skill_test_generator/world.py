@@ -3047,35 +3047,23 @@ else:
                         )
                         return None
 
-                # ── Register new sim (with v# bump on collision) ─────
-                sim_desc = (
-                    f"[skill: {vs.skill_name}] "
-                    f"{spec.get('description', '') or ''}"
-                ).strip()
-                hc_sim_name = await self._register_simulator(
-                    http, api_key, base_sim_name, sim_desc,
-                    icon_svg=spec.get("icon_svg", ""),
-                    label=f"hc-{vs.variant_key}",
-                )
-
-                # ── Seed + Snapshot ─────────────────────────────────────
+                # ── Seed + Snapshot (new artifact on existing sim) ────
                 await self._seed_api_routes(
                     _exec, api_routes, f"hc-{vs.variant_key}"
                 )
                 flows_yaml = self._build_flows_yaml(vs.variant_key)
                 try:
                     new_artifact_id = await self._take_snapshot(
-                        http, session_id, api_key, hc_sim_name,
+                        http, session_id, api_key, base_sim_name,
                         flows_yaml, f"hc-{vs.variant_key}",
                     )
                 except RuntimeError as e:
                     logger.error("HILLCLIMB [%s] %s", vs.variant_key, e)
                     return None
 
-                vs.sim_name = hc_sim_name
                 logger.info(
-                    "HILLCLIMB [%s] sim_name updated: %s → %s",
-                    vs.variant_key, base_sim_name, hc_sim_name,
+                    "HILLCLIMB [%s] new artifact %s on sim '%s'",
+                    vs.variant_key, new_artifact_id, base_sim_name,
                 )
                 return new_artifact_id
 
