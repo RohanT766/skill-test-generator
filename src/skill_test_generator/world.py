@@ -763,11 +763,21 @@ class SkillTestGeneratorWorld(
                 )
 
                 app_dir = "/tmp/variant/web"
-                preamble = (
-                    'for d in /home/*/.nvm/versions/node/*/bin; do '
-                    '[ -d "$d" ] && export PATH="$d:$PATH"; done; '
-                    'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
+
+                # Detect node path (nvm may install under any user home)
+                node_path_out, _ = await _exec(
+                    "command -v node 2>/dev/null "
+                    "|| find /home -maxdepth 6 -name node -path '*/bin/node' -type f 2>/dev/null | head -1 "
+                    "|| find /root -maxdepth 6 -name node -path '*/bin/node' -type f 2>/dev/null | head -1",
+                    timeout=15,
                 )
+                node_bin_dir = ""
+                if node_path_out:
+                    import os as _os
+                    node_bin_dir = _os.path.dirname(node_path_out.split("\n")[0].strip())
+                extra_path = f"{node_bin_dir}:" if node_bin_dir else ""
+                preamble = f'export PATH="{extra_path}/root/.bun/bin:/usr/local/bin:$PATH"'
+                logger.info("  [%s] node at: %s", vs.slug, node_path_out.strip())
 
                 out, _ = await _exec(
                     f"{preamble} && cd {app_dir} && bun install 2>&1 | tail -10",
@@ -2808,11 +2818,19 @@ else:
                 )
 
                 app_dir = "/tmp/variant/web"
-                preamble = (
-                    'for d in /home/*/.nvm/versions/node/*/bin; do '
-                    '[ -d "$d" ] && export PATH="$d:$PATH"; done; '
-                    'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
+
+                node_path_out, _ = await _exec(
+                    "command -v node 2>/dev/null "
+                    "|| find /home -maxdepth 6 -name node -path '*/bin/node' -type f 2>/dev/null | head -1 "
+                    "|| find /root -maxdepth 6 -name node -path '*/bin/node' -type f 2>/dev/null | head -1",
+                    timeout=15,
                 )
+                node_bin_dir = ""
+                if node_path_out:
+                    import os as _os
+                    node_bin_dir = _os.path.dirname(node_path_out.split("\n")[0].strip())
+                extra_path = f"{node_bin_dir}:" if node_bin_dir else ""
+                preamble = f'export PATH="{extra_path}/root/.bun/bin:/usr/local/bin:$PATH"'
 
                 # Upload edited sim code as tarball
                 tarball = self._tar_variant(sim_dir.parent, f"hc-{vs.slug}")
