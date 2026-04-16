@@ -1518,21 +1518,21 @@ else:
                 logger.info("Pass rate: N/A (no completed sessions)")
         logger.info("-" * 70)
 
-        attempts_by_skill: dict[str, list[dict]] = {}
+        attempts_by_slug: dict[str, list[dict]] = {}
         for a in all_attempts:
-            skill = a.get("skill_name", "unknown")
-            attempts_by_skill.setdefault(skill, []).append(a)
+            slug_key = a.get("slug", "unknown")
+            attempts_by_slug.setdefault(slug_key, []).append(a)
 
         for vs in self.state.variants:
             skill_name = vs.skill_name
             slug = vs.slug
-            skill_attempts = attempts_by_skill.get(skill_name, [])
+            variant_attempts = attempts_by_slug.get(slug, [])
             skill_finals = [r for r in vs.task_results]
 
             s_pass = sum(1 for r in skill_finals if r.get("outcome") == "PASS")
             s_fail = sum(1 for r in skill_finals if r.get("outcome") == "FAIL")
             s_error = sum(1 for r in skill_finals if r.get("outcome") == "ERROR")
-            s_retries = sum(1 for a in skill_attempts if a.get("attempt", 1) > 1)
+            s_retries = sum(1 for a in variant_attempts if a.get("attempt", 1) > 1)
 
             logger.info(
                 "SKILL: %s  [%s]", skill_name, slug,
@@ -1543,7 +1543,7 @@ else:
             )
 
             tc_attempts: dict[str, list[dict]] = {}
-            for a in skill_attempts:
+            for a in variant_attempts:
                 tc_key = a.get("testcase_id", "?")
                 tc_attempts.setdefault(tc_key, []).append(a)
 

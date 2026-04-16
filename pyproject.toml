@@ -1,6 +1,6 @@
 [project]
 name = "plato-world-skill-test-generator"
-version = "0.3.81"
+version = "0.3.82"
 description = "Generate targeted skill-test simulators from benchmark review skill gaps"
 requires-python = ">=3.11"
 dependencies = [
