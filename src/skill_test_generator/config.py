@@ -73,6 +73,29 @@ class IterationRecord(BaseModel):
     edits_summary: str = ""
 
 
+class TestcaseIterationRecord(BaseModel):
+    """One hillclimb iteration for a single testcase."""
+
+    iteration: int
+    testcase_id: str
+    artifact_id: str = ""
+    task_results: list[dict] = Field(default_factory=list)
+    pass_rate: float = 0.0
+    edits_summary: str = ""
+    edit_type: str = "none"
+
+
+class TestcaseHillclimbState(BaseModel):
+    """Per-testcase hillclimb tracking."""
+
+    testcase_id: str
+    original_pass_rate: float = 0.0
+    best_pass_rate: float = 0.0
+    best_testcase_id: str = ""
+    best_iteration_idx: int = 0
+    iterations: list[TestcaseIterationRecord] = Field(default_factory=list)
+
+
 class VariantStatus(BaseModel):
     """Tracks generation progress for a single skill variant."""
 
@@ -92,6 +115,9 @@ class VariantStatus(BaseModel):
     task_results: list[dict] = Field(default_factory=list)
     hillclimb_iterations: list[IterationRecord] = Field(default_factory=list)
     best_iteration: int = 0
+    testcase_hillclimb_state: dict[str, TestcaseHillclimbState] = Field(
+        default_factory=dict
+    )
 
 
 class HillclimbConfig(BaseModel):

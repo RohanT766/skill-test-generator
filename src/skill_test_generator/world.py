@@ -20,6 +20,8 @@ from .config import (
     SkillTestGeneratorConfig,
     SkillTestGeneratorState,
     Stage,
+    TestcaseHillclimbState,
+    TestcaseIterationRecord,
     VariantStatus,
 )
 
@@ -2006,7 +2008,11 @@ else:
     # ------------------------------------------------------------------
 
     async def _run_hillclimb(self) -> None:
-        """Hillclimb stage: make passing testcases harder until target failure rate."""
+        """Hillclimb stage: per-testcase difficulty tuning.
+
+        Variants are processed in parallel. Testcases within a variant that
+        exceed the target pass rate are hillclimbed sequentially.
+        """
         config = self.config
         hc = config.hillclimb
 
@@ -2034,42 +2040,83 @@ else:
         if not self._variant_specs:
             self._load_variant_specs_from_disk()
 
-        # Seed iteration-0 from existing results for every evaluated variant
+        # Seed per-testcase state and variant-level iteration-0
+        variants_with_work: list[VariantStatus] = []
         for vs in self.state.variants:
             if vs.stage != "evaluated" or not vs.task_results:
                 continue
-            if vs.hillclimb_iterations:
-                continue
-            passed = sum(1 for r in vs.task_results if r.get("outcome") == "PASS")
-            failed = sum(1 for r in vs.task_results if r.get("outcome") == "FAIL")
-            completed = passed + failed
-            rate = passed / completed if completed else 0.0
-            vs.hillclimb_iterations.append(
-                IterationRecord(
-                    iteration=0,
-                    artifact_id=vs.artifact_id,
-                    testcase_ids=list(vs.testcase_ids),
-                    task_results=list(vs.task_results),
-                    pass_rate=rate,
-                )
-            )
-            vs.best_iteration = 0
 
-        candidates = [
-            vs
-            for vs in self.state.variants
-            if vs.hillclimb_iterations
-            and vs.hillclimb_iterations[vs.best_iteration].pass_rate
-            > target_max_pass_rate
-        ]
+            # Group results by testcase_id → per-testcase pass rates
+            tc_results: dict[str, list[dict]] = {}
+            for r in vs.task_results:
+                tc_id = r.get("testcase_id", "")
+                if tc_id:
+                    tc_results.setdefault(tc_id, []).append(r)
+
+            has_candidates = False
+            for tc_id, results in tc_results.items():
+                if tc_id in vs.testcase_hillclimb_state:
+                    if (
+                        vs.testcase_hillclimb_state[tc_id].best_pass_rate
+                        > target_max_pass_rate
+                    ):
+                        has_candidates = True
+                    continue
+                passed = sum(1 for r in results if r.get("outcome") == "PASS")
+                failed = sum(1 for r in results if r.get("outcome") == "FAIL")
+                completed = passed + failed
+                rate = passed / completed if completed else 0.0
+                vs.testcase_hillclimb_state[tc_id] = TestcaseHillclimbState(
+                    testcase_id=tc_id,
+                    original_pass_rate=rate,
+                    best_pass_rate=rate,
+                    best_testcase_id=tc_id,
+                    best_iteration_idx=0,
+                    iterations=[
+                        TestcaseIterationRecord(
+                            iteration=0,
+                            testcase_id=tc_id,
+                            artifact_id=vs.artifact_id,
+                            task_results=results,
+                            pass_rate=rate,
+                        )
+                    ],
+                )
+                if rate > target_max_pass_rate:
+                    has_candidates = True
+
+            # Variant-level iteration-0 for backward compat / summary
+            if not vs.hillclimb_iterations:
+                passed = sum(
+                    1 for r in vs.task_results if r.get("outcome") == "PASS"
+                )
+                failed = sum(
+                    1 for r in vs.task_results if r.get("outcome") == "FAIL"
+                )
+                completed = passed + failed
+                rate = passed / completed if completed else 0.0
+                vs.hillclimb_iterations.append(
+                    IterationRecord(
+                        iteration=0,
+                        artifact_id=vs.artifact_id,
+                        testcase_ids=list(vs.testcase_ids),
+                        task_results=list(vs.task_results),
+                        pass_rate=rate,
+                    )
+                )
+                vs.best_iteration = 0
+
+            if has_candidates:
+                variants_with_work.append(vs)
+
         logger.info(
-            "HILLCLIMB: %d / %d variants exceed target (%.1f%%)",
-            len(candidates),
-            len([v for v in self.state.variants if v.hillclimb_iterations]),
+            "HILLCLIMB: %d / %d variants have testcases exceeding target (%.1f%%)",
+            len(variants_with_work),
+            len([v for v in self.state.variants if v.task_results]),
             target_max_pass_rate * 100,
         )
-        if not candidates:
-            logger.info("HILLCLIMB: nothing to do — all variants within target")
+        if not variants_with_work:
+            logger.info("HILLCLIMB: nothing to do — all testcases within target")
             self._log_hillclimb_summary(target_max_pass_rate)
             return
 
@@ -2077,9 +2124,11 @@ else:
 
         async def _hillclimb_one(vs: VariantStatus) -> None:
             async with sem:
-                await self._hillclimb_variant(vs, target_max_pass_rate, hc.max_retries)
+                await self._hillclimb_variant(
+                    vs, target_max_pass_rate, hc.max_retries
+                )
 
-        await asyncio.gather(*[_hillclimb_one(vs) for vs in candidates])
+        await asyncio.gather(*[_hillclimb_one(vs) for vs in variants_with_work])
 
         self._log_hillclimb_summary(target_max_pass_rate)
 
@@ -2089,113 +2138,195 @@ else:
         target_max_pass_rate: float,
         max_retries: int,
     ) -> None:
-        """Run the hillclimb loop for a single variant."""
+        """Process testcases that exceed target sequentially within a variant."""
         config = self.config
+        current_artifact_id = vs.artifact_id
 
-        for retry in range(1, max_retries + 1):
-            current = vs.hillclimb_iterations[vs.best_iteration]
-            logger.info(
-                "HILLCLIMB [%s] iteration %d/%d — current pass_rate=%.1f%%",
-                vs.slug,
-                retry,
-                max_retries,
-                current.pass_rate * 100,
+        exceeding = [
+            (tc_id, tc_state)
+            for tc_id, tc_state in vs.testcase_hillclimb_state.items()
+            if tc_state.best_pass_rate > target_max_pass_rate
+        ]
+        logger.info(
+            "HILLCLIMB [%s] %d/%d testcases exceed target, processing sequentially",
+            vs.slug,
+            len(exceeding),
+            len(vs.testcase_hillclimb_state),
+        )
+
+        for tc_id, tc_state in exceeding:
+            tc_idx = next(
+                (i for i, tid in enumerate(vs.testcase_ids) if tid == tc_id), -1
             )
-
-            if current.pass_rate <= target_max_pass_rate:
-                logger.info("HILLCLIMB [%s] already within target, stopping", vs.slug)
-                break
-
-            # (a) Fetch trajectories for the latest sessions
-            trajectory_data = await self._hc_fetch_trajectories(vs, current)
-
-            # (b) Write workspace context for the agent
-            workspace_dir = config.output / "hillclimb" / vs.slug / f"iter-{retry}"
-            workspace_dir.mkdir(parents=True, exist_ok=True)
-            await self._hc_write_workspace(vs, current, trajectory_data, workspace_dir)
-
-            # (c) Launch claude-code agent
-            edits = await self._hc_run_agent(vs, workspace_dir, retry)
-            if not edits:
+            if tc_idx < 0:
                 logger.warning(
-                    "HILLCLIMB [%s] agent produced no edits.json, skipping", vs.slug
+                    "HILLCLIMB [%s] tc %s not found in testcase_ids, skipping",
+                    vs.slug,
+                    tc_id,
                 )
                 continue
 
-            edits_summary = edits.get("rationale", "")[:200]
-            edit_type = edits.get("edit_type", "testcase_only")
-            sim_changed = edits.get("sim_changed", False) or edit_type in (
-                "sim_and_testcase",
-                "sim_only",
-            )
+            for retry in range(1, max_retries + 1):
+                if tc_state.best_pass_rate <= target_max_pass_rate:
+                    logger.info(
+                        "HILLCLIMB [%s][tc-%03d] within target after %d iterations",
+                        vs.slug,
+                        tc_idx,
+                        retry - 1,
+                    )
+                    break
 
-            # (d) Apply edits
-            new_artifact_id = current.artifact_id
-            if sim_changed:
-                new_artifact_id = await self._hc_apply_sim_edits(
-                    vs, workspace_dir, current.artifact_id, edits
+                best_iter = tc_state.iterations[tc_state.best_iteration_idx]
+                logger.info(
+                    "HILLCLIMB [%s][tc-%03d] iteration %d/%d — pass_rate=%.1f%%",
+                    vs.slug,
+                    tc_idx,
+                    retry,
+                    max_retries,
+                    tc_state.best_pass_rate * 100,
                 )
-                if not new_artifact_id:
-                    logger.error(
-                        "HILLCLIMB [%s] sim edit failed, skipping iteration", vs.slug
+
+                # (a) Fetch trajectories for this testcase's sessions only
+                trajectory_data = await self._hc_fetch_trajectories(
+                    vs, best_iter.task_results
+                )
+
+                # (b) Write workspace focused on this testcase
+                workspace_dir = (
+                    config.output
+                    / "hillclimb"
+                    / vs.slug
+                    / f"tc-{tc_idx:03d}"
+                    / f"iter-{retry}"
+                )
+                workspace_dir.mkdir(parents=True, exist_ok=True)
+                await self._hc_write_workspace_for_testcase(
+                    vs,
+                    tc_idx,
+                    tc_id,
+                    best_iter.task_results,
+                    trajectory_data,
+                    workspace_dir,
+                )
+
+                # (c) Launch agent focused on this testcase
+                edits = await self._hc_run_agent(
+                    vs, workspace_dir, retry, target_tc_idx=tc_idx
+                )
+                if not edits:
+                    logger.warning(
+                        "HILLCLIMB [%s][tc-%03d] no edits.json, skipping iteration",
+                        vs.slug,
+                        tc_idx,
                     )
                     continue
 
-            new_testcase_ids = await self._hc_publish_testcases(
-                vs, workspace_dir, new_artifact_id
-            )
-            if not new_testcase_ids:
-                logger.error(
-                    "HILLCLIMB [%s] testcase publish failed, skipping", vs.slug
+                edits_summary = edits.get("rationale", "")[:200]
+                edit_type = edits.get("edit_type", "testcase_only")
+                sim_changed = edits.get("sim_changed", False) or edit_type in (
+                    "sim_and_testcase",
+                    "sim_only",
                 )
-                continue
 
-            # (e) Re-run benchmark
-            new_results = await self._hc_rerun_benchmark(vs, new_testcase_ids)
+                # (d) Apply edits
+                new_artifact_id = current_artifact_id
+                new_tc_id: str | None = None
 
-            # (f) Score and compare
-            passed = sum(1 for r in new_results if r.get("outcome") == "PASS")
-            failed = sum(1 for r in new_results if r.get("outcome") == "FAIL")
-            completed = passed + failed
-            new_rate = passed / completed if completed else 0.0
+                if sim_changed:
+                    new_artifact_id = await self._hc_apply_sim_edits(
+                        vs, workspace_dir, current_artifact_id, edits
+                    )
+                    if not new_artifact_id:
+                        logger.error(
+                            "HILLCLIMB [%s][tc-%03d] sim edit failed",
+                            vs.slug,
+                            tc_idx,
+                        )
+                        continue
+                    current_artifact_id = new_artifact_id
 
-            iteration_record = IterationRecord(
-                iteration=retry,
-                artifact_id=new_artifact_id,
-                testcase_ids=new_testcase_ids,
-                task_results=new_results,
-                pass_rate=new_rate,
-                edits_summary=edits_summary,
-            )
-            vs.hillclimb_iterations.append(iteration_record)
+                    # Sim changed → republish ALL testcases against new snapshot
+                    all_new_ids = await self._hc_publish_testcases(
+                        vs, workspace_dir, new_artifact_id
+                    )
+                    if not all_new_ids:
+                        logger.error(
+                            "HILLCLIMB [%s][tc-%03d] testcase publish failed "
+                            "after sim change",
+                            vs.slug,
+                            tc_idx,
+                        )
+                        continue
+                    new_tc_id = (
+                        all_new_ids[tc_idx]
+                        if tc_idx < len(all_new_ids)
+                        else None
+                    )
+                else:
+                    # Testcase-only → publish just the edited testcase
+                    published = await self._hc_publish_single_testcase(
+                        vs, workspace_dir, current_artifact_id, tc_idx
+                    )
+                    new_tc_id = published[0] if published else None
 
-            logger.info(
-                "HILLCLIMB [%s] iteration %d result: %.1f%% (was %.1f%%)",
-                vs.slug,
-                retry,
-                new_rate * 100,
-                current.pass_rate * 100,
-            )
+                if not new_tc_id:
+                    logger.error(
+                        "HILLCLIMB [%s][tc-%03d] no testcase ID after publish",
+                        vs.slug,
+                        tc_idx,
+                    )
+                    continue
 
-            if new_rate <= target_max_pass_rate:
-                vs.best_iteration = len(vs.hillclimb_iterations) - 1
-                logger.info(
-                    "HILLCLIMB [%s] target reached at iteration %d", vs.slug, retry
+                # (e) Rerun benchmark for THIS testcase only
+                new_results = await self._hc_rerun_benchmark(vs, [new_tc_id])
+
+                # (f) Score and compare
+                passed = sum(
+                    1 for r in new_results if r.get("outcome") == "PASS"
                 )
-                break
-            elif new_rate < current.pass_rate:
-                vs.best_iteration = len(vs.hillclimb_iterations) - 1
+                failed = sum(
+                    1 for r in new_results if r.get("outcome") == "FAIL"
+                )
+                completed = passed + failed
+                new_rate = passed / completed if completed else 0.0
+
+                iter_record = TestcaseIterationRecord(
+                    iteration=retry,
+                    testcase_id=new_tc_id,
+                    artifact_id=new_artifact_id,
+                    task_results=new_results,
+                    pass_rate=new_rate,
+                    edits_summary=edits_summary,
+                    edit_type=edit_type,
+                )
+                tc_state.iterations.append(iter_record)
+
                 logger.info(
-                    "HILLCLIMB [%s] improved (%.1f%% → %.1f%%), continuing",
+                    "HILLCLIMB [%s][tc-%03d] iteration %d: %.1f%% → %.1f%%",
                     vs.slug,
-                    current.pass_rate * 100,
+                    tc_idx,
+                    retry,
+                    tc_state.best_pass_rate * 100,
                     new_rate * 100,
                 )
 
+                if new_rate < tc_state.best_pass_rate:
+                    tc_state.best_iteration_idx = len(tc_state.iterations) - 1
+                    tc_state.best_pass_rate = new_rate
+                    tc_state.best_testcase_id = new_tc_id
+
+                if new_rate <= target_max_pass_rate:
+                    logger.info(
+                        "HILLCLIMB [%s][tc-%03d] target reached",
+                        vs.slug,
+                        tc_idx,
+                    )
+                    break
+
     async def _hc_fetch_trajectories(
-        self, vs: VariantStatus, current: IterationRecord
+        self, vs: VariantStatus, task_results: list[dict]
     ) -> dict[str, dict]:
-        """Fetch session trajectories from Chronos for the current iteration."""
+        """Fetch session trajectories from Chronos for given task results."""
         from plato.chronos.sdk import AsyncChronos
 
         config = self.config
@@ -2204,7 +2335,7 @@ else:
         )
 
         trajectories: dict[str, dict] = {}
-        for result in current.task_results:
+        for result in task_results:
             chronos_id = result.get("chronos_id", "")
             if not chronos_id:
                 continue
@@ -2226,14 +2357,16 @@ else:
                 )
         return trajectories
 
-    async def _hc_write_workspace(
+    async def _hc_write_workspace_for_testcase(
         self,
         vs: VariantStatus,
-        current: IterationRecord,
+        target_tc_idx: int,
+        target_tc_id: str,
+        target_results: list[dict],
         trajectory_data: dict[str, dict],
         workspace_dir: Path,
     ) -> None:
-        """Write all context the hillclimb agent needs to the workspace."""
+        """Write workspace focused on a single target testcase for the agent."""
         spec = next((s for s in self._variant_specs if s.get("slug") == vs.slug), {})
         skill_def = next((s for s in self._skills if s.name == vs.skill_name), None)
 
@@ -2249,25 +2382,43 @@ else:
         )
         (workspace_dir / "spec.json").write_text(json.dumps(spec, indent=2))
 
-        results_list = []
-        for r in current.task_results:
-            results_list.append(
+        # Identify the target testcase for the agent
+        (workspace_dir / "target.json").write_text(
+            json.dumps(
                 {
-                    "testcase_id": r.get("testcase_id", ""),
-                    "task_name": r.get("task_name", ""),
-                    "outcome": r.get("outcome", ""),
-                    "score": r.get("score", 0),
-                    "chronos_id": r.get("chronos_id", ""),
-                    "scoring_details": r.get("scoring_details"),
-                }
+                    "target_testcase_index": target_tc_idx,
+                    "target_testcase_id": target_tc_id,
+                    "target_testcase_file": f"tc-{target_tc_idx:03d}.json",
+                    "note": (
+                        "Focus your edits on this testcase. "
+                        "Other testcases are for context only."
+                    ),
+                },
+                indent=2,
             )
-        (workspace_dir / "results.json").write_text(json.dumps(results_list, indent=2))
+        )
 
-        # Write testcase configs
+        # Results for the target testcase only
+        results_list = [
+            {
+                "testcase_id": r.get("testcase_id", ""),
+                "task_name": r.get("task_name", ""),
+                "outcome": r.get("outcome", ""),
+                "score": r.get("score", 0),
+                "chronos_id": r.get("chronos_id", ""),
+                "scoring_details": r.get("scoring_details"),
+            }
+            for r in target_results
+        ]
+        (workspace_dir / "results.json").write_text(
+            json.dumps(results_list, indent=2)
+        )
+
+        # Write ALL testcase configs (agent needs context if sim changes)
         tc_dir = workspace_dir / "testcases"
         tc_dir.mkdir(exist_ok=True)
         tasks = self._all_tasks.get(vs.slug, [])
-        for i, tc_id in enumerate(current.testcase_ids):
+        for i, tc_id in enumerate(vs.testcase_ids):
             task = tasks[i] if i < len(tasks) else {}
             (tc_dir / f"tc-{i:03d}.json").write_text(
                 json.dumps(
@@ -2280,12 +2431,13 @@ else:
                         "expected_output": task.get("expected_output"),
                         "output_schema": task.get("output_schema"),
                         "scoring_config": task.get("scoring_config"),
+                        "is_target": tc_id == target_tc_id,
                     },
                     indent=2,
                 )
             )
 
-        # Write session trajectories
+        # Session trajectories (only for the target testcase)
         sess_dir = workspace_dir / "sessions"
         sess_dir.mkdir(exist_ok=True)
         for chronos_id, tdata in trajectory_data.items():
@@ -2325,12 +2477,31 @@ else:
             )
 
     async def _hc_run_agent(
-        self, vs: VariantStatus, workspace_dir: Path, iteration: int
+        self,
+        vs: VariantStatus,
+        workspace_dir: Path,
+        iteration: int,
+        target_tc_idx: int = -1,
     ) -> dict | None:
         """Launch the hillclimb claude-code agent and return parsed edits.json."""
         from .prompts import HILLCLIMB_AGENT_PROMPT
 
         config = self.config
+
+        rel_dir = workspace_dir.relative_to(config.output)
+        mount_path = f"/workspace/output/{rel_dir}"
+
+        tc_focus = ""
+        if target_tc_idx >= 0:
+            tc_focus = (
+                f"- TARGET TESTCASE: tc-{target_tc_idx:03d}.json — "
+                f"focus your edits on this testcase.\n"
+                f"- Read target.json for details on which testcase to focus on.\n"
+                f"- results.json and sessions/ contain data ONLY for this "
+                f"target testcase.\n"
+                f"- Other testcases in testcases/ are for context — only edit "
+                f"them if you change the sim.\n"
+            )
 
         instruction = (
             f"{HILLCLIMB_AGENT_PROMPT}\n\n"
@@ -2338,10 +2509,14 @@ else:
             f"- Skill: {vs.skill_name}\n"
             f"- Variant: {vs.slug}\n"
             f"- Iteration: {iteration}\n"
-            f"- All files are in the workspace root.\n"
-            f"- Read skill.json, spec.json, results.json, testcases/, and sessions/ first.\n"
-            f"- Write your edits directly to testcases/ and/or sim/ directories.\n"
-            f"- When done, write edits.json to the workspace root.\n"
+            f"- Working directory: {mount_path}\n"
+            f"- First: cd {mount_path}\n"
+            f"{tc_focus}"
+            f"- Read skill.json, spec.json, target.json, results.json, "
+            f"testcases/, and sessions/ in that directory.\n"
+            f"- Write your edits directly to testcases/ and/or sim/ "
+            f"directories there.\n"
+            f"- When done, write edits.json to {mount_path}/edits.json\n"
         )
 
         agent_config = config.coder_agent
@@ -2350,10 +2525,14 @@ else:
 
             agent_config = AgentConfig(package="claude-code:latest")
 
+        display = f"hillclimb-{vs.slug}-i{iteration}"
+        if target_tc_idx >= 0:
+            display = f"hillclimb-{vs.slug}-tc{target_tc_idx:03d}-i{iteration}"
+
         try:
             runner = self.agent(
                 agent_config,
-                display_name=f"hillclimb-{vs.slug}-i{iteration}",
+                display_name=display,
                 workspaces=[self.workspace("output")],
             )
             await runner.run(instruction=instruction)
@@ -2367,12 +2546,21 @@ else:
                 edits_path = candidate
                 break
         if not edits_path.exists():
+            for candidate in config.output.rglob("edits.json"):
+                edits_path = candidate
+                logger.info(
+                    "HILLCLIMB [%s] found edits.json at %s", vs.slug, edits_path
+                )
+                break
+        if not edits_path.exists():
             return None
 
         try:
             return json.loads(edits_path.read_text())
         except (json.JSONDecodeError, OSError) as e:
-            logger.error("HILLCLIMB [%s] failed to parse edits.json: %s", vs.slug, e)
+            logger.error(
+                "HILLCLIMB [%s] failed to parse edits.json: %s", vs.slug, e
+            )
             return None
 
     async def _hc_apply_sim_edits(
@@ -2694,6 +2882,99 @@ else:
 
         return new_ids
 
+    async def _hc_publish_single_testcase(
+        self,
+        vs: VariantStatus,
+        workspace_dir: Path,
+        artifact_id: str,
+        tc_idx: int,
+    ) -> list[str]:
+        """Publish a single edited testcase file (testcase-only hillclimb)."""
+        from .task_generator import _build_v2_scoring_config
+
+        config = self.config
+        tc_file = workspace_dir / "testcases" / f"tc-{tc_idx:03d}.json"
+        if not tc_file.exists():
+            logger.error(
+                "HILLCLIMB [%s] testcase file %s not found", vs.slug, tc_file
+            )
+            return []
+
+        try:
+            tc_data = json.loads(tc_file.read_text())
+        except (json.JSONDecodeError, OSError):
+            return []
+
+        from plato._generated.api.v1.simulator import get_simulator_id
+        from plato._generated.api.v2.testcases import create_testcase
+        from plato._generated.models import CreateTestCaseRequest
+
+        from .skill_ingestion import _slugify as _slug
+
+        skill_tag = _slug(vs.short_name or vs.skill_name)
+        tc_tags = ["skill-test-generator", "hillclimb", skill_tag]
+
+        async with httpx.AsyncClient(
+            base_url=config.plato_api_url,
+            timeout=httpx.Timeout(60.0),
+        ) as http:
+            simulator_id: int | None = None
+            try:
+                sid_resp = await get_simulator_id.asyncio(
+                    client=http,
+                    simulator_name=vs.sim_name,
+                    x_api_key=config.plato_api_key,
+                )
+                simulator_id = sid_resp.simulator_id
+            except Exception:
+                pass
+
+            tc_name = f"{vs.slug}-hc-{tc_data.get('name', tc_file.stem)}"
+            v2_scoring = _build_v2_scoring_config(tc_data, vs.sim_name)
+
+            req = CreateTestCaseRequest(
+                name=tc_name,
+                prompt=tc_data.get("instruction", ""),
+                start_url=tc_data.get("start_url", "/"),
+                simulator_artifact_ids=[artifact_id],
+                simulator_id=simulator_id,
+                tags=tc_tags,
+            )
+            if v2_scoring:
+                req.v2_scoring_config = v2_scoring
+            if tc_data.get("scoring_type") == "output" and tc_data.get(
+                "output_schema"
+            ):
+                req.output_schema = tc_data["output_schema"]
+
+            try:
+                resp = await create_testcase.asyncio(
+                    client=http,
+                    body=req,
+                    x_api_key=config.plato_api_key,
+                )
+                tc = resp.test_case
+                tc_id = (
+                    tc.get("publicId")
+                    or tc.get("public_id")
+                    or str(tc.get("id", ""))
+                )
+                logger.info(
+                    "HILLCLIMB [%s] published testcase '%s' -> %s",
+                    vs.slug,
+                    tc_name,
+                    tc_id,
+                )
+                return [tc_id]
+            except Exception as e:
+                logger.error(
+                    "HILLCLIMB [%s] testcase creation error for '%s': %s",
+                    vs.slug,
+                    tc_name,
+                    e,
+                )
+                return []
+
     async def _hc_rerun_benchmark(
         self, vs: VariantStatus, testcase_ids: list[str]
     ) -> list[dict]:
@@ -2789,47 +3070,57 @@ else:
         return results
 
     def _log_hillclimb_summary(self, target: float) -> None:
-        """Log a structured summary of hillclimb results."""
+        """Log a structured per-testcase summary of hillclimb results."""
         logger.info("=" * 70)
-        logger.info("HILLCLIMB SUMMARY")
+        logger.info("HILLCLIMB SUMMARY (per-testcase)")
         logger.info("=" * 70)
         logger.info("Target max pass rate: %.1f%%", target * 100)
         logger.info("-" * 70)
 
         for vs in self.state.variants:
-            if not vs.hillclimb_iterations:
+            if not vs.testcase_hillclimb_state:
                 continue
 
-            iter0 = vs.hillclimb_iterations[0]
-            best = vs.hillclimb_iterations[vs.best_iteration]
-            n_iters = len(vs.hillclimb_iterations) - 1
-
-            met = "MET" if best.pass_rate <= target else "NOT MET"
+            total_tc = len(vs.testcase_hillclimb_state)
+            met_count = sum(
+                1
+                for s in vs.testcase_hillclimb_state.values()
+                if s.best_pass_rate <= target
+            )
             logger.info(
-                "VARIANT: %s  [%s]",
+                "VARIANT: %s  [%d/%d testcases at target]",
                 vs.slug,
-                met,
-            )
-            logger.info(
-                "  Original: %.1f%% → Best (iter %d): %.1f%%  (%d iterations)",
-                iter0.pass_rate * 100,
-                vs.best_iteration,
-                best.pass_rate * 100,
-                n_iters,
+                met_count,
+                total_tc,
             )
 
-            for it in vs.hillclimb_iterations:
-                marker = " ← best" if it.iteration == vs.best_iteration else ""
-                edits = f"  edits: {it.edits_summary}" if it.edits_summary else ""
+            for tc_id, tc_state in vs.testcase_hillclimb_state.items():
+                met = "OK" if tc_state.best_pass_rate <= target else "OVER"
+                n_iters = len(tc_state.iterations) - 1
                 logger.info(
-                    "  iter %d: %.1f%% (artifact=%s, %d testcases)%s%s",
-                    it.iteration,
-                    it.pass_rate * 100,
-                    it.artifact_id[:12] if it.artifact_id else "n/a",
-                    len(it.testcase_ids),
-                    marker,
-                    edits,
+                    "  TC %s [%s] %.1f%% → %.1f%% (%d iterations)",
+                    tc_id[:12],
+                    met,
+                    tc_state.original_pass_rate * 100,
+                    tc_state.best_pass_rate * 100,
+                    n_iters,
                 )
+                for idx, it in enumerate(tc_state.iterations):
+                    marker = (
+                        " <- best" if idx == tc_state.best_iteration_idx else ""
+                    )
+                    edits = (
+                        f"  edits: {it.edits_summary}" if it.edits_summary else ""
+                    )
+                    logger.info(
+                        "    iter %d: %.1f%% (tc=%s, artifact=%s)%s%s",
+                        it.iteration,
+                        it.pass_rate * 100,
+                        it.testcase_id[:12],
+                        it.artifact_id[:12] if it.artifact_id else "n/a",
+                        marker,
+                        edits,
+                    )
         logger.info("=" * 70)
 
     # ------------------------------------------------------------------
