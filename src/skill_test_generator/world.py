@@ -2239,6 +2239,9 @@ else:
 
         sem = asyncio.Semaphore(config.vm_concurrency)
 
+        if config.coder_agent and config.coder_agent.max_parallel < config.vm_concurrency:
+            config.coder_agent.max_parallel = config.vm_concurrency
+
         async def _hillclimb_one(vs: VariantStatus) -> None:
             async with sem:
                 await self._hillclimb_variant(
