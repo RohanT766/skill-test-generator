@@ -35,7 +35,7 @@
       "pipeline_vm_memory": 4096,
       "eval_agent_model": "amazon/nova-act",
       "cua_world_package": "plato-world-cua-benchmark:3.3.26",
-      "cua_agent_package": "computer-use-agent:3.2.51",
+      "cua_agent_package": "computer-use-agent:3.2.52",
       "coder_agent": {
         "package": "claude-code:latest",
         "config": {
