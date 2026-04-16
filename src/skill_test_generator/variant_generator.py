@@ -973,7 +973,7 @@ async def design_all_variants(
         base_slug = _slugify(skill.short_name or skill.name)
 
         for vi in range(1, specs_per_skill + 1):
-            slug = base_slug if specs_per_skill == 1 else f"{base_slug}-v{vi}"
+            variant_key = base_slug if specs_per_skill == 1 else f"{base_slug}-{vi}"
 
             async with semaphore:
                 max_retries = 2
@@ -989,17 +989,17 @@ async def design_all_variants(
                         )
                         spec["skill_name"] = skill.name
                         spec["skill_description"] = skill.description
-                        spec["slug"] = slug
+                        spec["slug"] = variant_key
 
                         scenario_desc = spec.get(
                             "scenario", spec.get("description", "")
                         )
                         if scenario_desc:
                             prior_scenarios.append(
-                                f"{spec.get('title', slug)}: {scenario_desc}"
+                                f"{spec.get('title', variant_key)}: {scenario_desc}"
                             )
                         skill_results.append(spec)
-                        logger.info("  Designed spec for %s", slug)
+                        logger.info("  Designed spec for %s", variant_key)
                         break
                     except Exception as e:
                         logger.warning(
@@ -1011,7 +1011,7 @@ async def design_all_variants(
                             e,
                         )
                         if attempt >= max_retries:
-                            logger.error("Giving up on design for '%s'", slug)
+                            logger.error("Giving up on design for '%s'", variant_key)
 
         return skill_results
 

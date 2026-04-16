@@ -185,10 +185,13 @@ class SkillTestGeneratorWorld(
             )
             for rv in config.resume_variants:
                 has_results = bool(rv.get("task_results"))
+                rv_slug = rv["slug"]
+                rv_vk = rv.get("variant_key", rv_slug)
                 vs = VariantStatus(
                     skill_name=rv["skill_name"],
                     short_name=rv.get("short_name", ""),
-                    slug=rv["slug"],
+                    slug=re.sub(r"-(?:v?\d+)$", "", rv_slug),
+                    variant_key=rv_vk,
                     sim_name=rv.get("sim_name", ""),
                     artifact_id=rv.get("artifact_id", ""),
                     testcase_ids=rv.get("testcase_ids", []),
@@ -297,15 +300,18 @@ class SkillTestGeneratorWorld(
             short = s.short_name or ""
             if sps == 1:
                 variants.append(
-                    VariantStatus(skill_name=s.name, short_name=short, slug=base_slug)
+                    VariantStatus(
+                        skill_name=s.name, short_name=short,
+                        slug=base_slug, variant_key=base_slug,
+                    )
                 )
             else:
                 for vi in range(1, sps + 1):
                     variants.append(
                         VariantStatus(
-                            skill_name=s.name,
-                            short_name=short,
-                            slug=f"{base_slug}-v{vi}",
+                            skill_name=s.name, short_name=short,
+                            slug=base_slug,
+                            variant_key=f"{base_slug}-{vi}",
                         )
                     )
         self.state.variants = variants
@@ -346,13 +352,13 @@ class SkillTestGeneratorWorld(
             json.dumps(self._variant_specs, indent=2, default=str)
         )
         for vs in self.state.variants:
-            match = [s for s in self._variant_specs if s.get("slug") == vs.slug]
+            match = [s for s in self._variant_specs if s.get("slug") == vs.variant_key]
             vs.stage = "designed" if match else "design_failed"
             if match:
                 app_name = match[0].get("app_name", "").strip()
                 app_name = re.sub(r"[^a-z0-9-]", "", app_name.lower().replace(" ", "-"))
                 app_name = app_name or config.sim_name_prefix
-                vs.sim_name = f"{app_name}-{vs.skill_slug}"
+                vs.sim_name = f"{app_name}-{vs.slug}"
 
     # ------------------------------------------------------------------
     # CODEGEN — parallel claude-code agent sessions on Chronos VMs
@@ -429,7 +435,7 @@ class SkillTestGeneratorWorld(
 
         async def _single_pipeline(vs: VariantStatus) -> None:
             spec = next(
-                (s for s in self._variant_specs if s.get("slug") == vs.slug),
+                (s for s in self._variant_specs if s.get("slug") == vs.variant_key),
                 None,
             )
             if not spec:
@@ -440,19 +446,19 @@ class SkillTestGeneratorWorld(
             try:
                 await _single_pipeline_inner(vs, spec)
             except Exception as e:
-                logger.error("  [%s] Unhandled pipeline error: %s", vs.slug, e)
+                logger.error("  [%s] Unhandled pipeline error: %s", vs.variant_key, e)
                 if vs.stage != "published":
                     vs.stage = "pipeline_failed"
                     vs.error = vs.error or f"unhandled: {e}"
 
         async def _single_pipeline_inner(vs: VariantStatus, spec: dict) -> None:
-            variant_dir = variants_dir / vs.slug
+            variant_dir = variants_dir / vs.variant_key
             sim_name = vs.sim_name
             if not sim_name:
                 app_name = spec.get("app_name", "").strip()
                 app_name = re.sub(r"[^a-z0-9-]", "", app_name.lower().replace(" ", "-"))
                 app_name = app_name or config.sim_name_prefix
-                sim_name = f"{app_name}-{vs.skill_slug}"
+                sim_name = f"{app_name}-{vs.slug}"
             vs.sim_name = sim_name
 
             # ── Phase 1: LLM codegen ──────────────────────────────────
@@ -468,7 +474,7 @@ class SkillTestGeneratorWorld(
             validation_errors: list[str] = []
             async with llm_sem:
                 try:
-                    logger.info("  [%s] One-shot codegen …", vs.slug)
+                    logger.info("  [%s] One-shot codegen …", vs.variant_key)
                     ref_screenshot: tuple[dict, bytes] | None = None
                     ref_filename = spec.get("_reference_screenshot", "")
                     if ref_filename:
@@ -489,7 +495,7 @@ class SkillTestGeneratorWorld(
                                     ref_screenshot = (ref_entry, ref_path.read_bytes())
                                     logger.info(
                                         "  [%s] Codegen using same ref: %s (%s)",
-                                        vs.slug,
+                                        vs.variant_key,
                                         ref_filename,
                                         ref_entry.get("content_type"),
                                     )
@@ -505,16 +511,16 @@ class SkillTestGeneratorWorld(
                         code_files,
                         spec=spec,
                     )
-                    logger.info("  [%s] Wrote %d files", vs.slug, len(files_written))
+                    logger.info("  [%s] Wrote %d files", vs.variant_key, len(files_written))
                 except Exception as e:
-                    logger.error("  [%s] Codegen failed: %s", vs.slug, e)
+                    logger.error("  [%s] Codegen failed: %s", vs.variant_key, e)
                     vs.stage = "pipeline_failed"
                     vs.error = f"codegen: {e}"
                     return
 
             if validation_errors:
                 logger.warning(
-                    "  [%s] Validation warnings: %s", vs.slug, validation_errors
+                    "  [%s] Validation warnings: %s", vs.variant_key, validation_errors
                 )
 
             # ── Phase 2: Pipeline VM (verify → build → snapshot) ──
@@ -530,7 +536,7 @@ class SkillTestGeneratorWorld(
                 )
 
                 async with vm_sem:
-                    logger.info("  [%s] Pipeline VM attempt %d …", vs.slug, attempt + 1)
+                    logger.info("  [%s] Pipeline VM attempt %d …", vs.variant_key, attempt + 1)
                     try:
                         result = await self._pipeline_vm_verify_build_publish(
                             vs=vs,
@@ -539,7 +545,7 @@ class SkillTestGeneratorWorld(
                             presigned_url=url,
                         )
                     except Exception as e:
-                        logger.error("  [%s] Pipeline VM error: %s", vs.slug, e)
+                        logger.error("  [%s] Pipeline VM error: %s", vs.variant_key, e)
                         result = {
                             "artifact_id": None,
                             "verified": False,
@@ -556,12 +562,12 @@ class SkillTestGeneratorWorld(
                     break
 
                 if failure_type == "code" and attempt == 0 and config.coder_agent:
-                    logger.info("  [%s] Code error, launching agent fix …", vs.slug)
+                    logger.info("  [%s] Code error, launching agent fix …", vs.variant_key)
                     try:
                         instruction = build_codegen_instruction(
                             spec=spec,
-                            slug=vs.slug,
-                            variant_dir=f"{agent_prefix}/variants/{vs.slug}",
+                            slug=vs.variant_key,
+                            variant_dir=f"{agent_prefix}/variants/{vs.variant_key}",
                             verify_port=config.codegen_verify_port,
                             files_written=files_written,
                             validation_errors=validation_errors,
@@ -570,18 +576,18 @@ class SkillTestGeneratorWorld(
                         )
                         runner = self.agent(
                             config.coder_agent,
-                            display_name=f"fix-{vs.slug}",
+                            display_name=f"fix-{vs.variant_key}",
                             workspaces=[self.workspace("code")],
                         )
                         await runner.run(instruction=instruction)
-                        logger.info("  [%s] Agent fix complete", vs.slug)
+                        logger.info("  [%s] Agent fix complete", vs.variant_key)
                     except Exception as e:
-                        logger.error("  [%s] Agent fix error: %s", vs.slug, e)
+                        logger.error("  [%s] Agent fix error: %s", vs.variant_key, e)
                         break
                 elif failure_type == "infra":
                     logger.info(
                         "  [%s] Infra error (attempt %d), retrying VM …",
-                        vs.slug,
+                        vs.variant_key,
                         attempt + 1,
                     )
                     continue
@@ -594,7 +600,7 @@ class SkillTestGeneratorWorld(
                 return
 
             vs.artifact_id = artifact_id
-            logger.info("  [%s] Artifact: %s", vs.slug, artifact_id)
+            logger.info("  [%s] Artifact: %s", vs.variant_key, artifact_id)
 
             # ── Phase 2b: Task generation (off-VM, uses fetched API data) ──
             generated_tasks: list[dict] = []
@@ -615,35 +621,35 @@ class SkillTestGeneratorWorld(
 
                 logger.info(
                     "  [%s] Generated %d tasks (off-VM)",
-                    vs.slug,
+                    vs.variant_key,
                     len(generated_tasks),
                 )
 
             if generated_tasks:
-                self._all_tasks[vs.slug] = generated_tasks
+                self._all_tasks[vs.variant_key] = generated_tasks
                 vs.task_count = len(generated_tasks)
-                tasks_dir = config.output / vs.slug
+                tasks_dir = config.output / vs.variant_key
                 tasks_dir.mkdir(parents=True, exist_ok=True)
                 (tasks_dir / "tasks.json").write_text(
                     json.dumps({"tasks": generated_tasks}, indent=2),
                 )
 
             # ── Phase 3: Create testcases ─────────────────────────────
-            tasks = self._all_tasks.get(vs.slug, [])
+            tasks = self._all_tasks.get(vs.variant_key, [])
             if tasks and artifact_id:
                 try:
                     new_ids = await self._create_testcases(vs, tasks, artifact_id)
                     vs.testcase_ids.extend(new_ids)
                     vs.stage = "published"
                 except Exception as e:
-                    logger.error("  [%s] Testcase creation error: %s", vs.slug, e)
+                    logger.error("  [%s] Testcase creation error: %s", vs.variant_key, e)
                     vs.stage = "pipeline_failed"
                     vs.error = f"testcase creation: {e}"
             else:
                 vs.stage = "pipeline_failed"
                 vs.error = "no tasks for testcase creation"
 
-            logger.info("  [%s] Pipeline complete → %s", vs.slug, vs.stage)
+            logger.info("  [%s] Pipeline complete → %s", vs.variant_key, vs.stage)
 
         await asyncio.gather(*[_single_pipeline(vs) for vs in eligible])
 
@@ -662,7 +668,7 @@ class SkillTestGeneratorWorld(
             if vs.artifact_id:
                 publish_results.append(
                     {
-                        "slug": vs.slug,
+                        "slug": vs.variant_key,
                         "sim_name": vs.sim_name,
                         "artifact_id": vs.artifact_id,
                         "testcase_count": len(vs.testcase_ids),
@@ -744,10 +750,10 @@ class SkillTestGeneratorWorld(
                     x_api_key=api_key,
                 )
                 session_id = resp.session_id
-                logger.info("  [%s] VM %s created", vs.slug, session_id)
+                logger.info("  [%s] VM %s created", vs.variant_key, session_id)
 
                 _exec = self._make_exec_fn(http, session_id, api_key)
-                await self._poll_vm_ready(http, session_id, api_key, vs.slug)
+                await self._poll_vm_ready(http, session_id, api_key, vs.variant_key)
 
                 # ── Download + setup ──────────────────────────────────
                 await _exec(
@@ -791,7 +797,7 @@ class SkillTestGeneratorWorld(
                     f"{preamble} && cd {app_dir} && bun install 2>&1 | tail -10",
                     timeout=300,
                 )
-                logger.info("  [%s] bun install: %s", vs.slug, out[-300:])
+                logger.info("  [%s] bun install: %s", vs.variant_key, out[-300:])
 
                 # Verify critical dependency is installed; force-install if missing
                 chk, _ = await _exec(
@@ -800,7 +806,7 @@ class SkillTestGeneratorWorld(
                 )
                 if "MISSING" in chk:
                     logger.warning(
-                        "  [%s] @electric-sql/pglite missing, reinstalling …", vs.slug
+                        "  [%s] @electric-sql/pglite missing, reinstalling …", vs.variant_key
                     )
                     await _exec(
                         f"{preamble} && cd {app_dir} && bun install --no-save @electric-sql/pglite 2>&1 | tail -5",
@@ -838,7 +844,7 @@ else:
                     "bun ./node_modules/next/dist/bin/next build 2>&1 | tail -40",
                     timeout=300,
                 )
-                logger.info("  [%s] Build: %s", vs.slug, build_out[-300:])
+                logger.info("  [%s] Build: %s", vs.variant_key, build_out[-300:])
 
                 check_out, _ = await _exec(
                     f"test -f {app_dir}/.next/BUILD_ID "
@@ -859,7 +865,7 @@ else:
                             "error": err[:2000],
                         }
                     )
-                    logger.error("  [%s] %s", vs.slug, err)
+                    logger.error("  [%s] %s", vs.variant_key, err)
                     return {
                         "artifact_id": None,
                         "verified": False,
@@ -878,7 +884,7 @@ else:
                 )
 
                 verify_checks = await self._verify_sim_on_vm(
-                    _exec, api_routes, vs.slug
+                    _exec, api_routes, vs.variant_key
                 )
                 checks.extend(verify_checks)
 
@@ -946,13 +952,13 @@ else:
                 if live_api_data:
                     logger.info(
                         "  [%s] Fetched live API data from %d route(s)",
-                        vs.slug,
+                        vs.variant_key,
                         len(live_api_data),
                     )
 
                 # ── SEED API ROUTES (server still running from verify) ──
                 await self._seed_api_routes(
-                    _exec, api_routes, vs.slug, retries=10
+                    _exec, api_routes, vs.variant_key, retries=10
                 )
 
                 # ── BOOT SERVICE (so app starts on snapshot restore) ──
@@ -990,7 +996,7 @@ else:
                     "systemctl daemon-reload && systemctl enable nextapp.service",
                     timeout=15,
                 )
-                logger.info("  [%s] Installed nextapp.service for boot", vs.slug)
+                logger.info("  [%s] Installed nextapp.service for boot", vs.variant_key)
 
                 # ── ENSURE SIMULATOR CATALOG ENTRY EXISTS ─────────────
                 sim_description = (
@@ -999,16 +1005,16 @@ else:
                 actual_name = await self._register_simulator(
                     http, api_key, sim_name, sim_description,
                     icon_svg=spec.get("icon_svg", ""),
-                    label=vs.slug,
+                    label=vs.variant_key,
                 )
                 if actual_name != sim_name:
                     sim_name = actual_name
                     vs.sim_name = sim_name
 
                 # ── SNAPSHOT ──────────────────────────────────────────
-                flows_yaml = self._build_flows_yaml(vs.slug)
+                flows_yaml = self._build_flows_yaml(vs.variant_key)
                 artifact_id = await self._take_snapshot(
-                    http, session_id, api_key, sim_name, flows_yaml, vs.slug
+                    http, session_id, api_key, sim_name, flows_yaml, vs.variant_key
                 )
 
                 try:
@@ -1038,7 +1044,7 @@ else:
                             session_id=session_id,
                             x_api_key=api_key,
                         )
-                        logger.info("  [%s] Pipeline VM closed", vs.slug)
+                        logger.info("  [%s] Pipeline VM closed", vs.variant_key)
                     except Exception:
                         pass
 
@@ -1448,7 +1454,7 @@ else:
         config = self.config
         sim_name = vs.sim_name
         if not sim_name:
-            logger.error("  [%s] sim_name not set, cannot create testcases", vs.slug)
+            logger.error("  [%s] sim_name not set, cannot create testcases", vs.variant_key)
             return []
 
         from plato._generated.api.v1.simulator import get_simulator_id
@@ -1488,11 +1494,11 @@ else:
                         "  [%s] scoring_config present but "
                         "_build_v2_scoring_config returned None for '%s' — "
                         "testcase may be ungradeable",
-                        vs.slug,
+                        vs.variant_key,
                         task.get("name", "unnamed"),
                     )
 
-                tc_name = f"{vs.skill_slug}-{task.get('name', 'unnamed')}"
+                tc_name = f"{vs.slug}-{task.get('name', 'unnamed')}"
                 req = CreateTestCaseRequest(
                     name=tc_name,
                     prompt=task.get("instruction", ""),
@@ -1556,9 +1562,9 @@ else:
         work_items: list[tuple] = []
         for vs in self.state.variants:
             if not vs.testcase_ids:
-                logger.info("Skipping %s: no testcases", vs.slug)
+                logger.info("Skipping %s: no testcases", vs.variant_key)
                 continue
-            tasks = self._all_tasks.get(vs.slug, [])
+            tasks = self._all_tasks.get(vs.variant_key, [])
             logger.info(
                 "Queuing %d testcases × %d sessions for skill: %s",
                 len(vs.testcase_ids),
@@ -1629,7 +1635,7 @@ else:
                             result["session_num"] = session_num
                             result["attempt"] = attempt
                             result["skill_name"] = vs.skill_name
-                            result["slug"] = vs.slug
+                            result["slug"] = vs.variant_key
                             result["outcome"] = self._classify_session_outcome(result)
 
                             session_status = result.get("status", "")
@@ -1678,7 +1684,7 @@ else:
                                 "outcome": "ERROR",
                                 "error": str(e),
                                 "skill_name": vs.skill_name,
-                                "slug": vs.slug,
+                                "slug": vs.variant_key,
                             }
                             attempts_for_item.append(err_result)
                             if attempt >= max_retries:
@@ -1756,7 +1762,7 @@ else:
 
         for vs in self.state.variants:
             skill_name = vs.skill_name
-            slug = vs.slug
+            slug = vs.variant_key
             variant_attempts = attempts_by_slug.get(slug, [])
             skill_finals = [r for r in vs.task_results]
 
@@ -2045,7 +2051,7 @@ else:
         for vs in self.state.variants:
             skill_result = {
                 "skill_name": vs.skill_name,
-                "slug": vs.slug,
+                "slug": vs.variant_key,
                 "sim_name": vs.sim_name,
                 "artifact_id": vs.artifact_id,
                 "testcase_count": len(vs.testcase_ids),
@@ -2203,7 +2209,7 @@ else:
         # API fallback: fetch testcase data if local tasks.json missing (resume)
         missing = [
             vs for vs in self.state.variants
-            if vs.testcase_ids and not self._all_tasks.get(vs.slug)
+            if vs.testcase_ids and not self._all_tasks.get(vs.variant_key)
         ]
         if missing:
             logger.info(
@@ -2324,7 +2330,7 @@ else:
         ]
         logger.info(
             "HILLCLIMB [%s] %d/%d testcases exceed target, processing sequentially",
-            vs.slug,
+            vs.variant_key,
             len(exceeding),
             len(vs.testcase_hillclimb_state),
         )
@@ -2336,7 +2342,7 @@ else:
             if tc_idx < 0:
                 logger.warning(
                     "HILLCLIMB [%s] tc %s not found in testcase_ids, skipping",
-                    vs.slug,
+                    vs.variant_key,
                     tc_id,
                 )
                 continue
@@ -2345,7 +2351,7 @@ else:
                 if tc_state.best_pass_rate <= target_max_pass_rate:
                     logger.info(
                         "HILLCLIMB [%s][tc-%03d] within target after %d iterations",
-                        vs.slug,
+                        vs.variant_key,
                         tc_idx,
                         retry - 1,
                     )
@@ -2354,7 +2360,7 @@ else:
                 best_iter = tc_state.iterations[tc_state.best_iteration_idx]
                 logger.info(
                     "HILLCLIMB [%s][tc-%03d] iteration %d/%d — pass_rate=%.1f%%",
-                    vs.slug,
+                    vs.variant_key,
                     tc_idx,
                     retry,
                     max_retries,
@@ -2370,7 +2376,7 @@ else:
                 workspace_dir = (
                     config.output
                     / "hillclimb"
-                    / vs.slug
+                    / vs.variant_key
                     / f"tc-{tc_idx:03d}"
                     / f"iter-{retry}"
                 )
@@ -2391,7 +2397,7 @@ else:
                 if not edits:
                     logger.warning(
                         "HILLCLIMB [%s][tc-%03d] no edits.json, skipping iteration",
-                        vs.slug,
+                        vs.variant_key,
                         tc_idx,
                     )
                     continue
@@ -2417,7 +2423,7 @@ else:
                     if not new_artifact_id:
                         logger.error(
                             "HILLCLIMB [%s][tc-%03d] sim edit failed",
-                            vs.slug,
+                            vs.variant_key,
                             tc_idx,
                         )
                         continue
@@ -2437,7 +2443,7 @@ else:
                         logger.error(
                             "HILLCLIMB [%s][tc-%03d] testcase publish failed "
                             "after sim change",
-                            vs.slug,
+                            vs.variant_key,
                             tc_idx,
                         )
                         continue
@@ -2452,7 +2458,7 @@ else:
                     if not tc_file.exists():
                         logger.error(
                             "HILLCLIMB [%s] testcase file %s not found",
-                            vs.slug,
+                            vs.variant_key,
                             tc_file,
                         )
                         new_tc_id = None
@@ -2469,7 +2475,7 @@ else:
                 if not new_tc_id:
                     logger.error(
                         "HILLCLIMB [%s][tc-%03d] no testcase ID after publish",
-                        vs.slug,
+                        vs.variant_key,
                         tc_idx,
                     )
                     continue
@@ -2500,7 +2506,7 @@ else:
 
                 logger.info(
                     "HILLCLIMB [%s][tc-%03d] iteration %d: %.1f%% → %.1f%%",
-                    vs.slug,
+                    vs.variant_key,
                     tc_idx,
                     retry,
                     tc_state.best_pass_rate * 100,
@@ -2515,7 +2521,7 @@ else:
                 if new_rate <= target_max_pass_rate:
                     logger.info(
                         "HILLCLIMB [%s][tc-%03d] target reached",
-                        vs.slug,
+                        vs.variant_key,
                         tc_idx,
                     )
                     break
@@ -2548,7 +2554,7 @@ else:
             except Exception as e:
                 logger.warning(
                     "HILLCLIMB [%s] failed to fetch trajectory for %s: %s",
-                    vs.slug,
+                    vs.variant_key,
                     chronos_id,
                     e,
                 )
@@ -2564,7 +2570,7 @@ else:
         workspace_dir: Path,
     ) -> None:
         """Write workspace focused on a single target testcase for the agent."""
-        spec = next((s for s in self._variant_specs if s.get("slug") == vs.slug), {})
+        spec = next((s for s in self._variant_specs if s.get("slug") == vs.variant_key), {})
         skill_def = next((s for s in self._skills if s.name == vs.skill_name), None)
 
         (workspace_dir / "skill.json").write_text(
@@ -2614,7 +2620,7 @@ else:
         # Write ALL testcase configs (agent needs context if sim changes)
         tc_dir = workspace_dir / "testcases"
         tc_dir.mkdir(exist_ok=True)
-        tasks = self._all_tasks.get(vs.slug, [])
+        tasks = self._all_tasks.get(vs.variant_key, [])
         for i, tc_id in enumerate(vs.testcase_ids):
             task = tasks[i] if i < len(tasks) else {}
             (tc_dir / f"tc-{i:03d}.json").write_text(
@@ -2680,7 +2686,7 @@ else:
             )
 
         # Copy sim source code
-        sim_src = self._code_data_dir() / "variants" / vs.slug / "web"
+        sim_src = self._code_data_dir() / "variants" / vs.variant_key / "web"
         sim_dest = workspace_dir / "sim"
         if sim_src.is_dir():
             import shutil
@@ -2737,7 +2743,7 @@ else:
             f"{HILLCLIMB_AGENT_PROMPT}\n\n"
             f"## Current State\n"
             f"- Skill: {vs.skill_name}\n"
-            f"- Variant: {vs.slug}\n"
+            f"- Variant: {vs.variant_key}\n"
             f"- Iteration: {iteration}\n"
             f"- Working directory: {mount_path}\n"
             f"- First: cd {mount_path}\n"
@@ -2756,9 +2762,9 @@ else:
 
             agent_config = AgentConfig(package="claude-code:latest")
 
-        display = f"hillclimb-{vs.slug}-i{iteration}"
+        display = f"hillclimb-{vs.variant_key}-i{iteration}"
         if target_tc_idx >= 0:
-            display = f"hillclimb-{vs.slug}-tc{target_tc_idx:03d}-i{iteration}"
+            display = f"hillclimb-{vs.variant_key}-tc{target_tc_idx:03d}-i{iteration}"
 
         try:
             runner = self.agent(
@@ -2768,7 +2774,7 @@ else:
             )
             await runner.run(instruction=instruction)
         except Exception as e:
-            logger.error("HILLCLIMB [%s] agent failed: %s", vs.slug, e)
+            logger.error("HILLCLIMB [%s] agent failed: %s", vs.variant_key, e)
             return None
 
         edits_path = workspace_dir / "edits.json"
@@ -2780,7 +2786,7 @@ else:
             for candidate in config.output.rglob("edits.json"):
                 edits_path = candidate
                 logger.info(
-                    "HILLCLIMB [%s] found edits.json at %s", vs.slug, edits_path
+                    "HILLCLIMB [%s] found edits.json at %s", vs.variant_key, edits_path
                 )
                 break
         if not edits_path.exists():
@@ -2790,7 +2796,7 @@ else:
             return json.loads(edits_path.read_text())
         except (json.JSONDecodeError, OSError) as e:
             logger.error(
-                "HILLCLIMB [%s] failed to parse edits.json: %s", vs.slug, e
+                "HILLCLIMB [%s] failed to parse edits.json: %s", vs.variant_key, e
             )
             return None
 
@@ -2825,11 +2831,11 @@ else:
 
         sim_dir = workspace_dir / "sim"
         if not sim_dir.is_dir():
-            logger.error("HILLCLIMB [%s] no sim/ directory for edits", vs.slug)
+            logger.error("HILLCLIMB [%s] no sim/ directory for edits", vs.variant_key)
             return None
 
         spec = next(
-            (s for s in self._variant_specs if s.get("slug") == vs.slug), {}
+            (s for s in self._variant_specs if s.get("slug") == vs.variant_key), {}
         )
         api_routes = [
             r for r in spec.get("api_routes", []) if isinstance(r, dict)
@@ -2864,12 +2870,12 @@ else:
                 )
                 session_id = resp.session_id
                 logger.info(
-                    "HILLCLIMB [%s] snapshot VM %s created", vs.slug, session_id
+                    "HILLCLIMB [%s] snapshot VM %s created", vs.variant_key, session_id
                 )
 
                 _exec = self._make_exec_fn(http, session_id, api_key)
                 await self._poll_vm_ready(
-                    http, session_id, api_key, f"hc-{vs.slug}"
+                    http, session_id, api_key, f"hc-{vs.variant_key}"
                 )
 
                 app_dir = "/tmp/variant/web"
@@ -2884,7 +2890,7 @@ else:
                 )
 
                 # Upload edited sim code as tarball
-                tarball = self._tar_variant(sim_dir.parent, f"hc-{vs.slug}")
+                tarball = self._tar_variant(sim_dir.parent, f"hc-{vs.variant_key}")
                 url = self._upload_to_s3(
                     tarball,
                     f"{S3_PREFIX}/{vs.sim_name}-hc-{len(vs.hillclimb_iterations)}.tar.gz",
@@ -2914,7 +2920,7 @@ else:
                 if not build_ok:
                     logger.error(
                         "HILLCLIMB [%s] rebuild failed: %s",
-                        vs.slug,
+                        vs.variant_key,
                         build_out[-500:],
                     )
                     return None
@@ -2930,7 +2936,7 @@ else:
                 )
 
                 verify_checks = await self._verify_sim_on_vm(
-                    _exec, api_routes, f"hc-{vs.slug}"
+                    _exec, api_routes, f"hc-{vs.variant_key}"
                 )
 
                 if not all(c["pass"] for c in verify_checks):
@@ -2941,7 +2947,7 @@ else:
                         ]
                         logger.info(
                             "HILLCLIMB [%s] verify failed (%s), launching fix agent",
-                            vs.slug,
+                            vs.variant_key,
                             ", ".join(failed_names),
                         )
                         try:
@@ -2949,8 +2955,8 @@ else:
 
                             fix_instruction = build_codegen_instruction(
                                 spec=spec,
-                                slug=vs.slug,
-                                variant_dir=f"/workspace/output/hillclimb/{vs.slug}",
+                                slug=vs.variant_key,
+                                variant_dir=f"/workspace/output/hillclimb/{vs.variant_key}",
                                 verify_port=config.codegen_verify_port,
                                 files_written=[],
                                 validation_errors=[],
@@ -2959,17 +2965,17 @@ else:
                             )
                             runner = self.agent(
                                 config.coder_agent,
-                                display_name=f"hc-fix-{vs.slug}",
+                                display_name=f"hc-fix-{vs.variant_key}",
                                 workspaces=[self.workspace("output")],
                             )
                             await runner.run(instruction=fix_instruction)
                             logger.info(
                                 "HILLCLIMB [%s] fix agent complete, re-uploading",
-                                vs.slug,
+                                vs.variant_key,
                             )
 
                             tarball = self._tar_variant(
-                                sim_dir.parent, f"hc-fix-{vs.slug}"
+                                sim_dir.parent, f"hc-fix-{vs.variant_key}"
                             )
                             url = self._upload_to_s3(
                                 tarball,
@@ -3001,7 +3007,7 @@ else:
                                 if not build_ok:
                                     logger.error(
                                         "HILLCLIMB [%s] fix-rebuild failed",
-                                        vs.slug,
+                                        vs.variant_key,
                                     )
                                     return None
 
@@ -3021,23 +3027,23 @@ else:
                             )
 
                             retry_checks = await self._verify_sim_on_vm(
-                                _exec, api_routes, f"hc-fix-{vs.slug}"
+                                _exec, api_routes, f"hc-fix-{vs.variant_key}"
                             )
                             if not all(c["pass"] for c in retry_checks):
                                 logger.error(
                                     "HILLCLIMB [%s] still failing after fix agent",
-                                    vs.slug,
+                                    vs.variant_key,
                                 )
                                 return None
                         except Exception as e:
                             logger.error(
-                                "HILLCLIMB [%s] fix agent error: %s", vs.slug, e
+                                "HILLCLIMB [%s] fix agent error: %s", vs.variant_key, e
                             )
                             return None
                     else:
                         logger.error(
                             "HILLCLIMB [%s] verify failed, no coder_agent configured",
-                            vs.slug,
+                            vs.variant_key,
                         )
                         return None
 
@@ -3049,27 +3055,27 @@ else:
                 hc_sim_name = await self._register_simulator(
                     http, api_key, base_sim_name, sim_desc,
                     icon_svg=spec.get("icon_svg", ""),
-                    label=f"hc-{vs.slug}",
+                    label=f"hc-{vs.variant_key}",
                 )
 
                 # ── Seed + Snapshot ─────────────────────────────────────
                 await self._seed_api_routes(
-                    _exec, api_routes, f"hc-{vs.slug}"
+                    _exec, api_routes, f"hc-{vs.variant_key}"
                 )
-                flows_yaml = self._build_flows_yaml(vs.slug)
+                flows_yaml = self._build_flows_yaml(vs.variant_key)
                 try:
                     new_artifact_id = await self._take_snapshot(
                         http, session_id, api_key, hc_sim_name,
-                        flows_yaml, f"hc-{vs.slug}",
+                        flows_yaml, f"hc-{vs.variant_key}",
                     )
                 except RuntimeError as e:
-                    logger.error("HILLCLIMB [%s] %s", vs.slug, e)
+                    logger.error("HILLCLIMB [%s] %s", vs.variant_key, e)
                     return None
 
                 vs.sim_name = hc_sim_name
                 logger.info(
                     "HILLCLIMB [%s] sim_name updated: %s → %s",
-                    vs.slug, base_sim_name, hc_sim_name,
+                    vs.variant_key, base_sim_name, hc_sim_name,
                 )
                 return new_artifact_id
 
@@ -3116,7 +3122,7 @@ else:
                                 http,
                                 config,
                                 tc_id,
-                                f"hc-{vs.slug}",
+                                f"hc-{vs.variant_key}",
                                 launch_job,
                                 get_session_status,
                                 get_session,
@@ -3145,7 +3151,7 @@ else:
                         except Exception as e:
                             logger.error(
                                 "HILLCLIMB [%s] session error (attempt %d): %s",
-                                vs.slug,
+                                vs.variant_key,
                                 attempt,
                                 e,
                             )
@@ -3168,7 +3174,7 @@ else:
 
             logger.info(
                 "HILLCLIMB [%s] launching %d sessions for %d testcases",
-                vs.slug,
+                vs.variant_key,
                 len(tasks),
                 len(testcase_ids),
             )
@@ -3196,7 +3202,7 @@ else:
             )
             logger.info(
                 "VARIANT: %s  [%d/%d testcases at target]",
-                vs.slug,
+                vs.variant_key,
                 met_count,
                 total_tc,
             )
@@ -3271,7 +3277,7 @@ else:
             timeout=httpx.Timeout(30.0),
         ) as http:
             for vs in self.state.variants:
-                if vs.slug in self._all_tasks and self._all_tasks[vs.slug]:
+                if vs.variant_key in self._all_tasks and self._all_tasks[vs.variant_key]:
                     continue
                 if not vs.testcase_ids:
                     continue
@@ -3315,9 +3321,9 @@ else:
                         tasks.append({"_testcase_id": tc_id})
 
                 if tasks:
-                    self._all_tasks[vs.slug] = tasks
+                    self._all_tasks[vs.variant_key] = tasks
                     logger.info(
-                        "Loaded %d tasks from API for %s", len(tasks), vs.slug
+                        "Loaded %d tasks from API for %s", len(tasks), vs.variant_key
                     )
 
     def _build_summary(self) -> str:

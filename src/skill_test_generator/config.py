@@ -102,13 +102,7 @@ class VariantStatus(BaseModel):
     skill_name: str
     short_name: str = ""
     slug: str = ""
-
-    @property
-    def skill_slug(self) -> str:
-        """Public slug without the variant -v{N} suffix."""
-        import re
-
-        return re.sub(r"-v\d+$", "", self.slug)
+    variant_key: str = ""
     stage: str = "pending"
     sim_name: str = ""
     app_port: int = 0

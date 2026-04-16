@@ -479,7 +479,7 @@ def build_plato_task_configs(
         app_name = spec.get("app_name", "").strip()
         app_name = re.sub(r"[^a-z0-9-]", "", app_name.lower().replace(" ", "-"))
         app_name = app_name or sim_name_prefix
-        skill_slug = re.sub(r"-v\d+$", "", slug)
+        skill_slug = re.sub(r"-\d+$", "", slug)
         sim_name = f"{app_name}-{skill_slug}"
         tasks = all_tasks.get(slug, [])
 
