@@ -3095,6 +3095,15 @@ else:
             tc_name = f"{vs.slug}-hc-{tc_data.get('name', tc_file.stem)}"
             v2_scoring = _build_v2_scoring_config(tc_data, vs.sim_name)
 
+            if not v2_scoring and tc_data.get("scoring_config"):
+                logger.warning(
+                    "HILLCLIMB [%s] scoring_config present but "
+                    "_build_v2_scoring_config returned None for %s — "
+                    "testcase may be ungradeable",
+                    vs.slug,
+                    tc_file.name,
+                )
+
             req = CreateTestCaseRequest(
                 name=tc_name,
                 prompt=tc_data.get("instruction", ""),
@@ -3123,10 +3132,12 @@ else:
                     or str(tc.get("id", ""))
                 )
                 logger.info(
-                    "HILLCLIMB [%s] published testcase '%s' -> %s",
+                    "HILLCLIMB [%s] published testcase '%s' -> %s "
+                    "(has_scoring=%s)",
                     vs.slug,
                     tc_name,
                     tc_id,
+                    bool(v2_scoring),
                 )
                 return [tc_id]
             except Exception as e:

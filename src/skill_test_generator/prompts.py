@@ -526,6 +526,19 @@ Write your changes to the workspace. For each file you modify:
 - Testcase files: edit in `testcases/` directory
 - Sim code: edit in `sim/` directory
 
+**CRITICAL — Scoring config rules for testcase edits:**
+When you edit a testcase JSON file, you MUST keep the scoring config \
+consistent with your changes. The scoring fields are:
+- `scoring_config.scoring_schema` — the expected JSON output values \
+  used to grade the agent. If you change the question, you MUST update \
+  the scoring schema to match the new correct answer.
+- `expected_output` — set this to the SAME dict as `scoring_schema` \
+  (duplication is required by the publishing pipeline).
+- `output_schema` — if present, update to match the new structure.
+
+If you change the instruction but forget to update the scoring schema, \
+the testcase will be UNGRADEABLE and show 0% for the wrong reason.
+
 ### Step 5: Output manifest
 
 After making all edits, write `edits.json` to the workspace root with \

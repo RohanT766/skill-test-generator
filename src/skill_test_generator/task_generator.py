@@ -391,21 +391,45 @@ def validate_expected_outputs(
 
 
 def _build_v2_scoring_config(task: dict, sim_name: str) -> dict | None:
-    """Build a V2ScoringConfig dict from a generated task's scoring fields."""
+    """Build a V2ScoringConfig dict from a generated task's scoring fields.
+
+    Supports multiple input formats:
+    - Standard codegen: ``expected_output`` + ``output_schema`` fields
+    - Hillclimb agent: ``scoring_config.scoring_schema`` dict
+    - Pre-built v2: ``scoring_config.v2_scoring_config`` passthrough
+    """
     scoring_type = task.get("scoring_type", "output")
+    scoring_config = task.get("scoring_config") or {}
+
+    # Passthrough: already a fully-formed v2 config (e.g. from API fetch)
+    if isinstance(scoring_config, dict) and scoring_config.get("v2_scoring_config"):
+        return scoring_config["v2_scoring_config"]
 
     if scoring_type == "output":
         output_schema = task.get("output_schema")
         expected_output = task.get("expected_output")
-        if not output_schema or not expected_output:
-            return None
 
-        return {
-            "output_config": {
-                "type": "json_schema",
-                "scoring_schema": expected_output,
-            },
-        }
+        # Fallback: hillclimb agent writes scoring_schema inside scoring_config
+        if not expected_output and isinstance(scoring_config, dict):
+            expected_output = scoring_config.get("scoring_schema")
+
+        if expected_output:
+            return {
+                "output_config": {
+                    "type": "json_schema",
+                    "scoring_schema": expected_output,
+                },
+            }
+
+        if output_schema:
+            return {
+                "output_config": {
+                    "type": "json_schema",
+                    "scoring_schema": output_schema,
+                },
+            }
+
+        return None
 
     if scoring_type == "mutations":
         mutations = []
