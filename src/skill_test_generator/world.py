@@ -452,6 +452,10 @@ class SkillTestGeneratorWorld(
             variant_dir.mkdir(parents=True, exist_ok=True)
             (variant_dir / "spec.json").write_text(json.dumps(spec, indent=2))
 
+            icon_svg = spec.get("icon_svg", "")
+            if icon_svg and icon_svg.strip().startswith("<svg"):
+                (variant_dir / "icon.svg").write_text(icon_svg)
+
             files_written: list[str] = []
             validation_errors: list[str] = []
             async with llm_sem:
@@ -992,7 +996,9 @@ else:
                 except Exception:
                     _sim_config = SimulatorConfig.from_dict({"type": "docker_app"})
 
-                PLATO_LOGO = "https://plato.so/favicon.ico"
+                icon_url = self._upload_icon_svg(
+                    sim_name, spec.get("icon_svg", ""),
+                ) or "https://plato.so/favicon.ico"
                 sim_description = (
                     f"[skill: {vs.skill_name}] {spec.get('description', '') or ''}"
                 ).strip()
@@ -1005,7 +1011,7 @@ else:
                             simType="docker_app",
                             config=_sim_config,
                             enabled=True,
-                            imgUrl=PLATO_LOGO,
+                            imgUrl=icon_url,
                             internalAppPort=3000,
                             metadata={"is_skill_gym": True},
                         ),
@@ -1359,7 +1365,7 @@ else:
         logger.info("  Tarball for %s: %.1fMB", name, size_mb)
         return buf.getvalue()
 
-    def _upload_to_s3(self, data: bytes, key: str) -> str:
+    def _upload_to_s3(self, data: bytes, key: str, expires: int = 3600) -> str:
         """Upload bytes to S3 and return a presigned GET URL."""
         import boto3
 
@@ -1376,10 +1382,23 @@ else:
         url = s3.generate_presigned_url(
             "get_object",
             Params={"Bucket": S3_BUCKET, "Key": key},
-            ExpiresIn=3600,
+            ExpiresIn=expires,
         )
         logger.info("  Uploaded to s3://%s/%s", S3_BUCKET, key)
         return url
+
+    def _upload_icon_svg(self, sim_name: str, icon_svg: str) -> str | None:
+        """Upload an icon SVG to S3 and return a long-lived presigned URL."""
+        if not icon_svg or not icon_svg.strip().startswith("<svg"):
+            return None
+        try:
+            key = f"{S3_PREFIX}/icons/{sim_name}.svg"
+            return self._upload_to_s3(
+                icon_svg.encode("utf-8"), key, expires=604800,
+            )
+        except Exception as e:
+            logger.warning("Could not upload icon for %s: %s", sim_name, e)
+            return None
 
     async def _create_testcases(
         self,
@@ -2765,7 +2784,7 @@ else:
         config = self.config
         api_key = config.plato_api_key
         api_url = config.plato_api_url
-        sim_name = vs.sim_name
+        base_sim_name = vs.sim_name
         session_id: str | None = None
 
         sim_dir = workspace_dir / "sim"
@@ -2791,7 +2810,7 @@ else:
                 )
 
                 env = EnvFromResource(
-                    simulator=sim_name,
+                    simulator=base_sim_name,
                     artifact=current_artifact_id,
                     sim_config=SimConfigCompute(
                         cpus=config.pipeline_vm_cpus,
@@ -2986,6 +3005,68 @@ else:
                         )
                         return None
 
+                # ── Versioned sim name ─────────────────────────────────
+                from plato._generated.api.v1.simulator import (
+                    create_simulator,
+                    get_simulator_id,
+                )
+                from plato._generated.models import (
+                    CreateSimulatorRequest,
+                    SimulatorConfig,
+                )
+
+                base = re.sub(r"-[a-f0-9]{6,}$", "", base_sim_name)
+                hc_sim_name = base
+                for v in range(1, 100):
+                    candidate = f"{base}-v{v}"
+                    try:
+                        await get_simulator_id.asyncio(
+                            client=http,
+                            simulator_name=candidate,
+                            x_api_key=api_key,
+                        )
+                    except Exception:
+                        hc_sim_name = candidate
+                        break
+                else:
+                    hc_sim_name = f"{base}-v{v}"
+
+                icon_url = self._upload_icon_svg(
+                    hc_sim_name, spec.get("icon_svg", ""),
+                ) or "https://plato.so/favicon.ico"
+                sim_desc = (
+                    f"[skill: {vs.skill_name}] "
+                    f"{spec.get('description', '') or ''}"
+                ).strip()
+                try:
+                    _sim_config = SimulatorConfig.from_dict(
+                        {"type": "docker_app"}
+                    )
+                    await create_simulator.asyncio(
+                        client=http,
+                        body=CreateSimulatorRequest(
+                            name=hc_sim_name,
+                            description=sim_desc,
+                            simType="docker_app",
+                            config=_sim_config,
+                            enabled=True,
+                            imgUrl=icon_url,
+                            internalAppPort=3000,
+                            metadata={"is_skill_gym": True},
+                        ),
+                        x_api_key=api_key,
+                    )
+                    logger.info(
+                        "HILLCLIMB [%s] Created simulator '%s'",
+                        vs.slug, hc_sim_name,
+                    )
+                except Exception as e:
+                    if "already exists" not in str(e).lower() and "409" not in str(e):
+                        logger.warning(
+                            "HILLCLIMB [%s] Could not create sim '%s': %s",
+                            vs.slug, hc_sim_name, e,
+                        )
+
                 # ── Seed + Snapshot ─────────────────────────────────────
                 await self._seed_api_routes(
                     _exec, api_routes, f"hc-{vs.slug}"
@@ -2993,12 +3074,18 @@ else:
                 flows_yaml = self._build_flows_yaml(vs.slug)
                 try:
                     new_artifact_id = await self._take_snapshot(
-                        http, session_id, api_key, sim_name,
+                        http, session_id, api_key, hc_sim_name,
                         flows_yaml, f"hc-{vs.slug}",
                     )
                 except RuntimeError as e:
                     logger.error("HILLCLIMB [%s] %s", vs.slug, e)
                     return None
+
+                vs.sim_name = hc_sim_name
+                logger.info(
+                    "HILLCLIMB [%s] sim_name updated: %s → %s",
+                    vs.slug, base_sim_name, hc_sim_name,
+                )
                 return new_artifact_id
 
             finally:

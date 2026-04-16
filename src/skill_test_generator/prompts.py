@@ -188,7 +188,13 @@ distinctive that makes sense for the domain.
 present for the skill test to work
 - "forbidden_features": array of UI features that MUST NOT be included \
 because they would let the agent bypass the tested skill
-- "edit_capabilities": description of how users can edit data in this app\
+- "edit_capabilities": description of how users can edit data in this app
+- "icon_svg": a small, clean SVG string (viewBox="0 0 32 32") for the \
+product logo — the icon that appears in the app's navigation chrome next \
+to the product name. Keep it simple (1-3 shapes, no text, no raster \
+images). Use a single brand color from the color_palette. This should \
+feel like a real product icon — e.g. a warehouse box for an inventory \
+app, a diamond for a database tool, a chart for analytics, etc.\
 """
 
 VARIANT_CODE_SYSTEM_PROMPT = """\
