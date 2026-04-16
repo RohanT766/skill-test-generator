@@ -105,9 +105,9 @@ class SkillTestGeneratorWorld(
         config = self.config
         errors: list[str] = []
 
-        if not config.anthropic_api_key:
+        if not config.anthropic_api_key and not config.resume_variants:
             errors.append("anthropic_api_key is empty")
-        else:
+        elif config.anthropic_api_key:
             try:
                 import anthropic
 
@@ -158,7 +158,11 @@ class SkillTestGeneratorWorld(
                 except Exception as e:
                     errors.append(f"AWS credentials invalid (S3 inaccessible): {e}")
 
-        if not config.s3_skills and not config.custom_skills:
+        if (
+            not config.s3_skills
+            and not config.custom_skills
+            and not config.resume_variants
+        ):
             errors.append("No skills configured: set s3_skills or custom_skills")
 
         if errors:
