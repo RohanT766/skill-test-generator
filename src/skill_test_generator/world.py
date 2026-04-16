@@ -1395,7 +1395,16 @@ else:
 
         icon_url = self._icon_svg_to_data_uri(icon_svg) or "https://plato.so/favicon.ico"
 
-        candidates = [base_name] + [f"{base_name}-v{n}" for n in range(2, 100)]
+        m = re.match(r"^(.*)-v(\d+)$", base_name)
+        if m:
+            stem, start_v = m.group(1), int(m.group(2))
+            candidates = [base_name] + [
+                f"{stem}-v{n}" for n in range(start_v + 1, start_v + 100)
+            ]
+        else:
+            candidates = [base_name] + [
+                f"{base_name}-v{n}" for n in range(2, 100)
+            ]
         for name in candidates:
             try:
                 await create_simulator.asyncio(
