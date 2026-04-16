@@ -764,20 +764,23 @@ class SkillTestGeneratorWorld(
 
                 app_dir = "/tmp/variant/web"
 
-                # Detect node path (nvm may install under any user home)
+                # Detect node path — source nvm if available, then locate binary
                 node_path_out, _ = await _exec(
-                    "command -v node 2>/dev/null "
-                    "|| find /home -maxdepth 6 -name node -path '*/bin/node' -type f 2>/dev/null | head -1 "
-                    "|| find /root -maxdepth 6 -name node -path '*/bin/node' -type f 2>/dev/null | head -1",
-                    timeout=15,
+                    'export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"; '
+                    '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" 2>/dev/null; '
+                    "NODE_BIN=$(command -v node 2>/dev/null); "
+                    '[ -z "$NODE_BIN" ] && NODE_BIN=$(find /home /root -maxdepth 6 '
+                    "-name node -path '*/bin/node' -type f 2>/dev/null | head -1); "
+                    'echo "$NODE_BIN"',
+                    timeout=20,
                 )
                 node_bin_dir = ""
-                if node_path_out:
+                if node_path_out and node_path_out.strip():
                     import os as _os
-                    node_bin_dir = _os.path.dirname(node_path_out.split("\n")[0].strip())
+                    node_bin_dir = _os.path.dirname(node_path_out.strip().split("\n")[0])
                 extra_path = f"{node_bin_dir}:" if node_bin_dir else ""
                 preamble = f'export PATH="{extra_path}/root/.bun/bin:/usr/local/bin:$PATH"'
-                logger.info("  [%s] node at: %s", vs.slug, node_path_out.strip())
+                logger.info("  [%s] node at: %s (bin_dir=%s)", vs.slug, node_path_out.strip(), node_bin_dir)
 
                 out, _ = await _exec(
                     f"{preamble} && cd {app_dir} && bun install 2>&1 | tail -10",
@@ -2820,15 +2823,18 @@ else:
                 app_dir = "/tmp/variant/web"
 
                 node_path_out, _ = await _exec(
-                    "command -v node 2>/dev/null "
-                    "|| find /home -maxdepth 6 -name node -path '*/bin/node' -type f 2>/dev/null | head -1 "
-                    "|| find /root -maxdepth 6 -name node -path '*/bin/node' -type f 2>/dev/null | head -1",
-                    timeout=15,
+                    'export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"; '
+                    '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" 2>/dev/null; '
+                    "NODE_BIN=$(command -v node 2>/dev/null); "
+                    '[ -z "$NODE_BIN" ] && NODE_BIN=$(find /home /root -maxdepth 6 '
+                    "-name node -path '*/bin/node' -type f 2>/dev/null | head -1); "
+                    'echo "$NODE_BIN"',
+                    timeout=20,
                 )
                 node_bin_dir = ""
-                if node_path_out:
+                if node_path_out and node_path_out.strip():
                     import os as _os
-                    node_bin_dir = _os.path.dirname(node_path_out.split("\n")[0].strip())
+                    node_bin_dir = _os.path.dirname(node_path_out.strip().split("\n")[0])
                 extra_path = f"{node_bin_dir}:" if node_bin_dir else ""
                 preamble = f'export PATH="{extra_path}/root/.bun/bin:/usr/local/bin:$PATH"'
 
