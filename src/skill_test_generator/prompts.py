@@ -646,6 +646,39 @@ Write your changes to the workspace. For each file you modify:
 - Testcase files: edit in `testcases/` directory
 - Sim code: edit in `sim/` directory
 
+**CRITICAL — If you edit sim code, DO NOT BREAK THE BUILD.**
+
+Your sim edits will be built and verified on a separate VM after you finish. \
+If the build fails, a fix agent will attempt repair — but this wastes time \
+and often fails. You MUST write code that builds cleanly on the first try.
+
+Rules for safe sim edits:
+- Make TARGETED, surgical changes. Do not rewrite entire files when you \
+  only need to change seed data or add a few records.
+- If you change `db/schema.ts`, you MUST also update \
+  `drizzle/0000_zippy_changeling.sql` to match.
+- If you add/rename columns, update ALL files that reference the old names \
+  (seed.ts, API routes, page components).
+- NEVER add new npm dependencies. Work with what's already installed.
+- NEVER modify protected files (package.json, tsconfig.json, next.config.ts, \
+  db/client.ts, db/bootstrap.ts, db/types.ts, db/index.ts, \
+  lib/plato-mutation-logger.ts, components/theme-provider.tsx, \
+  app/providers.tsx, app/globals.css).
+- Test your logic mentally: read the code, trace the data flow, confirm \
+  every reference is consistent before writing edits.json.
+
+Common build-breakers to avoid:
+- Raw `<` or `>` in JSX text (use `{'>'}` or `&gt;`)
+- Redefining `apiGet`/`apiPost` instead of importing from `@/lib/api`
+- Importing `@/db/client` in "use client" components
+- Missing `--> statement-breakpoint` between CREATE TABLE statements in SQL
+- Referencing columns/tables that don't exist in the schema
+- Mismatched column types between schema.ts and the migration SQL
+
+If you are unsure your sim code changes will build cleanly, prefer a \
+DATA-ONLY edit (changing seed values in db/seed.ts and the migration SQL) \
+over a code-structure change. Data edits are far less likely to break.
+
 **CRITICAL — Testcase JSON structure:**
 When you edit a testcase JSON file, the file MUST contain these fields \
 (keep them consistent with your changes):

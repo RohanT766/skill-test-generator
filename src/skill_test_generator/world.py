@@ -993,53 +993,17 @@ else:
                 logger.info("  [%s] Installed nextapp.service for boot", vs.slug)
 
                 # ── ENSURE SIMULATOR CATALOG ENTRY EXISTS ─────────────
-                from plato._generated.api.v1.env import create_simulator
-                from plato._generated.models import (
-                    CreateSimulatorRequest,
-                    SimulatorConfig,
-                )
-
-                try:
-                    _sim_config = SimulatorConfig(type="docker_app")  # type: ignore[arg-type]
-                except Exception:
-                    _sim_config = SimulatorConfig.from_dict({"type": "docker_app"})
-
-                icon_url = self._upload_icon_svg(
-                    sim_name, spec.get("icon_svg", ""),
-                ) or "https://plato.so/favicon.ico"
                 sim_description = (
                     f"[skill: {vs.skill_name}] {spec.get('description', '') or ''}"
                 ).strip()
-                try:
-                    await create_simulator.asyncio(
-                        client=http,
-                        body=CreateSimulatorRequest(
-                            name=sim_name,
-                            description=sim_description,
-                            simType="docker_app",
-                            config=_sim_config,
-                            enabled=True,
-                            imgUrl=icon_url,
-                            internalAppPort=3000,
-                            metadata={"is_skill_gym": True},
-                        ),
-                        x_api_key=api_key,
-                    )
-                    logger.info("  [%s] Created simulator '%s'", vs.slug, sim_name)
-                except Exception as e:
-                    if "already exists" in str(e).lower() or "409" in str(e):
-                        logger.info(
-                            "  [%s] Simulator '%s' already exists",
-                            vs.slug,
-                            sim_name,
-                        )
-                    else:
-                        logger.warning(
-                            "  [%s] Could not create simulator '%s': %s",
-                            vs.slug,
-                            sim_name,
-                            e,
-                        )
+                actual_name = await self._register_simulator(
+                    http, api_key, sim_name, sim_description,
+                    icon_svg=spec.get("icon_svg", ""),
+                    label=vs.slug,
+                )
+                if actual_name != sim_name:
+                    sim_name = actual_name
+                    vs.sim_name = sim_name
 
                 # ── SNAPSHOT ──────────────────────────────────────────
                 flows_yaml = self._build_flows_yaml(vs.slug)
@@ -1407,6 +1371,61 @@ else:
         except Exception as e:
             logger.warning("Could not upload icon for %s: %s", sim_name, e)
             return None
+
+    async def _register_simulator(
+        self,
+        http,
+        api_key: str,
+        base_name: str,
+        description: str,
+        icon_svg: str = "",
+        label: str = "",
+    ) -> str:
+        """Create a simulator, bumping to -v2, -v3 etc. on name collision.
+
+        Returns the actual sim name that was registered.
+        """
+        from plato._generated.api.v1.env import create_simulator
+        from plato._generated.models import (
+            CreateSimulatorRequest,
+            SimulatorConfig,
+        )
+
+        try:
+            _sim_config = SimulatorConfig(type="docker_app")  # type: ignore[arg-type]
+        except Exception:
+            _sim_config = SimulatorConfig.from_dict({"type": "docker_app"})
+
+        icon_url = self._upload_icon_svg(base_name, icon_svg) or "https://plato.so/favicon.ico"
+
+        candidates = [base_name] + [f"{base_name}-v{n}" for n in range(2, 100)]
+        for name in candidates:
+            try:
+                await create_simulator.asyncio(
+                    client=http,
+                    body=CreateSimulatorRequest(
+                        name=name,
+                        description=description,
+                        simType="docker_app",
+                        config=_sim_config,
+                        enabled=True,
+                        imgUrl=icon_url,
+                        internalAppPort=3000,
+                        is_skill_gym=True,
+                    ),
+                    x_api_key=api_key,
+                )
+                logger.info("  [%s] Created simulator '%s'", label, name)
+                return name
+            except Exception as e:
+                if "already exists" in str(e).lower() or "409" in str(e):
+                    continue
+                logger.warning(
+                    "  [%s] Could not create simulator '%s': %s",
+                    label, name, e,
+                )
+                return base_name
+        return base_name
 
     async def _create_testcases(
         self,
@@ -3016,67 +3035,16 @@ else:
                         )
                         return None
 
-                # ── Versioned sim name ─────────────────────────────────
-                from plato._generated.api.v1.simulator import (
-                    create_simulator,
-                    get_simulator_id,
-                )
-                from plato._generated.models import (
-                    CreateSimulatorRequest,
-                    SimulatorConfig,
-                )
-
-                base = re.sub(r"-v\d+$", "", base_sim_name)
-                hc_sim_name = base
-                for v in range(1, 100):
-                    candidate = f"{base}-v{v}"
-                    try:
-                        await get_simulator_id.asyncio(
-                            client=http,
-                            simulator_name=candidate,
-                            x_api_key=api_key,
-                        )
-                    except Exception:
-                        hc_sim_name = candidate
-                        break
-                else:
-                    hc_sim_name = f"{base}-v{v}"
-
-                icon_url = self._upload_icon_svg(
-                    hc_sim_name, spec.get("icon_svg", ""),
-                ) or "https://plato.so/favicon.ico"
+                # ── Register new sim (with v# bump on collision) ─────
                 sim_desc = (
                     f"[skill: {vs.skill_name}] "
                     f"{spec.get('description', '') or ''}"
                 ).strip()
-                try:
-                    _sim_config = SimulatorConfig.from_dict(
-                        {"type": "docker_app"}
-                    )
-                    await create_simulator.asyncio(
-                        client=http,
-                        body=CreateSimulatorRequest(
-                            name=hc_sim_name,
-                            description=sim_desc,
-                            simType="docker_app",
-                            config=_sim_config,
-                            enabled=True,
-                            imgUrl=icon_url,
-                            internalAppPort=3000,
-                            metadata={"is_skill_gym": True},
-                        ),
-                        x_api_key=api_key,
-                    )
-                    logger.info(
-                        "HILLCLIMB [%s] Created simulator '%s'",
-                        vs.slug, hc_sim_name,
-                    )
-                except Exception as e:
-                    if "already exists" not in str(e).lower() and "409" not in str(e):
-                        logger.warning(
-                            "HILLCLIMB [%s] Could not create sim '%s': %s",
-                            vs.slug, hc_sim_name, e,
-                        )
+                hc_sim_name = await self._register_simulator(
+                    http, api_key, base_sim_name, sim_desc,
+                    icon_svg=spec.get("icon_svg", ""),
+                    label=f"hc-{vs.slug}",
+                )
 
                 # ── Seed + Snapshot ─────────────────────────────────────
                 await self._seed_api_routes(
