@@ -764,23 +764,7 @@ class SkillTestGeneratorWorld(
 
                 app_dir = "/tmp/variant/web"
 
-                # Detect node path — source nvm if available, then locate binary
-                node_path_out, _ = await _exec(
-                    'export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"; '
-                    '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" 2>/dev/null; '
-                    "NODE_BIN=$(command -v node 2>/dev/null); "
-                    '[ -z "$NODE_BIN" ] && NODE_BIN=$(find /home /root -maxdepth 6 '
-                    "-name node -path '*/bin/node' -type f 2>/dev/null | head -1); "
-                    'echo "$NODE_BIN"',
-                    timeout=20,
-                )
-                node_bin_dir = ""
-                if node_path_out and node_path_out.strip():
-                    import os as _os
-                    node_bin_dir = _os.path.dirname(node_path_out.strip().split("\n")[0])
-                extra_path = f"{node_bin_dir}:" if node_bin_dir else ""
-                preamble = f'export PATH="{extra_path}/root/.bun/bin:/usr/local/bin:$PATH"'
-                logger.info("  [%s] node at: %s (bin_dir=%s)", vs.slug, node_path_out.strip(), node_bin_dir)
+                preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
 
                 out, _ = await _exec(
                     f"{preamble} && cd {app_dir} && bun install 2>&1 | tail -10",
@@ -830,7 +814,7 @@ else:
                 build_out, build_ok = await _exec(
                     f"{preamble} && cd {app_dir} && "
                     "NODE_ENV=production NEXT_DIST_DIR=.next "
-                    "node ./node_modules/next/dist/bin/next build 2>&1 | tail -40",
+                    "bun ./node_modules/next/dist/bin/next build 2>&1 | tail -40",
                     timeout=300,
                 )
                 logger.info("  [%s] Build: %s", vs.slug, build_out[-300:])
@@ -867,7 +851,7 @@ else:
                 await _exec(
                     f"{preamble} && cd {app_dir} && mkdir -p /tmp/pglite-data && "
                     f"NEXT_DIST_DIR=.next NODE_ENV=production PORT=3000 APP_PORT=3000 "
-                    f"nohup node ./node_modules/next/dist/bin/next start "
+                    f"nohup bun ./node_modules/next/dist/bin/next start "
                     f"--hostname 0.0.0.0 -p 3000 > /tmp/dev.log 2>&1 &",
                     timeout=30,
                 )
@@ -952,7 +936,7 @@ else:
 
                 # ── BOOT SERVICE (so app starts on snapshot restore) ──
                 svc_exec = (
-                    "/usr/bin/node ./node_modules/next/dist/bin/next start "
+                    "/root/.bun/bin/bun ./node_modules/next/dist/bin/next start "
                     "--hostname 0.0.0.0 -p 3000"
                 )
                 svc_unit = (
@@ -2822,21 +2806,7 @@ else:
 
                 app_dir = "/tmp/variant/web"
 
-                node_path_out, _ = await _exec(
-                    'export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"; '
-                    '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" 2>/dev/null; '
-                    "NODE_BIN=$(command -v node 2>/dev/null); "
-                    '[ -z "$NODE_BIN" ] && NODE_BIN=$(find /home /root -maxdepth 6 '
-                    "-name node -path '*/bin/node' -type f 2>/dev/null | head -1); "
-                    'echo "$NODE_BIN"',
-                    timeout=20,
-                )
-                node_bin_dir = ""
-                if node_path_out and node_path_out.strip():
-                    import os as _os
-                    node_bin_dir = _os.path.dirname(node_path_out.strip().split("\n")[0])
-                extra_path = f"{node_bin_dir}:" if node_bin_dir else ""
-                preamble = f'export PATH="{extra_path}/root/.bun/bin:/usr/local/bin:$PATH"'
+                preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
 
                 # Upload edited sim code as tarball
                 tarball = self._tar_variant(sim_dir.parent, f"hc-{vs.slug}")
@@ -2864,7 +2834,7 @@ else:
                     build_out, build_ok = await _exec(
                         f"{preamble} && cd {app_dir} && "
                         "NODE_ENV=production NEXT_DIST_DIR=.next "
-                        "node ./node_modules/next/dist/bin/next build 2>&1 | tail -20",
+                        "bun ./node_modules/next/dist/bin/next build 2>&1 | tail -20",
                         timeout=300,
                     )
                     if not build_ok:
@@ -2880,7 +2850,7 @@ else:
                 await _exec(
                     f"{preamble} && cd {app_dir} && mkdir -p /tmp/pglite-data && "
                     "NEXT_DIST_DIR=.next NODE_ENV=production PORT=3000 "
-                    "nohup node ./node_modules/next/dist/bin/next start "
+                    "nohup bun ./node_modules/next/dist/bin/next start "
                     "--hostname 0.0.0.0 -p 3000 > /tmp/dev.log 2>&1 &",
                     timeout=30,
                 )
@@ -2950,7 +2920,7 @@ else:
                                     f"{preamble} && cd {app_dir} && "
                                     "bun install 2>&1 | tail -5 && "
                                     "NODE_ENV=production NEXT_DIST_DIR=.next "
-                                    "node ./node_modules/next/dist/bin/next "
+                                    "bun ./node_modules/next/dist/bin/next "
                                     "build 2>&1 | tail -20",
                                     timeout=300,
                                 )
