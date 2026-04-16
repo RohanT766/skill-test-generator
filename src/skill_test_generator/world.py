@@ -442,7 +442,11 @@ class SkillTestGeneratorWorld(
                             if ref_path.exists():
                                 manifest = _load_reference_manifest()
                                 ref_entry = next(
-                                    (e for e in manifest if e["filename"] == ref_filename),
+                                    (
+                                        e
+                                        for e in manifest
+                                        if e["filename"] == ref_filename
+                                    ),
                                     None,
                                 )
                                 if ref_entry:
@@ -501,8 +505,10 @@ class SkillTestGeneratorWorld(
                     except Exception as e:
                         logger.error("  [%s] Pipeline VM error: %s", vs.slug, e)
                         result = {
-                            "artifact_id": None, "verified": False,
-                            "checks": [], "failure_type": "infra",
+                            "artifact_id": None,
+                            "verified": False,
+                            "checks": [],
+                            "failure_type": "infra",
                         }
 
                 last_checks = result.get("checks", [])
@@ -539,7 +545,8 @@ class SkillTestGeneratorWorld(
                 elif failure_type == "infra":
                     logger.info(
                         "  [%s] Infra error (attempt %d), retrying VM …",
-                        vs.slug, attempt + 1,
+                        vs.slug,
+                        attempt + 1,
                     )
                     continue
                 else:
@@ -770,7 +777,9 @@ class SkillTestGeneratorWorld(
                     timeout=10,
                 )
                 if "MISSING" in chk:
-                    logger.warning("  [%s] @electric-sql/pglite missing, reinstalling …", vs.slug)
+                    logger.warning(
+                        "  [%s] @electric-sql/pglite missing, reinstalling …", vs.slug
+                    )
                     await _exec(
                         f"{preamble} && cd {app_dir} && bun install --no-save @electric-sql/pglite 2>&1 | tail -5",
                         timeout=120,
@@ -829,7 +838,12 @@ else:
                         }
                     )
                     logger.error("  [%s] %s", vs.slug, err)
-                    return {"artifact_id": None, "verified": False, "checks": checks, "failure_type": "code"}
+                    return {
+                        "artifact_id": None,
+                        "verified": False,
+                        "checks": checks,
+                        "failure_type": "code",
+                    }
                 checks.append({"name": "production_build", "pass": True, "error": ""})
 
                 # ── VERIFY (production server) ────────────────────────
@@ -864,7 +878,12 @@ else:
                             "error": f"Production server never healthy. Log: {log_tail[-500:]}",
                         }
                     )
-                    return {"artifact_id": None, "verified": False, "checks": checks, "failure_type": "code"}
+                    return {
+                        "artifact_id": None,
+                        "verified": False,
+                        "checks": checks,
+                        "failure_type": "code",
+                    }
 
                 checks.append({"name": "server_startup", "pass": True, "error": ""})
                 checks.append({"name": "GET /api/health", "pass": True, "error": ""})
@@ -878,7 +897,11 @@ else:
                         f"http://127.0.0.1:3000{route} 2>&1 | tail -c 2000",
                         timeout=15,
                     )
-                    body = out.split("HTTP_CODE:")[0].strip() if "HTTP_CODE:" in out else out
+                    body = (
+                        out.split("HTTP_CODE:")[0].strip()
+                        if "HTTP_CODE:" in out
+                        else out
+                    )
                     ok = "HTTP_CODE:200" in out and len(body) >= 2
                     checks.append(
                         {
@@ -928,7 +951,12 @@ else:
                         )
 
                 if not all(c["pass"] for c in checks):
-                    return {"artifact_id": None, "verified": False, "checks": checks, "failure_type": "code"}
+                    return {
+                        "artifact_id": None,
+                        "verified": False,
+                        "checks": checks,
+                        "failure_type": "code",
+                    }
 
                 # ── FETCH LIVE API DATA (for taskgen after VM closes) ──
                 live_api_data: dict[str, str] = {}
@@ -944,7 +972,9 @@ else:
                     all_data = ""
                     page = 1
                     while page <= 20:
-                        url_with_page = f"http://127.0.0.1:3000{route}?page={page}&pageSize=100"
+                        url_with_page = (
+                            f"http://127.0.0.1:3000{route}?page={page}&pageSize=100"
+                        )
                         out, ok = await _exec(
                             f"curl -s '{url_with_page}' 2>&1",
                             timeout=15,
@@ -964,10 +994,12 @@ else:
                             pagination = resp_json.get("pagination")
                             if not isinstance(pagination, dict):
                                 pagination = {}
-                            tp = (resp_json.get("totalPages")
-                                  or resp_json.get("total_pages")
-                                  or pagination.get("totalPages")
-                                  or pagination.get("total_pages"))
+                            tp = (
+                                resp_json.get("totalPages")
+                                or resp_json.get("total_pages")
+                                or pagination.get("totalPages")
+                                or pagination.get("total_pages")
+                            )
                             if tp and page >= int(tp):
                                 break
                             rows = resp_json.get("data", resp_json.get("items", []))
@@ -1062,8 +1094,7 @@ else:
 
                 PLATO_LOGO = "https://plato.so/favicon.ico"
                 sim_description = (
-                    f"[skill: {vs.skill_name}] "
-                    f"{spec.get('description', '') or ''}"
+                    f"[skill: {vs.skill_name}] {spec.get('description', '') or ''}"
                 ).strip()
                 try:
                     await create_simulator.asyncio(
@@ -1359,7 +1390,6 @@ else:
         async with httpx.AsyncClient(
             base_url=config.chronos_url, timeout=httpx.Timeout(120.0)
         ) as http:
-
             max_retries = 3
 
             async def _run_one(
@@ -1384,7 +1414,9 @@ else:
                     for attempt in range(1, max_retries + 1):
                         logger.info(
                             "  Launching: %s (attempt %d/%d)",
-                            session_label, attempt, max_retries,
+                            session_label,
+                            attempt,
+                            max_retries,
                         )
                         try:
                             result = await self._launch_and_wait(
@@ -1407,7 +1439,9 @@ else:
 
                             session_status = result.get("status", "")
                             is_infra_failure = session_status in (
-                                "failed", "error", "cancelled",
+                                "failed",
+                                "error",
+                                "cancelled",
                             )
 
                             if result.get("score", 0) > 0:
@@ -1430,7 +1464,8 @@ else:
                             if is_infra_failure and attempt < max_retries:
                                 logger.warning(
                                     "    Session %s ended with status=%s, retrying…",
-                                    result.get("chronos_id", "?"), session_status,
+                                    result.get("chronos_id", "?"),
+                                    session_status,
                                 )
                                 continue
 
@@ -1442,7 +1477,9 @@ else:
                         except Exception as e:
                             logger.error(
                                 "    Failed to run testcase %s (attempt %d): %s",
-                                tc_id, attempt, e,
+                                tc_id,
+                                attempt,
+                                e,
                             )
                             err_result = {
                                 "testcase_id": tc_id,
@@ -1464,7 +1501,8 @@ else:
                     if completed_count % 5 == 0 or completed_count == total_work:
                         logger.info(
                             "RUN progress: %d/%d work items done",
-                            completed_count, total_work,
+                            completed_count,
+                            total_work,
                         )
 
             await asyncio.gather(
@@ -1500,18 +1538,23 @@ else:
         logger.info("=" * 70)
         logger.info(
             "Total sessions launched: %d  (retries: %d)",
-            total_attempts, total_retries,
+            total_attempts,
+            total_retries,
         )
         logger.info(
             "Final outcomes: %d PASS | %d FAIL | %d ERROR  (of %d work items)",
-            n_pass, n_fail, n_error, n_total,
+            n_pass,
+            n_fail,
+            n_error,
+            n_total,
         )
         if n_total:
             effective_total = n_pass + n_fail
             if effective_total > 0:
                 logger.info(
                     "Pass rate (excluding errors): %d/%d = %.1f%%",
-                    n_pass, effective_total,
+                    n_pass,
+                    effective_total,
                     n_pass / effective_total * 100,
                 )
             else:
@@ -1535,11 +1578,16 @@ else:
             s_retries = sum(1 for a in variant_attempts if a.get("attempt", 1) > 1)
 
             logger.info(
-                "SKILL: %s  [%s]", skill_name, slug,
+                "SKILL: %s  [%s]",
+                skill_name,
+                slug,
             )
             logger.info(
                 "  Results: %d PASS | %d FAIL | %d ERROR | %d retries",
-                s_pass, s_fail, s_error, s_retries,
+                s_pass,
+                s_fail,
+                s_error,
+                s_retries,
             )
 
             tc_attempts: dict[str, list[dict]] = {}
@@ -1557,7 +1605,9 @@ else:
 
                 logger.info(
                     "  TESTCASE: %s  (%s)  → %s",
-                    task_name, tc_id, outcome_str,
+                    task_name,
+                    tc_id,
+                    outcome_str,
                 )
 
                 for att in sorted(tc_att_list, key=lambda x: x.get("attempt", 1)):
@@ -1610,7 +1660,10 @@ else:
                 agent_config["nova_act_api_key"] = config.nova_act_api_key
             else:
                 agent_config["nova_act_workflow_name"] = config.nova_act_workflow_name
-        elif "anthropic" in config.eval_agent_model or "claude" in config.eval_agent_model:
+        elif (
+            "anthropic" in config.eval_agent_model
+            or "claude" in config.eval_agent_model
+        ):
             if config.anthropic_api_key:
                 agent_config["anthropic_api_key"] = config.anthropic_api_key
 
@@ -1817,7 +1870,9 @@ else:
             for tr in vs.task_results:
                 outcome = tr.get("outcome", "")
                 is_error = outcome == "ERROR" or tr.get("status") in (
-                    "failed", "error", "cancelled",
+                    "failed",
+                    "error",
+                    "cancelled",
                 )
                 is_pass = tr.get("score", 0) > 0
 
@@ -1867,9 +1922,7 @@ else:
 
         global_completed = global_passed + global_failed
         global_pct = (
-            round(global_passed / global_completed * 100, 1)
-            if global_completed
-            else 0
+            round(global_passed / global_completed * 100, 1) if global_completed else 0
         )
 
         logger.info("=" * 70)
@@ -1877,11 +1930,15 @@ else:
         logger.info("=" * 70)
         logger.info(
             "Overall: %d PASS | %d FAIL | %d ERROR",
-            global_passed, global_failed, global_errored,
+            global_passed,
+            global_failed,
+            global_errored,
         )
         logger.info(
             "Pass rate (excluding errors): %d/%d = %.1f%%",
-            global_passed, global_completed, global_pct,
+            global_passed,
+            global_completed,
+            global_pct,
         )
         logger.info("-" * 70)
 
@@ -1954,21 +2011,15 @@ else:
         for vs in self.state.variants:
             status = f"[{vs.stage}]"
             tasks = f" ({vs.task_count} tasks)" if vs.task_count else ""
-            passed = sum(
-                1 for t in vs.task_results
-                if t.get("score", 0) > 0
-            )
+            passed = sum(1 for t in vs.task_results if t.get("score", 0) > 0)
             errored = sum(
-                1 for t in vs.task_results
+                1
+                for t in vs.task_results
                 if t.get("outcome") == "ERROR"
                 or t.get("status") in ("failed", "error", "cancelled")
             )
             completed = len(vs.task_results) - errored
-            rate = (
-                f" pass_rate={passed}/{completed}"
-                if completed
-                else " pass_rate=0/0"
-            )
+            rate = f" pass_rate={passed}/{completed}" if completed else " pass_rate=0/0"
             if errored:
                 rate += f" ({errored} errored out)"
             err = f" ERROR: {vs.error}" if vs.error else ""

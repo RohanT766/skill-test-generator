@@ -107,11 +107,17 @@ async def select_reference_screenshot(
         return None
 
     _UNUSABLE_CONTENT_TYPES = {
-        "modal dialog", "login page", "error page", "footer",
-        "help page", "terms page", "sitemap page",
+        "modal dialog",
+        "login page",
+        "error page",
+        "footer",
+        "help page",
+        "terms page",
+        "sitemap page",
     }
     manifest = [
-        e for e in manifest
+        e
+        for e in manifest
         if e.get("content_type", "").lower() not in _UNUSABLE_CONTENT_TYPES
     ]
     if not manifest:
@@ -152,12 +158,12 @@ async def select_reference_screenshot(
     candidates = manifest
     if wanted_types:
         filtered = [
-            e for e in manifest
-            if e.get("content_type", "").lower() in wanted_types
+            e for e in manifest if e.get("content_type", "").lower() in wanted_types
         ]
         if wanted_industries and filtered:
             narrowed = [
-                e for e in filtered
+                e
+                for e in filtered
                 if e.get("industry", "").lower() in wanted_industries
             ]
             if narrowed:
@@ -330,36 +336,40 @@ async def design_variant(
     if ref:
         ref_meta, ref_bytes = ref
         media_type = _detect_media_type(ref_bytes, ref_meta.get("filename", ""))
-        content_blocks.append({
-            "type": "image",
-            "source": {
-                "type": "base64",
-                "media_type": media_type,
-                "data": base64.b64encode(ref_bytes).decode(),
-            },
-        })
+        content_blocks.append(
+            {
+                "type": "image",
+                "source": {
+                    "type": "base64",
+                    "media_type": media_type,
+                    "data": base64.b64encode(ref_bytes).decode(),
+                },
+            }
+        )
         ref_ct = ref_meta.get("content_type", "")
         ref_patterns = ", ".join(ref_meta.get("ui_patterns", []))
         ref_desc = ref_meta.get("description", "")
         ref_industry = ref_meta.get("industry", "")
-        content_blocks.append({
-            "type": "text",
-            "text": (
-                "## Visual Reference (MATCH THIS CLOSELY)\n\n"
-                "The image above is a screenshot from a real website. Your app must "
-                "closely match its visual design — replicate the layout structure "
-                "(sidebar vs top nav, positioning, proportions), color scheme, "
-                "typography density, and spacing. The screenshot's industry is a "
-                "strong hint — use the same or a closely related industry. "
-                "Generate your own product name, data values, and entities — do NOT "
-                "copy specific text — but the visual shell must look like it belongs "
-                "to the same product family as the screenshot.\n\n"
-                f"**Page type:** {ref_ct}\n"
-                f"**Industry:** {ref_industry}\n"
-                f"**UI patterns:** {ref_patterns}\n"
-                f"**Description:** {ref_desc}\n\n"
-            ),
-        })
+        content_blocks.append(
+            {
+                "type": "text",
+                "text": (
+                    "## Visual Reference (MATCH THIS CLOSELY)\n\n"
+                    "The image above is a screenshot from a real website. Your app must "
+                    "closely match its visual design — replicate the layout structure "
+                    "(sidebar vs top nav, positioning, proportions), color scheme, "
+                    "typography density, and spacing. The screenshot's industry is a "
+                    "strong hint — use the same or a closely related industry. "
+                    "Generate your own product name, data values, and entities — do NOT "
+                    "copy specific text — but the visual shell must look like it belongs "
+                    "to the same product family as the screenshot.\n\n"
+                    f"**Page type:** {ref_ct}\n"
+                    f"**Industry:** {ref_industry}\n"
+                    f"**UI patterns:** {ref_patterns}\n"
+                    f"**Description:** {ref_desc}\n\n"
+                ),
+            }
+        )
         logger.info(
             "Design ref for '%s': %s (%s)",
             skill.name,
@@ -382,9 +392,7 @@ async def design_variant(
             f"layout style, and color scheme. Pick an industry that hasn't been used yet.\n\n"
         )
         if prior_scenarios:
-            user_text += (
-                "Products already designed (DO NOT reuse these industries):\n"
-            )
+            user_text += "Products already designed (DO NOT reuse these industries):\n"
             for ps in prior_scenarios:
                 user_text += f"- {ps}\n"
             user_text += "\n"
@@ -432,36 +440,42 @@ async def generate_variant_code(
     if reference_screenshot:
         ref_meta, ref_bytes = reference_screenshot
         media_type = _detect_media_type(ref_bytes, ref_meta.get("filename", ""))
-        content_blocks.append({
-            "type": "image",
-            "source": {
-                "type": "base64",
-                "media_type": media_type,
-                "data": base64.b64encode(ref_bytes).decode(),
-            },
-        })
+        content_blocks.append(
+            {
+                "type": "image",
+                "source": {
+                    "type": "base64",
+                    "media_type": media_type,
+                    "data": base64.b64encode(ref_bytes).decode(),
+                },
+            }
+        )
         ref_desc = ref_meta.get("description", "")
         ref_ct = ref_meta.get("content_type", "")
         ref_industry = ref_meta.get("industry", "")
         ref_patterns = ", ".join(ref_meta.get("ui_patterns", []))
-        content_blocks.append({
-            "type": "text",
-            "text": (
-                "## Visual Reference (MATCH THIS CLOSELY)\n\n"
-                "The image above is the same reference screenshot used during the "
-                "design phase. Your generated code must closely replicate its "
-                "visual design — layout structure, color scheme, nav pattern, "
-                "typography density, and spacing. The spec defines the industry, "
-                "data, and skill-specific UI — follow the spec for those. The "
-                "screenshot governs the visual shell. Do NOT copy specific text "
-                "or data values from the screenshot.\n\n"
-                f"**Reference info:** {ref_ct} | {ref_industry}\n"
-                f"**UI patterns:** {ref_patterns}\n"
-                f"**Description:** {ref_desc}\n\n"
-            ),
-        })
+        content_blocks.append(
+            {
+                "type": "text",
+                "text": (
+                    "## Visual Reference (MATCH THIS CLOSELY)\n\n"
+                    "The image above is the same reference screenshot used during the "
+                    "design phase. Your generated code must closely replicate its "
+                    "visual design — layout structure, color scheme, nav pattern, "
+                    "typography density, and spacing. The spec defines the industry, "
+                    "data, and skill-specific UI — follow the spec for those. The "
+                    "screenshot governs the visual shell. Do NOT copy specific text "
+                    "or data values from the screenshot.\n\n"
+                    f"**Reference info:** {ref_ct} | {ref_industry}\n"
+                    f"**UI patterns:** {ref_patterns}\n"
+                    f"**Description:** {ref_desc}\n\n"
+                ),
+            }
+        )
 
-    user_text = f"## App Specification\n\n```json\n{json.dumps(spec, indent=2)}\n```\n\n"
+    user_text = (
+        f"## App Specification\n\n```json\n{json.dumps(spec, indent=2)}\n```\n\n"
+    )
     if fix_context:
         user_text += (
             f"## CRITICAL: Previous Code Had Errors — Fix Them\n\n"
@@ -721,9 +735,7 @@ def _post_process_code(code_files: dict[str, str]) -> dict[str, str]:
             )
 
         if "let seeded" in content and "await seedDatabase()" not in content:
-            db_call = _re.search(
-                r"(const\s+db\s*=\s*await\s+getDb\(\)\s*;?)", content
-            )
+            db_call = _re.search(r"(const\s+db\s*=\s*await\s+getDb\(\)\s*;?)", content)
             if db_call:
                 content = content.replace(
                     db_call.group(1),
@@ -766,8 +778,6 @@ _TEMPLATE_PROTECTED = frozenset(
         "app/globals.css",
     }
 )
-
-
 
 
 def apply_variant_code(
