@@ -553,6 +553,55 @@ how it is stored in the database. If the UI displays "1,234.56" or \
 If a number is displayed with decimals (e.g. 99.00), use a float (99.0), \
 not an int (99). When in doubt, prefer strings over numbers in expected_output.
 
+## Sim Code Editing Rules
+
+If you edit sim code in the `sim/` directory, you MUST follow these rules — \
+they are the same technical constraints the app was built with:
+
+**Stack:** Next.js 16 + React 19, App Router, PGlite + Drizzle ORM, \
+shadcn/ui, TanStack Query + Zustand + nuqs, Tailwind CSS 4.
+
+**Database access:**
+- Always `import { getDb } from '@/db/client'` then `const db = await getDb()` \
+  — NEVER import or use a bare `db` object.
+- Schema tables in `db/schema.ts` using `pgTable` from `drizzle-orm/pg-core`.
+- Migration SQL in `drizzle/0000_zippy_changeling.sql` — use \
+  `--> statement-breakpoint` between CREATE TABLE statements.
+- `db/seed.ts` exports `async function seedDatabase()` — idempotent, \
+  ASCII-only string values, at least 20-30 records.
+- EVERY GET handler that queries DB must lazy-seed:
+  `if (!seeded) { await seedDatabase(); seeded = true; }`
+
+**Client-side data fetching:**
+- "use client" components MUST use RELATIVE URLs only: `/api/...`
+- Use `apiGet`/`apiPost`/`apiPut` from `@/lib/api` — NEVER redefine them.
+- Use TanStack Query for all client data fetching.
+- NEVER import `getDb`, `@/db/client`, or any db/* module in client components.
+- NEVER use `http://localhost` or absolute URLs in client fetch calls.
+
+**Mutation logging (required for mutation task scoring):**
+- Every write API route must call `logMutation` from \
+  `@/lib/plato-mutation-logger` after successful DB writes:
+  `await logMutation("table_name", "update", { id: numericId }, values);`
+- The row_filter must use the numeric primary key.
+
+**JSX:** Never use raw `<` or `>` in text content — use `{'>'}` or `&gt;`.
+
+**Protected files — do NOT modify these:**
+package.json, tsconfig.json, next.config.ts, next.config.js, \
+postcss.config.mjs, tailwind.config.ts, db/client.ts, db/bootstrap.ts, \
+db/types.ts, db/index.ts, lib/plato-mutation-logger.ts, \
+components/theme-provider.tsx, app/providers.tsx, app/globals.css
+
+**Layout / chrome:** Do not change the app's navigation shell, product name, \
+or overall layout structure. The chrome_description governs these.
+
+**No skill bypasses:** The app must FORCE the user through the interaction \
+pattern the skill describes. Do not create alternative paths.
+
+**Adversarial data fidelity:** Seed data is engineered with decoys. Do not \
+reorder, rename, simplify, or "clean up" seed values.
+
 ### Step 4: Execute edits
 
 Write your changes to the workspace. For each file you modify:

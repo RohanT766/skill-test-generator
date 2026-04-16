@@ -689,17 +689,13 @@ class SkillTestGeneratorWorld(
         """
         from plato._generated.api.v2.sessions import (
             close as sessions_close,
-            execute as sessions_execute,
             make as sessions_make,
-            snapshot as sessions_snapshot,
         )
         from plato._generated.models import (
             AppSchemasBuildModelsSimConfigCompute as SimConfigCompute,
-            AppApiV2SchemasSessionCreateSnapshotRequest,
             CreateSessionFromEnvs,
             EnvFromResource,
             Envs,
-            ExecuteCommandRequest,
             RunSessionSource,
         )
 
@@ -714,17 +710,6 @@ class SkillTestGeneratorWorld(
             base_url=api_url,
             timeout=httpx.Timeout(300.0, connect=30.0),
         ) as http:
-
-            async def _exec(cmd: str, timeout: int = 30) -> tuple[str, bool]:
-                r = await sessions_execute.asyncio(
-                    client=http,
-                    session_id=session_id,
-                    body=ExecuteCommandRequest(command=cmd, timeout=timeout),
-                    x_api_key=api_key,
-                )
-                for _, v in r.results.items():
-                    return (v.stdout or "").strip(), bool(v.success)
-                return "", False
 
             try:
                 # ── Create VM ─────────────────────────────────────────
@@ -749,18 +734,8 @@ class SkillTestGeneratorWorld(
                 session_id = resp.session_id
                 logger.info("  [%s] VM %s created", vs.slug, session_id)
 
-                for _ in range(60):
-                    await asyncio.sleep(3)
-                    sr = await http.get(
-                        f"/api/v2/sessions/{session_id}",
-                        headers={"X-API-Key": api_key},
-                    )
-                    jobs = sr.json().get("jobs", [{}])
-                    if jobs and jobs[0].get("status") == "running":
-                        break
-                else:
-                    raise RuntimeError("VM never reached running state")
-                logger.info("  [%s] VM running", vs.slug)
+                _exec = self._make_exec_fn(http, session_id, api_key)
+                await self._poll_vm_ready(http, session_id, api_key, vs.slug)
 
                 # ── Download + setup ──────────────────────────────────
                 await _exec(
@@ -954,33 +929,9 @@ else:
                     )
 
                 # ── SEED API ROUTES (server still running from verify) ──
-                # Seed API routes before snapshot
-                seed_routes = [
-                    r.get("route", "")
-                    for r in api_routes
-                    if r.get("route")
-                    and "/health" not in r.get("route", "")
-                    and "[" not in r.get("route", "")
-                ]
-                if not seed_routes:
-                    seed_routes = ["/api/items", "/api/data"]
-                for route in seed_routes:
-                    for seed_attempt in range(10):
-                        out, _ = await _exec(
-                            f"curl -s -w '\\nHTTP_CODE:%{{http_code}}' "
-                            f"http://127.0.0.1:3000{route} 2>&1 | tail -c 2000",
-                            timeout=30,
-                        )
-                        if "HTTP_CODE:200" in out and len(out) > 30:
-                            logger.info(
-                                "  [%s] Seed %s OK (attempt %d)",
-                                vs.slug,
-                                route,
-                                seed_attempt,
-                            )
-                            break
-                        await asyncio.sleep(3)
-                await asyncio.sleep(3)
+                await self._seed_api_routes(
+                    _exec, api_routes, vs.slug, retries=10
+                )
 
                 # ── BOOT SERVICE (so app starts on snapshot restore) ──
                 svc_exec = (
@@ -1066,51 +1017,10 @@ else:
                         )
 
                 # ── SNAPSHOT ──────────────────────────────────────────
-                wait_selector = self._derive_wait_selector(vs.slug)
-                flows_yaml = (
-                    "flows:\n"
-                    "- name: login\n"
-                    "  steps:\n"
-                    "  - type: navigate\n"
-                    "    url: /\n"
-                    "    timeout: 60000\n"
-                    "    retries: 3\n"
-                    "    retry_delay_ms: 5000\n"
-                    "  - type: wait\n"
-                    "    duration: 5000\n"
-                    "  - type: wait_for_selector\n"
-                    f'    selector: "{wait_selector}"\n'
-                    "    timeout: 60000\n"
-                    "    retries: 5\n"
-                    "    retry_delay_ms: 3000\n"
-                    "  - type: wait\n"
-                    "    duration: 3000\n"
+                flows_yaml = self._build_flows_yaml(vs.slug)
+                artifact_id = await self._take_snapshot(
+                    http, session_id, api_key, sim_name, flows_yaml, vs.slug
                 )
-
-                snap = await sessions_snapshot.asyncio(
-                    client=http,
-                    session_id=session_id,
-                    body=AppApiV2SchemasSessionCreateSnapshotRequest(
-                        override_service=sim_name,
-                        override_dataset="base",
-                        internal_app_port=3000,
-                        flows=flows_yaml,
-                        target="sims.plato.so",
-                    ),
-                    x_api_key=api_key,
-                )
-
-                artifact_id: str | None = None
-                for _, snap_result in snap.results.items():
-                    if snap_result.success and snap_result.artifact_id:
-                        artifact_id = snap_result.artifact_id
-                        break
-
-                if not artifact_id:
-                    errors = [r.error for r in snap.results.values() if r.error]
-                    raise RuntimeError(f"Snapshot failed: {errors}")
-
-                logger.info("  [%s] Snapshot: %s", vs.slug, artifact_id)
 
                 try:
                     from plato._generated.api.v1.cluster import prefetch_snapshot
@@ -1243,6 +1153,177 @@ else:
                 )
 
         return checks
+
+    # ------------------------------------------------------------------
+    # Shared VM / session helpers (used by both pipeline and hillclimb)
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _make_exec_fn(http, session_id: str, api_key: str):
+        """Create a bound _exec(cmd, timeout) closure for VM shell commands."""
+        from plato._generated.api.v2.sessions import execute as sessions_execute
+        from plato._generated.models import ExecuteCommandRequest
+
+        async def _exec(cmd: str, timeout: int = 30) -> tuple[str, bool]:
+            r = await sessions_execute.asyncio(
+                client=http,
+                session_id=session_id,
+                body=ExecuteCommandRequest(command=cmd, timeout=timeout),
+                x_api_key=api_key,
+            )
+            for _, v in r.results.items():
+                return (v.stdout or "").strip(), bool(v.success)
+            return "", False
+
+        return _exec
+
+    @staticmethod
+    async def _poll_vm_ready(http, session_id: str, api_key: str, label: str) -> None:
+        """Poll until the VM session reaches 'running' status."""
+        for _ in range(60):
+            await asyncio.sleep(3)
+            sr = await http.get(
+                f"/api/v2/sessions/{session_id}",
+                headers={"X-API-Key": api_key},
+            )
+            jobs = sr.json().get("jobs", [{}])
+            if jobs and jobs[0].get("status") == "running":
+                logger.info("  [%s] VM running", label)
+                return
+        raise RuntimeError(f"[{label}] VM never reached running state")
+
+    def _build_flows_yaml(self, slug: str) -> str:
+        """Build the flows YAML for snapshot login flow."""
+        wait_selector = self._derive_wait_selector(slug)
+        return (
+            "flows:\n"
+            "- name: login\n"
+            "  steps:\n"
+            "  - type: navigate\n"
+            "    url: /\n"
+            "    timeout: 60000\n"
+            "    retries: 3\n"
+            "    retry_delay_ms: 5000\n"
+            "  - type: wait\n"
+            "    duration: 5000\n"
+            "  - type: wait_for_selector\n"
+            f'    selector: "{wait_selector}"\n'
+            "    timeout: 60000\n"
+            "    retries: 5\n"
+            "    retry_delay_ms: 3000\n"
+            "  - type: wait\n"
+            "    duration: 3000\n"
+        )
+
+    @staticmethod
+    async def _take_snapshot(
+        http,
+        session_id: str,
+        api_key: str,
+        sim_name: str,
+        flows_yaml: str,
+        label: str,
+    ) -> str:
+        """Call the snapshot API and return the artifact_id.
+
+        Raises RuntimeError if the snapshot fails.
+        """
+        from plato._generated.api.v2.sessions import snapshot as sessions_snapshot
+        from plato._generated.models import (
+            AppApiV2SchemasSessionCreateSnapshotRequest,
+        )
+
+        snap = await sessions_snapshot.asyncio(
+            client=http,
+            session_id=session_id,
+            body=AppApiV2SchemasSessionCreateSnapshotRequest(
+                override_service=sim_name,
+                override_dataset="base",
+                internal_app_port=3000,
+                flows=flows_yaml,
+                target="sims.plato.so",
+            ),
+            x_api_key=api_key,
+        )
+
+        artifact_id: str | None = None
+        for _, snap_result in snap.results.items():
+            if snap_result.success and snap_result.artifact_id:
+                artifact_id = snap_result.artifact_id
+                break
+
+        if not artifact_id:
+            errors = [r.error for r in snap.results.values() if r.error]
+            raise RuntimeError(f"[{label}] Snapshot failed: {errors}")
+
+        logger.info("  [%s] Snapshot: %s", label, artifact_id)
+        return artifact_id
+
+    @staticmethod
+    async def _seed_api_routes(
+        _exec,
+        api_routes: list[dict],
+        label: str,
+        *,
+        retries: int = 1,
+    ) -> None:
+        """Hit non-dynamic API routes to seed the database before snapshot."""
+        seed_routes = [
+            r.get("route", "")
+            for r in api_routes
+            if r.get("route")
+            and "/health" not in r.get("route", "")
+            and "[" not in r.get("route", "")
+        ]
+        if not seed_routes and retries > 1:
+            seed_routes = ["/api/items", "/api/data"]
+        for route in seed_routes:
+            for attempt in range(retries):
+                out, _ = await _exec(
+                    f"curl -s -w '\\nHTTP_CODE:%{{http_code}}' "
+                    f"http://127.0.0.1:3000{route} 2>&1 | tail -c 2000",
+                    timeout=30,
+                )
+                if "HTTP_CODE:200" in out and len(out) > 30:
+                    if retries > 1:
+                        logger.info(
+                            "  [%s] Seed %s OK (attempt %d)",
+                            label,
+                            route,
+                            attempt,
+                        )
+                    break
+                if attempt < retries - 1:
+                    await asyncio.sleep(3)
+        await asyncio.sleep(3)
+
+    @staticmethod
+    def _classify_session_outcome(result: dict) -> str:
+        """Determine PASS/FAIL/ERROR from a session result dict."""
+        status = result.get("status", "")
+        if result.get("score", 0) > 0:
+            return "PASS"
+        if status in ("failed", "error", "cancelled"):
+            return "ERROR"
+        return "FAIL"
+
+    @staticmethod
+    def _task_dict_from_file(tc_file: Path) -> dict | None:
+        """Build a task dict from a testcase JSON workspace file."""
+        try:
+            tc_data = json.loads(tc_file.read_text())
+        except (json.JSONDecodeError, OSError):
+            return None
+        return {
+            "name": tc_data.get("name", tc_file.stem),
+            "instruction": tc_data.get("instruction", ""),
+            "start_url": tc_data.get("start_url", "/"),
+            "scoring_type": tc_data.get("scoring_type", "output"),
+            "output_schema": tc_data.get("output_schema"),
+            "expected_output": tc_data.get("expected_output"),
+            "scoring_config": tc_data.get("scoring_config"),
+            "expected_mutations": tc_data.get("expected_mutations"),
+        }
 
     def _tar_variant(self, variant_dir: Path, name: str) -> bytes:
         """Create a tarball of the variant directory, excluding heavy dirs.
@@ -1483,6 +1564,7 @@ else:
                             result["attempt"] = attempt
                             result["skill_name"] = vs.skill_name
                             result["slug"] = vs.slug
+                            result["outcome"] = self._classify_session_outcome(result)
 
                             session_status = result.get("status", "")
                             is_infra_failure = session_status in (
@@ -1490,13 +1572,6 @@ else:
                                 "error",
                                 "cancelled",
                             )
-
-                            if result.get("score", 0) > 0:
-                                result["outcome"] = "PASS"
-                            elif is_infra_failure:
-                                result["outcome"] = "ERROR"
-                            else:
-                                result["outcome"] = "FAIL"
 
                             attempts_for_item.append(result)
 
@@ -2283,20 +2358,9 @@ else:
                     tc_dir = workspace_dir / "testcases"
                     all_tasks: list[dict] = []
                     for tc_file in sorted(tc_dir.glob("tc-*.json")):
-                        try:
-                            tc_data = json.loads(tc_file.read_text())
-                        except (json.JSONDecodeError, OSError):
-                            continue
-                        all_tasks.append({
-                            "name": tc_data.get("name", tc_file.stem),
-                            "instruction": tc_data.get("instruction", ""),
-                            "start_url": tc_data.get("start_url", "/"),
-                            "scoring_type": tc_data.get("scoring_type", "output"),
-                            "output_schema": tc_data.get("output_schema"),
-                            "expected_output": tc_data.get("expected_output"),
-                            "scoring_config": tc_data.get("scoring_config"),
-                            "expected_mutations": tc_data.get("expected_mutations"),
-                        })
+                        task = self._task_dict_from_file(tc_file)
+                        if task:
+                            all_tasks.append(task)
                     all_new_ids = await self._create_testcases(
                         vs, all_tasks, new_artifact_id
                     )
@@ -2324,21 +2388,8 @@ else:
                         )
                         new_tc_id = None
                     else:
-                        try:
-                            tc_data = json.loads(tc_file.read_text())
-                        except (json.JSONDecodeError, OSError):
-                            tc_data = None
-                        if tc_data:
-                            task = {
-                                "name": tc_data.get("name", tc_file.stem),
-                                "instruction": tc_data.get("instruction", ""),
-                                "start_url": tc_data.get("start_url", "/"),
-                                "scoring_type": tc_data.get("scoring_type", "output"),
-                                "output_schema": tc_data.get("output_schema"),
-                                "expected_output": tc_data.get("expected_output"),
-                                "scoring_config": tc_data.get("scoring_config"),
-                                "expected_mutations": tc_data.get("expected_mutations"),
-                            }
+                        task = self._task_dict_from_file(tc_file)
+                        if task:
                             published = await self._create_testcases(
                                 vs, [task], current_artifact_id
                             )
@@ -2688,16 +2739,12 @@ else:
         """
         from plato._generated.api.v2.sessions import (
             close as sessions_close,
-            execute as sessions_execute,
             make as sessions_make,
-            snapshot as sessions_snapshot,
         )
         from plato._generated.models import (
-            AppApiV2SchemasSessionCreateSnapshotRequest,
             CreateSessionFromEnvs,
             EnvFromResource,
             Envs,
-            ExecuteCommandRequest,
             RunSessionSource,
         )
 
@@ -2723,17 +2770,6 @@ else:
             base_url=api_url,
             timeout=httpx.Timeout(300.0, connect=30.0),
         ) as http:
-
-            async def _exec(cmd: str, timeout: int = 30) -> tuple[str, bool]:
-                r = await sessions_execute.asyncio(
-                    client=http,
-                    session_id=session_id,
-                    body=ExecuteCommandRequest(command=cmd, timeout=timeout),
-                    x_api_key=api_key,
-                )
-                for _, v in r.results.items():
-                    return (v.stdout or "").strip(), bool(v.success)
-                return "", False
 
             try:
                 from plato._generated.models import (
@@ -2762,18 +2798,10 @@ else:
                     "HILLCLIMB [%s] snapshot VM %s created", vs.slug, session_id
                 )
 
-                for _ in range(60):
-                    await asyncio.sleep(3)
-                    sr = await http.get(
-                        f"/api/v2/sessions/{session_id}",
-                        headers={"X-API-Key": api_key},
-                    )
-                    jobs = sr.json().get("jobs", [{}])
-                    if jobs and jobs[0].get("status") == "running":
-                        break
-                else:
-                    raise RuntimeError("VM never reached running state")
-                logger.info("HILLCLIMB [%s] snapshot VM running", vs.slug)
+                _exec = self._make_exec_fn(http, session_id, api_key)
+                await self._poll_vm_ready(
+                    http, session_id, api_key, f"hc-{vs.slug}"
+                )
 
                 app_dir = "/tmp/variant/web"
                 preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
@@ -2937,67 +2965,19 @@ else:
                         )
                         return None
 
-                # ── Seed API routes before snapshot ────────────────────
-                seed_routes = [
-                    r.get("route", "")
-                    for r in api_routes
-                    if r.get("route")
-                    and "/health" not in r.get("route", "")
-                    and "[" not in r.get("route", "")
-                ]
-                for route in seed_routes:
-                    await _exec(
-                        f"curl -s http://127.0.0.1:3000{route} > /dev/null",
-                        timeout=15,
+                # ── Seed + Snapshot ─────────────────────────────────────
+                await self._seed_api_routes(
+                    _exec, api_routes, f"hc-{vs.slug}"
+                )
+                flows_yaml = self._build_flows_yaml(vs.slug)
+                try:
+                    new_artifact_id = await self._take_snapshot(
+                        http, session_id, api_key, sim_name,
+                        flows_yaml, f"hc-{vs.slug}",
                     )
-                await asyncio.sleep(3)
-
-                # ── Snapshot ───────────────────────────────────────────
-                wait_selector = self._derive_wait_selector(vs.slug)
-                flows_yaml = (
-                    "flows:\n"
-                    "- name: login\n"
-                    "  steps:\n"
-                    "  - type: navigate\n"
-                    "    url: /\n"
-                    "    timeout: 60000\n"
-                    "    retries: 3\n"
-                    "    retry_delay_ms: 5000\n"
-                    "  - type: wait\n"
-                    "    duration: 5000\n"
-                    "  - type: wait_for_selector\n"
-                    f'    selector: "{wait_selector}"\n'
-                    "    timeout: 60000\n"
-                    "    retries: 5\n"
-                    "    retry_delay_ms: 3000\n"
-                    "  - type: wait\n"
-                    "    duration: 3000\n"
-                )
-                snap = await sessions_snapshot.asyncio(
-                    client=http,
-                    session_id=session_id,
-                    body=AppApiV2SchemasSessionCreateSnapshotRequest(
-                        override_service=sim_name,
-                        override_dataset="base",
-                        internal_app_port=3000,
-                        flows=flows_yaml,
-                        target="sims.plato.so",
-                    ),
-                    x_api_key=api_key,
-                )
-
-                new_artifact_id: str | None = None
-                for _, snap_result in snap.results.items():
-                    if snap_result.success and snap_result.artifact_id:
-                        new_artifact_id = snap_result.artifact_id
-                        break
-
-                if not new_artifact_id:
-                    errors = [r.error for r in snap.results.values() if r.error]
-                    logger.error("HILLCLIMB [%s] snapshot failed: %s", vs.slug, errors)
+                except RuntimeError as e:
+                    logger.error("HILLCLIMB [%s] %s", vs.slug, e)
                     return None
-
-                logger.info("HILLCLIMB [%s] new snapshot: %s", vs.slug, new_artifact_id)
                 return new_artifact_id
 
             finally:
@@ -3055,14 +3035,12 @@ else:
                             result["session_num"] = session_num
                             result["attempt"] = attempt
 
-                            status = result.get("status", "")
-                            is_infra = status in ("failed", "error", "cancelled")
-                            if result.get("score", 0) > 0:
-                                result["outcome"] = "PASS"
-                            elif is_infra:
-                                result["outcome"] = "ERROR"
-                            else:
-                                result["outcome"] = "FAIL"
+                            result["outcome"] = self._classify_session_outcome(
+                                result
+                            )
+                            is_infra = result.get("status", "") in (
+                                "failed", "error", "cancelled",
+                            )
 
                             if is_infra and attempt < 3:
                                 continue
