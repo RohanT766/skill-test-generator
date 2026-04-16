@@ -1007,6 +1007,7 @@ else:
                             enabled=True,
                             imgUrl=PLATO_LOGO,
                             internalAppPort=3000,
+                            metadata={"is_skill_gym": True},
                         ),
                         x_api_key=api_key,
                     )

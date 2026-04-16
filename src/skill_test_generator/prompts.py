@@ -441,8 +441,13 @@ that agents attempt, and the full session trajectories of every agent run.
 
 ## Your Goal
 
-Make the testcases HARDER so that the agent pass rate drops to the target \
-threshold, WITHOUT making them impossible or testing unrelated skills.
+Make the simulator HARDER so that the agent pass rate drops to the target \
+threshold, WITHOUT making tasks impossible or testing unrelated skills.
+
+The most important thing is that the simulator itself genuinely strains \
+the target skill. A well-designed sim forces agents to deeply exercise \
+the skill to get the right answer — the difficulty comes from the \
+APPLICATION, not from vague wording in the prompt.
 
 ## Context files (all paths relative to workspace root)
 
@@ -475,36 +480,59 @@ Read ALL session trajectories carefully. For each session, determine:
 
 ### Step 3: Plan difficulty adjustments
 
-Decide what to change. Your options, IN ORDER OF PREFERENCE:
+Your PRIMARY lever is the simulator itself — its code, data, and UI \
+structure. The testcase prompt should stay clear and unambiguous. \
+Difficulty must come from the app being genuinely harder to navigate, \
+not from tricky or vague wording.
 
-1. **Edit testcase prompt/scoring** (PREFERRED) — make the question harder, \
-   require more precision, add distractors to the prompt, tighten scoring \
-   criteria. This is cheapest and safest.
+**PRIORITY ORDER:**
 
-2. **Edit testcase + sim code** — change UI structure to make the skill \
-   harder to exercise (e.g. add more pages to paginate through, make text \
-   more truncated, add more similar-looking entities). Only if prompt-only \
-   changes are insufficient.
+1. **Edit sim code + data to strain the skill** (STRONGLY PREFERRED) — \
+   This is the most effective approach. Change the application so that \
+   exercising the skill is genuinely harder. More pages to paginate \
+   through. More similar-looking entities to disambiguate. Data scattered \
+   across more locations. Deeper nesting. More distractors in the UI. \
+   Truncation that hides more critical information. The app should make \
+   the agent WORK HARDER to use the skill correctly.
 
-3. **Edit sim data** (LAST RESORT) — change the seeded database values. \
-   Only do this if there is truly no other way. If you change data, you \
-   MUST update ALL testcase scoring configs and expected values to match \
-   the new data.
+2. **Edit sim data** — Change the seeded database values to create harder \
+   scenarios. Add more decoy records. Make the correct answer less \
+   obvious. Scatter relevant data across more pages/tables. Ensure the \
+   naive approach (looking at first-visible data) gives a confident WRONG \
+   answer. If you change data, you MUST update ALL testcase scoring \
+   configs and expected values to match.
 
-### IMPORTANT: What does NOT work
+3. **Edit testcase prompt/scoring** (LAST RESORT, use sparingly) — Only \
+   tweak the prompt if you ALSO make sim changes. A prompt-only edit \
+   almost never reduces pass rates. The prompt must remain clear and \
+   unambiguous — never make it vague or remove key context to trick the \
+   agent. If the task asks "what is the total across all locations", \
+   DO NOT remove "across all locations" to make it confusing — instead \
+   make the aggregation itself harder in the sim.
 
-- **Small added conditionals are NOT enough.** Adding a single extra \
-  WHERE clause or filter (e.g. "count active dogs" instead of "count dogs") \
-  almost never reduces the pass rate. Agents handle simple compound \
-  conditions trivially.
-- **Keyword-swapping alone is NOT enough.** Replacing one domain term with \
-  another rarely confuses agents if the UI still has obvious labels.
-- You need STRUCTURAL difficulty: require the agent to cross-reference \
-  multiple pages, aggregate data across tabs, navigate pagination that \
-  isn't obvious, distinguish visually similar items, or reason about \
-  implicit relationships not directly shown in the UI.
-- Think about what would trip up a fast but careless reader. What requires \
-  CAREFUL attention vs. surface-level scanning?
+### CRITICAL: What does NOT work — prompt-only changes FAIL
+
+**Do NOT rely on prompt edits alone.** Evidence shows that prompt-only \
+changes almost never reduce pass rates:
+- Making the prompt more vague or ambiguous does NOT make the task harder \
+  — it makes it unfair. The agent either interprets it correctly (100%) \
+  or gets confused and gives garbage (0%). There is no middle ground.
+- Removing specificity from the instruction (e.g. removing "across all \
+  locations" or "combining all pages") either has no effect or causes \
+  overcorrection to 0%.
+- Adding compound conditions, keyword swaps, or filter criteria to the \
+  prompt alone almost never works. Agents handle these trivially.
+- Renaming output fields in the schema is cosmetic and has zero effect.
+
+**What DOES work:**
+- Making the SIM itself strain the skill. If the skill is pagination, \
+  add more pages and make page boundaries fall in tricky places. If the \
+  skill is disambiguation, add more near-identical entities. If the skill \
+  is aggregation, scatter data across more tabs/views and add decoy \
+  subtotals that look like the answer.
+- The difficulty should be in the APPLICATION STRUCTURE, not in the \
+  question wording. A clear question + a challenging app = the right \
+  difficulty. A vague question + an easy app = unfair and broken.
 
 ### IMPORTANT: Do NOT overcorrect
 
@@ -512,13 +540,17 @@ Decide what to change. Your options, IN ORDER OF PREFERENCE:
 - The target is the sweet spot — some agents should pass, some should fail.
 - Make sure an expert human can still complete the task in a reasonable time.
 - If you're making sim code changes, ensure the app still builds and runs.
+- Keep the testcase prompt CLEAR and UNAMBIGUOUS. Difficulty comes from the \
+  app, not from confusing instructions.
 
 CRITICAL RULES:
 - Do NOT make the task impossible. An expert human should still be able to \
   complete it.
 - Do NOT test different skills. Stay focused on the EXACT skill defined.
 - Do NOT change the fundamental nature of the app or its chrome/layout.
-- Prefer bold structural changes over many small tweaks.
+- Prefer bold structural sim changes over prompt tweaks.
+- The testcase prompt must remain a clear, specific question. NEVER make \
+  it vague to "trick" the agent.
 
 ## Task Design Guidelines
 
