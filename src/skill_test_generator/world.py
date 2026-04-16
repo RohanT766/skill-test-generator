@@ -1359,18 +1359,15 @@ else:
         logger.info("  Uploaded to s3://%s/%s", S3_BUCKET, key)
         return url
 
-    def _upload_icon_svg(self, sim_name: str, icon_svg: str) -> str | None:
-        """Upload an icon SVG to S3 and return a long-lived presigned URL."""
+    @staticmethod
+    def _icon_svg_to_data_uri(icon_svg: str) -> str | None:
+        """Convert an SVG string to a data URI for use as imgUrl."""
         if not icon_svg or not icon_svg.strip().startswith("<svg"):
             return None
-        try:
-            key = f"{S3_PREFIX}/icons/{sim_name}.svg"
-            return self._upload_to_s3(
-                icon_svg.encode("utf-8"), key, expires=604800,
-            )
-        except Exception as e:
-            logger.warning("Could not upload icon for %s: %s", sim_name, e)
-            return None
+        import base64
+
+        encoded = base64.b64encode(icon_svg.strip().encode("utf-8")).decode("ascii")
+        return f"data:image/svg+xml;base64,{encoded}"
 
     async def _register_simulator(
         self,
@@ -1396,7 +1393,7 @@ else:
         except Exception:
             _sim_config = SimulatorConfig.from_dict({"type": "docker_app"})
 
-        icon_url = self._upload_icon_svg(base_name, icon_svg) or "https://plato.so/favicon.ico"
+        icon_url = self._icon_svg_to_data_uri(icon_svg) or "https://plato.so/favicon.ico"
 
         candidates = [base_name] + [f"{base_name}-v{n}" for n in range(2, 100)]
         for name in candidates:
