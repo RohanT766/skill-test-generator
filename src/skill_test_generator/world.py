@@ -2838,28 +2838,27 @@ else:
                     timeout=180,
                 )
 
-                # ── BUILD if code changed ──────────────────────────────
-                needs_rebuild = edits.get("sim_code_changed", False)
-                if needs_rebuild:
-                    await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
-                    await _exec(f"rm -rf {app_dir}/.next", timeout=10)
-                    await _exec(
-                        f"{preamble} && cd {app_dir} && bun install 2>&1 | tail -5",
-                        timeout=300,
+                # ── BUILD — always needed since tarball has no .next ─────
+                needs_rebuild = True
+                await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
+                await _exec(f"rm -rf {app_dir}/.next", timeout=10)
+                await _exec(
+                    f"{preamble} && cd {app_dir} && bun install 2>&1 | tail -5",
+                    timeout=300,
+                )
+                build_out, build_ok = await _exec(
+                    f"{preamble} && cd {app_dir} && "
+                    "NODE_ENV=production NEXT_DIST_DIR=.next "
+                    "bun ./node_modules/next/dist/bin/next build 2>&1 | tail -20",
+                    timeout=300,
+                )
+                if not build_ok:
+                    logger.error(
+                        "HILLCLIMB [%s] rebuild failed: %s",
+                        vs.slug,
+                        build_out[-500:],
                     )
-                    build_out, build_ok = await _exec(
-                        f"{preamble} && cd {app_dir} && "
-                        "NODE_ENV=production NEXT_DIST_DIR=.next "
-                        "bun ./node_modules/next/dist/bin/next build 2>&1 | tail -20",
-                        timeout=300,
-                    )
-                    if not build_ok:
-                        logger.error(
-                            "HILLCLIMB [%s] rebuild failed: %s",
-                            vs.slug,
-                            build_out[-500:],
-                        )
-                        return None
+                    return None
 
                 # ── Start server + verify ──────────────────────────────
                 await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
