@@ -15,6 +15,7 @@ import httpx
 from plato.worlds import BaseWorld, Observation, StepResult, register_world
 
 from .config import (
+    IterationRecord,
     SkillDefinition,
     SkillTestGeneratorConfig,
     SkillTestGeneratorState,
@@ -176,14 +177,18 @@ class SkillTestGeneratorWorld(
                 "Resuming from pre-existing variants (%d)", len(config.resume_variants)
             )
             for rv in config.resume_variants:
+                has_results = bool(rv.get("task_results"))
                 vs = VariantStatus(
                     skill_name=rv["skill_name"],
+                    short_name=rv.get("short_name", ""),
                     slug=rv["slug"],
                     sim_name=rv.get("sim_name", ""),
                     artifact_id=rv.get("artifact_id", ""),
                     testcase_ids=rv.get("testcase_ids", []),
                     task_count=len(rv.get("testcase_ids", [])),
-                    stage="published",
+                    task_results=rv.get("task_results", []),
+                    chronos_session_ids=rv.get("chronos_session_ids", []),
+                    stage="evaluated" if has_results else "published",
                 )
                 state.variants.append(vs)
             state.skills_loaded = len({vs.skill_name for vs in state.variants})
@@ -194,9 +199,21 @@ class SkillTestGeneratorWorld(
             Stage.CODEGEN,
             Stage.RUN,
             Stage.EVALUATE,
+            Stage.HILLCLIMB,
         ]
         if config.resume_variants:
-            stages = [Stage.RUN, Stage.EVALUATE]
+            has_existing_results = any(
+                rv.get("task_results") for rv in config.resume_variants
+            )
+            if has_existing_results and config.hillclimb.enabled:
+                stages = [Stage.HILLCLIMB]
+            elif has_existing_results:
+                stages = [Stage.EVALUATE]
+            else:
+                resume_stages = [Stage.RUN, Stage.EVALUATE]
+                if config.hillclimb.enabled:
+                    resume_stages.append(Stage.HILLCLIMB)
+                stages = resume_stages
         elif config.stage:
             stages = [config.stage]
         else:
@@ -208,6 +225,7 @@ class SkillTestGeneratorWorld(
             Stage.CODEGEN: self._run_variant_pipelines,
             Stage.RUN: self._run_agent_eval,
             Stage.EVALUATE: self._run_evaluate,
+            Stage.HILLCLIMB: self._run_hillclimb,
         }
 
         for stage in stages:
@@ -1977,6 +1995,837 @@ else:
                             res.get("score", 0),
                             res.get("reason", "n/a"),
                         )
+        logger.info("=" * 70)
+
+    # ------------------------------------------------------------------
+    # HILLCLIMB: iteratively increase testcase difficulty
+    # ------------------------------------------------------------------
+
+    async def _run_hillclimb(self) -> None:
+        """Hillclimb stage: make passing testcases harder until target failure rate."""
+        config = self.config
+        hc = config.hillclimb
+
+        if not hc.enabled:
+            logger.info("Skipping HILLCLIMB stage: not enabled")
+            return
+
+        if config.sessions_per_testcase <= 0:
+            logger.info("Skipping HILLCLIMB stage: sessions_per_testcase is 0")
+            return
+
+        n_sessions = config.sessions_per_testcase
+        target_max_pass_rate = (n_sessions - hc.total_failures) / n_sessions
+        logger.info(
+            "HILLCLIMB: target max pass rate = %.1f%% "
+            "(sessions=%d, target_failures=%d, max_retries=%d)",
+            target_max_pass_rate * 100,
+            n_sessions,
+            hc.total_failures,
+            hc.max_retries,
+        )
+
+        if not self._all_tasks:
+            self._load_tasks_from_disk()
+        if not self._variant_specs:
+            self._load_variant_specs_from_disk()
+
+        # Seed iteration-0 from existing results for every evaluated variant
+        for vs in self.state.variants:
+            if vs.stage != "evaluated" or not vs.task_results:
+                continue
+            if vs.hillclimb_iterations:
+                continue
+            passed = sum(1 for r in vs.task_results if r.get("outcome") == "PASS")
+            failed = sum(1 for r in vs.task_results if r.get("outcome") == "FAIL")
+            completed = passed + failed
+            rate = passed / completed if completed else 0.0
+            vs.hillclimb_iterations.append(
+                IterationRecord(
+                    iteration=0,
+                    artifact_id=vs.artifact_id,
+                    testcase_ids=list(vs.testcase_ids),
+                    task_results=list(vs.task_results),
+                    pass_rate=rate,
+                )
+            )
+            vs.best_iteration = 0
+
+        candidates = [
+            vs
+            for vs in self.state.variants
+            if vs.hillclimb_iterations
+            and vs.hillclimb_iterations[vs.best_iteration].pass_rate
+            > target_max_pass_rate
+        ]
+        logger.info(
+            "HILLCLIMB: %d / %d variants exceed target (%.1f%%)",
+            len(candidates),
+            len([v for v in self.state.variants if v.hillclimb_iterations]),
+            target_max_pass_rate * 100,
+        )
+        if not candidates:
+            logger.info("HILLCLIMB: nothing to do — all variants within target")
+            self._log_hillclimb_summary(target_max_pass_rate)
+            return
+
+        sem = asyncio.Semaphore(config.vm_concurrency)
+
+        async def _hillclimb_one(vs: VariantStatus) -> None:
+            async with sem:
+                await self._hillclimb_variant(vs, target_max_pass_rate, hc.max_retries)
+
+        await asyncio.gather(*[_hillclimb_one(vs) for vs in candidates])
+
+        self._log_hillclimb_summary(target_max_pass_rate)
+
+    async def _hillclimb_variant(
+        self,
+        vs: VariantStatus,
+        target_max_pass_rate: float,
+        max_retries: int,
+    ) -> None:
+        """Run the hillclimb loop for a single variant."""
+        config = self.config
+
+        for retry in range(1, max_retries + 1):
+            current = vs.hillclimb_iterations[vs.best_iteration]
+            logger.info(
+                "HILLCLIMB [%s] iteration %d/%d — current pass_rate=%.1f%%",
+                vs.slug,
+                retry,
+                max_retries,
+                current.pass_rate * 100,
+            )
+
+            if current.pass_rate <= target_max_pass_rate:
+                logger.info("HILLCLIMB [%s] already within target, stopping", vs.slug)
+                break
+
+            # (a) Fetch trajectories for the latest sessions
+            trajectory_data = await self._hc_fetch_trajectories(vs, current)
+
+            # (b) Write workspace context for the agent
+            workspace_dir = config.output / "hillclimb" / vs.slug / f"iter-{retry}"
+            workspace_dir.mkdir(parents=True, exist_ok=True)
+            await self._hc_write_workspace(vs, current, trajectory_data, workspace_dir)
+
+            # (c) Launch claude-code agent
+            edits = await self._hc_run_agent(vs, workspace_dir, retry)
+            if not edits:
+                logger.warning(
+                    "HILLCLIMB [%s] agent produced no edits.json, skipping", vs.slug
+                )
+                continue
+
+            edits_summary = edits.get("rationale", "")[:200]
+            edit_type = edits.get("edit_type", "testcase_only")
+            sim_changed = edits.get("sim_changed", False) or edit_type in (
+                "sim_and_testcase",
+                "sim_only",
+            )
+
+            # (d) Apply edits
+            new_artifact_id = current.artifact_id
+            if sim_changed:
+                new_artifact_id = await self._hc_apply_sim_edits(
+                    vs, workspace_dir, current.artifact_id, edits
+                )
+                if not new_artifact_id:
+                    logger.error(
+                        "HILLCLIMB [%s] sim edit failed, skipping iteration", vs.slug
+                    )
+                    continue
+
+            new_testcase_ids = await self._hc_publish_testcases(
+                vs, workspace_dir, new_artifact_id
+            )
+            if not new_testcase_ids:
+                logger.error(
+                    "HILLCLIMB [%s] testcase publish failed, skipping", vs.slug
+                )
+                continue
+
+            # (e) Re-run benchmark
+            new_results = await self._hc_rerun_benchmark(vs, new_testcase_ids)
+
+            # (f) Score and compare
+            passed = sum(1 for r in new_results if r.get("outcome") == "PASS")
+            failed = sum(1 for r in new_results if r.get("outcome") == "FAIL")
+            completed = passed + failed
+            new_rate = passed / completed if completed else 0.0
+
+            iteration_record = IterationRecord(
+                iteration=retry,
+                artifact_id=new_artifact_id,
+                testcase_ids=new_testcase_ids,
+                task_results=new_results,
+                pass_rate=new_rate,
+                edits_summary=edits_summary,
+            )
+            vs.hillclimb_iterations.append(iteration_record)
+
+            logger.info(
+                "HILLCLIMB [%s] iteration %d result: %.1f%% (was %.1f%%)",
+                vs.slug,
+                retry,
+                new_rate * 100,
+                current.pass_rate * 100,
+            )
+
+            if new_rate <= target_max_pass_rate:
+                vs.best_iteration = len(vs.hillclimb_iterations) - 1
+                logger.info(
+                    "HILLCLIMB [%s] target reached at iteration %d", vs.slug, retry
+                )
+                break
+            elif new_rate < current.pass_rate:
+                vs.best_iteration = len(vs.hillclimb_iterations) - 1
+                logger.info(
+                    "HILLCLIMB [%s] improved (%.1f%% → %.1f%%), continuing",
+                    vs.slug,
+                    current.pass_rate * 100,
+                    new_rate * 100,
+                )
+
+    async def _hc_fetch_trajectories(
+        self, vs: VariantStatus, current: IterationRecord
+    ) -> dict[str, dict]:
+        """Fetch session trajectories from Chronos for the current iteration."""
+        from plato.chronos.sdk import AsyncChronos
+
+        config = self.config
+        chronos = AsyncChronos(
+            base_url=config.chronos_url, api_key=config.plato_api_key
+        )
+
+        trajectories: dict[str, dict] = {}
+        for result in current.task_results:
+            chronos_id = result.get("chronos_id", "")
+            if not chronos_id:
+                continue
+            try:
+                trajectory = await chronos.get_trajectory(chronos_id)
+                trajectories[chronos_id] = {
+                    "trajectory": trajectory.model_dump(mode="json"),
+                    "testcase_id": result.get("testcase_id", ""),
+                    "task_name": result.get("task_name", ""),
+                    "outcome": result.get("outcome", ""),
+                    "score": result.get("score", 0),
+                }
+            except Exception as e:
+                logger.warning(
+                    "HILLCLIMB [%s] failed to fetch trajectory for %s: %s",
+                    vs.slug,
+                    chronos_id,
+                    e,
+                )
+        return trajectories
+
+    async def _hc_write_workspace(
+        self,
+        vs: VariantStatus,
+        current: IterationRecord,
+        trajectory_data: dict[str, dict],
+        workspace_dir: Path,
+    ) -> None:
+        """Write all context the hillclimb agent needs to the workspace."""
+        spec = next((s for s in self._variant_specs if s.get("slug") == vs.slug), {})
+        skill_def = next((s for s in self._skills if s.name == vs.skill_name), None)
+
+        (workspace_dir / "skill.json").write_text(
+            json.dumps(
+                {
+                    "name": vs.skill_name,
+                    "short_name": vs.short_name,
+                    "description": skill_def.description if skill_def else "",
+                },
+                indent=2,
+            )
+        )
+        (workspace_dir / "spec.json").write_text(json.dumps(spec, indent=2))
+
+        results_list = []
+        for r in current.task_results:
+            results_list.append(
+                {
+                    "testcase_id": r.get("testcase_id", ""),
+                    "task_name": r.get("task_name", ""),
+                    "outcome": r.get("outcome", ""),
+                    "score": r.get("score", 0),
+                    "chronos_id": r.get("chronos_id", ""),
+                    "scoring_details": r.get("scoring_details"),
+                }
+            )
+        (workspace_dir / "results.json").write_text(json.dumps(results_list, indent=2))
+
+        # Write testcase configs
+        tc_dir = workspace_dir / "testcases"
+        tc_dir.mkdir(exist_ok=True)
+        tasks = self._all_tasks.get(vs.slug, [])
+        for i, tc_id in enumerate(current.testcase_ids):
+            task = tasks[i] if i < len(tasks) else {}
+            (tc_dir / f"tc-{i:03d}.json").write_text(
+                json.dumps(
+                    {
+                        "testcase_id": tc_id,
+                        "name": task.get("name", ""),
+                        "instruction": task.get("instruction", ""),
+                        "start_url": task.get("start_url", "/"),
+                        "scoring_type": task.get("scoring_type", "output"),
+                        "expected_output": task.get("expected_output"),
+                        "output_schema": task.get("output_schema"),
+                        "scoring_config": task.get("scoring_config"),
+                    },
+                    indent=2,
+                )
+            )
+
+        # Write session trajectories
+        sess_dir = workspace_dir / "sessions"
+        sess_dir.mkdir(exist_ok=True)
+        for chronos_id, tdata in trajectory_data.items():
+            safe_id = chronos_id[:12]
+            sd = sess_dir / safe_id
+            sd.mkdir(exist_ok=True)
+            (sd / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "chronos_id": chronos_id,
+                        "testcase_id": tdata["testcase_id"],
+                        "task_name": tdata["task_name"],
+                        "outcome": tdata["outcome"],
+                        "score": tdata["score"],
+                    },
+                    indent=2,
+                )
+            )
+            (sd / "trajectory.json").write_text(
+                json.dumps(tdata["trajectory"], indent=2, default=str)
+            )
+
+        # Copy sim source code
+        sim_src = self._code_data_dir() / "variants" / vs.slug / "web"
+        sim_dest = workspace_dir / "sim"
+        if sim_src.is_dir():
+            import shutil
+
+            if sim_dest.exists():
+                shutil.rmtree(sim_dest)
+            shutil.copytree(
+                sim_src,
+                sim_dest,
+                ignore=shutil.ignore_patterns(
+                    "node_modules", ".next", ".next-*", ".turbo", "__pycache__"
+                ),
+            )
+
+    async def _hc_run_agent(
+        self, vs: VariantStatus, workspace_dir: Path, iteration: int
+    ) -> dict | None:
+        """Launch the hillclimb claude-code agent and return parsed edits.json."""
+        from .prompts import HILLCLIMB_AGENT_PROMPT
+
+        config = self.config
+
+        instruction = (
+            f"{HILLCLIMB_AGENT_PROMPT}\n\n"
+            f"## Current State\n"
+            f"- Skill: {vs.skill_name}\n"
+            f"- Variant: {vs.slug}\n"
+            f"- Iteration: {iteration}\n"
+            f"- All files are in the workspace root.\n"
+            f"- Read skill.json, spec.json, results.json, testcases/, and sessions/ first.\n"
+            f"- Write your edits directly to testcases/ and/or sim/ directories.\n"
+            f"- When done, write edits.json to the workspace root.\n"
+        )
+
+        agent_config = config.coder_agent
+        if not agent_config:
+            from plato.worlds import AgentConfig
+
+            agent_config = AgentConfig(package="claude-code:latest")
+
+        try:
+            runner = self.agent(
+                agent_config,
+                display_name=f"hillclimb-{vs.slug}-i{iteration}",
+                workspaces=[self.workspace("output")],
+            )
+            await runner.run(instruction=instruction)
+        except Exception as e:
+            logger.error("HILLCLIMB [%s] agent failed: %s", vs.slug, e)
+            return None
+
+        edits_path = workspace_dir / "edits.json"
+        if not edits_path.exists():
+            for candidate in workspace_dir.rglob("edits.json"):
+                edits_path = candidate
+                break
+        if not edits_path.exists():
+            return None
+
+        try:
+            return json.loads(edits_path.read_text())
+        except (json.JSONDecodeError, OSError) as e:
+            logger.error("HILLCLIMB [%s] failed to parse edits.json: %s", vs.slug, e)
+            return None
+
+    async def _hc_apply_sim_edits(
+        self,
+        vs: VariantStatus,
+        workspace_dir: Path,
+        current_artifact_id: str,
+        edits: dict,
+    ) -> str | None:
+        """Boot from existing snapshot, apply sim edits, re-snapshot.
+
+        Returns new artifact_id or None on failure.
+        """
+        from plato._generated.api.v2.sessions import (
+            close as sessions_close,
+            execute as sessions_execute,
+            make as sessions_make,
+            snapshot as sessions_snapshot,
+        )
+        from plato._generated.models import (
+            AppApiV2SchemasSessionCreateSnapshotRequest,
+            CreateSessionFromEnvs,
+            EnvFromResource,
+            Envs,
+            ExecuteCommandRequest,
+            RunSessionSource,
+        )
+
+        config = self.config
+        api_key = config.plato_api_key
+        api_url = config.plato_api_url
+        sim_name = vs.sim_name
+        session_id: str | None = None
+
+        sim_dir = workspace_dir / "sim"
+        if not sim_dir.is_dir():
+            logger.error("HILLCLIMB [%s] no sim/ directory for edits", vs.slug)
+            return None
+
+        async with httpx.AsyncClient(
+            base_url=api_url,
+            timeout=httpx.Timeout(300.0, connect=30.0),
+        ) as http:
+
+            async def _exec(cmd: str, timeout: int = 30) -> tuple[str, bool]:
+                r = await sessions_execute.asyncio(
+                    client=http,
+                    session_id=session_id,
+                    body=ExecuteCommandRequest(command=cmd, timeout=timeout),
+                    x_api_key=api_key,
+                )
+                for _, v in r.results.items():
+                    return (v.stdout or "").strip(), bool(v.success)
+                return "", False
+
+            try:
+                from plato._generated.models import (
+                    AppSchemasBuildModelsSimConfigCompute as SimConfigCompute,
+                )
+
+                env = EnvFromResource(
+                    simulator=sim_name,
+                    artifact=current_artifact_id,
+                    sim_config=SimConfigCompute(
+                        cpus=config.pipeline_vm_cpus,
+                        memory=config.pipeline_vm_memory,
+                        disk=10240,
+                    ),
+                )
+                body = CreateSessionFromEnvs(
+                    envs=[Envs(root=env)],
+                    timeout=1800,
+                    source=RunSessionSource.SDK,
+                )
+                resp = await sessions_make.asyncio(
+                    client=http, body=body, x_api_key=api_key
+                )
+                session_id = resp.session_id
+                logger.info(
+                    "HILLCLIMB [%s] snapshot VM %s created", vs.slug, session_id
+                )
+
+                for _ in range(60):
+                    await asyncio.sleep(3)
+                    sr = await http.get(
+                        f"/api/v2/sessions/{session_id}",
+                        headers={"X-API-Key": api_key},
+                    )
+                    jobs = sr.json().get("jobs", [{}])
+                    if jobs and jobs[0].get("status") == "running":
+                        break
+                else:
+                    raise RuntimeError("VM never reached running state")
+                logger.info("HILLCLIMB [%s] snapshot VM running", vs.slug)
+
+                # Upload edited sim code as tarball
+                tarball = self._tar_variant(sim_dir.parent, f"hc-{vs.slug}")
+                url = self._upload_to_s3(
+                    tarball,
+                    f"{S3_PREFIX}/{vs.sim_name}-hc-{len(vs.hillclimb_iterations)}.tar.gz",
+                )
+
+                app_dir = "/tmp/variant/web"
+                preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
+
+                await _exec(
+                    f"curl -sfL '{url}' -o /tmp/hc-variant.tar.gz && "
+                    "mkdir -p /tmp/variant && "
+                    "tar xzf /tmp/hc-variant.tar.gz -C /tmp/variant --strip-components=0",
+                    timeout=180,
+                )
+
+                needs_rebuild = edits.get("sim_code_changed", False)
+                if needs_rebuild:
+                    await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
+                    await _exec(f"rm -rf {app_dir}/.next", timeout=10)
+                    await _exec(
+                        f"{preamble} && cd {app_dir} && bun install 2>&1 | tail -5",
+                        timeout=300,
+                    )
+                    build_out, build_ok = await _exec(
+                        f"{preamble} && cd {app_dir} && "
+                        "NODE_ENV=production NEXT_DIST_DIR=.next "
+                        "node ./node_modules/next/dist/bin/next build 2>&1 | tail -20",
+                        timeout=300,
+                    )
+                    if not build_ok:
+                        logger.error(
+                            "HILLCLIMB [%s] rebuild failed: %s",
+                            vs.slug,
+                            build_out[-500:],
+                        )
+                        return None
+
+                # Re-seed if data changed
+                if edits.get("sim_data_changed", False):
+                    await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
+                    await _exec(
+                        f"{preamble} && cd {app_dir} && mkdir -p /tmp/pglite-data && "
+                        "NEXT_DIST_DIR=.next NODE_ENV=production PORT=3000 "
+                        "nohup node ./node_modules/next/dist/bin/next start "
+                        "--hostname 0.0.0.0 -p 3000 > /tmp/dev.log 2>&1 &",
+                        timeout=30,
+                    )
+                    for _ in range(20):
+                        out, _ = await _exec(
+                            "curl -sf http://127.0.0.1:3000/api/health && echo OK || echo FAIL",
+                            timeout=10,
+                        )
+                        if "OK" in out:
+                            break
+                        await asyncio.sleep(3)
+
+                    spec = next(
+                        (s for s in self._variant_specs if s.get("slug") == vs.slug),
+                        {},
+                    )
+                    api_routes = [
+                        r for r in spec.get("api_routes", []) if isinstance(r, dict)
+                    ]
+                    for r in api_routes:
+                        route = r.get("route", "")
+                        if route and "/health" not in route and "[" not in route:
+                            await _exec(
+                                f"curl -s http://127.0.0.1:3000{route} > /dev/null",
+                                timeout=15,
+                            )
+                    await asyncio.sleep(3)
+
+                # Snapshot
+                wait_selector = self._derive_wait_selector(vs.slug)
+                flows_yaml = (
+                    "flows:\n"
+                    "- name: login\n"
+                    "  steps:\n"
+                    "  - type: navigate\n"
+                    "    url: /\n"
+                    "    timeout: 60000\n"
+                    "    retries: 3\n"
+                    "    retry_delay_ms: 5000\n"
+                    "  - type: wait\n"
+                    "    duration: 5000\n"
+                    "  - type: wait_for_selector\n"
+                    f'    selector: "{wait_selector}"\n'
+                    "    timeout: 60000\n"
+                    "    retries: 5\n"
+                    "    retry_delay_ms: 3000\n"
+                    "  - type: wait\n"
+                    "    duration: 3000\n"
+                )
+                snap = await sessions_snapshot.asyncio(
+                    client=http,
+                    session_id=session_id,
+                    body=AppApiV2SchemasSessionCreateSnapshotRequest(
+                        override_service=sim_name,
+                        override_dataset="base",
+                        internal_app_port=3000,
+                        flows=flows_yaml,
+                        target="sims.plato.so",
+                    ),
+                    x_api_key=api_key,
+                )
+
+                new_artifact_id: str | None = None
+                for _, snap_result in snap.results.items():
+                    if snap_result.success and snap_result.artifact_id:
+                        new_artifact_id = snap_result.artifact_id
+                        break
+
+                if not new_artifact_id:
+                    errors = [r.error for r in snap.results.values() if r.error]
+                    logger.error("HILLCLIMB [%s] snapshot failed: %s", vs.slug, errors)
+                    return None
+
+                logger.info("HILLCLIMB [%s] new snapshot: %s", vs.slug, new_artifact_id)
+                return new_artifact_id
+
+            finally:
+                if session_id:
+                    try:
+                        await sessions_close.asyncio(
+                            client=http,
+                            session_id=session_id,
+                            x_api_key=api_key,
+                        )
+                    except Exception:
+                        pass
+
+    async def _hc_publish_testcases(
+        self,
+        vs: VariantStatus,
+        workspace_dir: Path,
+        artifact_id: str,
+    ) -> list[str]:
+        """Create new testcases from the (possibly edited) workspace testcase files."""
+        from .task_generator import _build_v2_scoring_config
+
+        config = self.config
+        tc_dir = workspace_dir / "testcases"
+        if not tc_dir.is_dir():
+            return []
+
+        from plato._generated.api.v1.simulator import get_simulator_id
+        from plato._generated.api.v2.testcases import create_testcase
+        from plato._generated.models import CreateTestCaseRequest
+
+        from .skill_ingestion import _slugify as _slug
+
+        skill_tag = _slug(vs.short_name or vs.skill_name)
+        tc_tags = ["skill-test-generator", "hillclimb", skill_tag]
+        new_ids: list[str] = []
+
+        async with httpx.AsyncClient(
+            base_url=config.plato_api_url,
+            timeout=httpx.Timeout(60.0),
+        ) as http:
+            simulator_id: int | None = None
+            try:
+                sid_resp = await get_simulator_id.asyncio(
+                    client=http,
+                    simulator_name=vs.sim_name,
+                    x_api_key=config.plato_api_key,
+                )
+                simulator_id = sid_resp.simulator_id
+            except Exception:
+                pass
+
+            tc_files = sorted(tc_dir.glob("tc-*.json"))
+            for tc_file in tc_files:
+                try:
+                    tc_data = json.loads(tc_file.read_text())
+                except (json.JSONDecodeError, OSError):
+                    continue
+
+                tc_name = f"{vs.slug}-hc-{tc_data.get('name', tc_file.stem)}"
+                v2_scoring = _build_v2_scoring_config(tc_data, vs.sim_name)
+
+                req = CreateTestCaseRequest(
+                    name=tc_name,
+                    prompt=tc_data.get("instruction", ""),
+                    start_url=tc_data.get("start_url", "/"),
+                    simulator_artifact_ids=[artifact_id],
+                    simulator_id=simulator_id,
+                    tags=tc_tags,
+                )
+                if v2_scoring:
+                    req.v2_scoring_config = v2_scoring
+                if tc_data.get("scoring_type") == "output" and tc_data.get(
+                    "output_schema"
+                ):
+                    req.output_schema = tc_data["output_schema"]
+
+                try:
+                    resp = await create_testcase.asyncio(
+                        client=http,
+                        body=req,
+                        x_api_key=config.plato_api_key,
+                    )
+                    tc = resp.test_case
+                    tc_id = (
+                        tc.get("publicId")
+                        or tc.get("public_id")
+                        or str(tc.get("id", ""))
+                    )
+                    new_ids.append(tc_id)
+                    logger.info(
+                        "HILLCLIMB [%s] created testcase '%s' -> %s",
+                        vs.slug,
+                        tc_name,
+                        tc_id,
+                    )
+                except Exception as e:
+                    logger.error(
+                        "HILLCLIMB [%s] testcase creation error for '%s': %s",
+                        vs.slug,
+                        tc_name,
+                        e,
+                    )
+
+        return new_ids
+
+    async def _hc_rerun_benchmark(
+        self, vs: VariantStatus, testcase_ids: list[str]
+    ) -> list[dict]:
+        """Re-run sessions for the new testcases and return results."""
+        from plato.chronos.api.jobs import launch_job
+        from plato.chronos.api.sessions import get_session, get_session_status
+        from plato.chronos.models import (
+            LaunchJobRequest,
+            VMResources,
+            WorldConfigInput,
+            WorldRuntimeConfig,
+        )
+
+        config = self.config
+        n_sessions = config.sessions_per_testcase
+        sem = asyncio.Semaphore(config.run_concurrency)
+        results: list[dict] = []
+        results_lock = asyncio.Lock()
+
+        async with httpx.AsyncClient(
+            base_url=config.chronos_url, timeout=httpx.Timeout(120.0)
+        ) as http:
+
+            async def _run_one(tc_id: str, session_num: int, idx: int) -> None:
+                await asyncio.sleep(idx * 2.0)
+                async with sem:
+                    for attempt in range(1, 4):
+                        try:
+                            result = await self._launch_and_wait(
+                                http,
+                                config,
+                                tc_id,
+                                f"hc-{vs.slug}",
+                                launch_job,
+                                get_session_status,
+                                get_session,
+                                LaunchJobRequest,
+                                WorldConfigInput,
+                                WorldRuntimeConfig,
+                                VMResources,
+                            )
+                            result["session_num"] = session_num
+                            result["attempt"] = attempt
+
+                            status = result.get("status", "")
+                            is_infra = status in ("failed", "error", "cancelled")
+                            if result.get("score", 0) > 0:
+                                result["outcome"] = "PASS"
+                            elif is_infra:
+                                result["outcome"] = "ERROR"
+                            else:
+                                result["outcome"] = "FAIL"
+
+                            if is_infra and attempt < 3:
+                                continue
+
+                            async with results_lock:
+                                results.append(result)
+                            break
+
+                        except Exception as e:
+                            logger.error(
+                                "HILLCLIMB [%s] session error (attempt %d): %s",
+                                vs.slug,
+                                attempt,
+                                e,
+                            )
+                            if attempt >= 3:
+                                async with results_lock:
+                                    results.append(
+                                        {
+                                            "testcase_id": tc_id,
+                                            "outcome": "ERROR",
+                                            "error": str(e),
+                                        }
+                                    )
+
+            tasks = []
+            idx = 0
+            for tc_id in testcase_ids:
+                for sn in range(1, n_sessions + 1):
+                    tasks.append(_run_one(tc_id, sn, idx))
+                    idx += 1
+
+            logger.info(
+                "HILLCLIMB [%s] launching %d sessions for %d testcases",
+                vs.slug,
+                len(tasks),
+                len(testcase_ids),
+            )
+            await asyncio.gather(*tasks)
+
+        return results
+
+    def _log_hillclimb_summary(self, target: float) -> None:
+        """Log a structured summary of hillclimb results."""
+        logger.info("=" * 70)
+        logger.info("HILLCLIMB SUMMARY")
+        logger.info("=" * 70)
+        logger.info("Target max pass rate: %.1f%%", target * 100)
+        logger.info("-" * 70)
+
+        for vs in self.state.variants:
+            if not vs.hillclimb_iterations:
+                continue
+
+            iter0 = vs.hillclimb_iterations[0]
+            best = vs.hillclimb_iterations[vs.best_iteration]
+            n_iters = len(vs.hillclimb_iterations) - 1
+
+            met = "MET" if best.pass_rate <= target else "NOT MET"
+            logger.info(
+                "VARIANT: %s  [%s]",
+                vs.slug,
+                met,
+            )
+            logger.info(
+                "  Original: %.1f%% → Best (iter %d): %.1f%%  (%d iterations)",
+                iter0.pass_rate * 100,
+                vs.best_iteration,
+                best.pass_rate * 100,
+                n_iters,
+            )
+
+            for it in vs.hillclimb_iterations:
+                marker = " ← best" if it.iteration == vs.best_iteration else ""
+                edits = f"  edits: {it.edits_summary}" if it.edits_summary else ""
+                logger.info(
+                    "  iter %d: %.1f%% (artifact=%s, %d testcases)%s%s",
+                    it.iteration,
+                    it.pass_rate * 100,
+                    it.artifact_id[:12] if it.artifact_id else "n/a",
+                    len(it.testcase_ids),
+                    marker,
+                    edits,
+                )
         logger.info("=" * 70)
 
     # ------------------------------------------------------------------

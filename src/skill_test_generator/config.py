@@ -31,6 +31,7 @@ class Stage(str, Enum):
     PUBLISH = "publish"
     RUN = "run"
     EVALUATE = "evaluate"
+    HILLCLIMB = "hillclimb"
 
 
 class SkillDefinition(BaseModel):
@@ -61,6 +62,17 @@ class SkillDefinition(BaseModel):
     )
 
 
+class IterationRecord(BaseModel):
+    """Snapshot of one hillclimb iteration's results."""
+
+    iteration: int
+    artifact_id: str = ""
+    testcase_ids: list[str] = Field(default_factory=list)
+    task_results: list[dict] = Field(default_factory=list)
+    pass_rate: float = 0.0
+    edits_summary: str = ""
+
+
 class VariantStatus(BaseModel):
     """Tracks generation progress for a single skill variant."""
 
@@ -78,6 +90,30 @@ class VariantStatus(BaseModel):
     chronos_session_ids: list[str] = Field(default_factory=list)
     plato_session_ids: list[str] = Field(default_factory=list)
     task_results: list[dict] = Field(default_factory=list)
+    hillclimb_iterations: list[IterationRecord] = Field(default_factory=list)
+    best_iteration: int = 0
+
+
+class HillclimbConfig(BaseModel):
+    """Configuration for the hillclimb difficulty-tuning stage."""
+
+    enabled: bool = Field(
+        default=False,
+        description="Enable the HILLCLIMB stage after EVALUATE.",
+    )
+    total_failures: int = Field(
+        default=1,
+        ge=0,
+        description=(
+            "Target minimum failures per testcase. With sessions_per_testcase=3 "
+            "and total_failures=1, the max acceptable pass rate is 2/3."
+        ),
+    )
+    max_retries: int = Field(
+        default=2,
+        ge=0,
+        description="Max edit+rerun iterations beyond the original attempt.",
+    )
 
 
 class AgentModel(str, Enum):
@@ -279,6 +315,11 @@ class SkillTestGeneratorConfig(RunConfig):
     cua_agent_package: str = Field(
         default="computer-use-agent:3.2.48",
         description="Computer-use agent package.",
+    )
+
+    hillclimb: HillclimbConfig = Field(
+        default_factory=HillclimbConfig,
+        description="Hillclimb difficulty-tuning configuration.",
     )
 
 

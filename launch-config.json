@@ -1,6 +1,6 @@
 {
   "world": {
-    "package": "plato-world-skill-test-generator:0.3.84",
+    "package": "plato-world-skill-test-generator:0.3.85",
     "runtime": {
       "type": "vm",
       "vm": {
@@ -49,7 +49,12 @@
       "aws_session_token": "${AWS_SESSION_TOKEN}",
       "anthropic_api_key": "${ANTHROPIC_API_KEY}",
       "plato_api_key": "${PLATO_API_KEY}",
-      "nova_act_workflow_name": "${NOVA_ACT_WORKFLOW_NAME}"
+      "nova_act_workflow_name": "${NOVA_ACT_WORKFLOW_NAME}",
+      "hillclimb": {
+        "enabled": false,
+        "total_failures": 1,
+        "max_retries": 2
+      }
     }
   },
   "retry": {

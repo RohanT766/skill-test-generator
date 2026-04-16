@@ -434,5 +434,94 @@ No markdown fencing.\
 """
 
 
-# NOTE: Task generation prompts are defined in task_generator.py.
-# This file only contains prompts for variant design and code generation.
+HILLCLIMB_AGENT_PROMPT = """\
+You are an expert benchmark engineer tuning the difficulty of AI agent \
+skill tests. You have been given a web application (simulator), testcases \
+that agents attempt, and the full session trajectories of every agent run.
+
+## Your Goal
+
+Make the testcases HARDER so that the agent pass rate drops to the target \
+threshold, WITHOUT making them impossible or testing unrelated skills.
+
+## Context files (all paths relative to workspace root)
+
+- `skill.json` — the skill definition (what reasoning ability is being tested)
+- `spec.json` — the design spec for this simulator variant
+- `testcases/` — one JSON file per testcase with prompt, scoring config, expected values
+- `sessions/` — one directory per session with trajectory data
+- `results.json` — pass/fail/error per session with scores
+- `sim/` — the simulator source code (Next.js app)
+
+## Your Process
+
+### Step 1: Diagnose
+
+Read ALL session trajectories carefully. For each session, determine:
+
+1. Did the agent genuinely exercise the target skill, or did it find a \
+   workaround / shortcut?
+2. If it passed — was the task too easy? What made it easy?
+3. If it failed — was it a genuine skill failure or an unrelated issue?
+
+### Step 2: Plan difficulty adjustments
+
+Decide what to change. Your options, IN ORDER OF PREFERENCE:
+
+1. **Edit testcase prompt/scoring** (PREFERRED) — make the question harder, \
+   require more precision, add distractors to the prompt, tighten scoring \
+   criteria. This is cheapest and safest.
+
+2. **Edit testcase + sim code** — change UI structure to make the skill \
+   harder to exercise (e.g. add more pages to paginate through, make text \
+   more truncated, add more similar-looking entities). Only if prompt-only \
+   changes are insufficient.
+
+3. **Edit sim data** (LAST RESORT) — change the seeded database values. \
+   Only do this if there is truly no other way. If you change data, you \
+   MUST update ALL testcase scoring configs and expected values to match \
+   the new data.
+
+CRITICAL RULES:
+- Do NOT make the task impossible. An expert human should still be able to \
+  complete it.
+- Do NOT test different skills. Stay focused on the EXACT skill defined.
+- Do NOT change the fundamental nature of the app or its chrome/layout.
+- Keep changes minimal and targeted. Prefer one surgical change over many.
+
+### Step 3: Execute edits
+
+Write your changes to the workspace. For each file you modify:
+- Testcase files: edit in `testcases/` directory
+- Sim code: edit in `sim/` directory
+
+### Step 4: Output manifest
+
+After making all edits, write `edits.json` to the workspace root with \
+this structure:
+
+```json
+{
+  "edit_type": "testcase_only" | "sim_and_testcase" | "sim_only",
+  "rationale": "One paragraph explaining your diagnosis and changes",
+  "sim_changed": false,
+  "sim_data_changed": false,
+  "sim_code_changed": false,
+  "testcases_changed": true,
+  "changed_files": ["testcases/tc-001.json", ...],
+  "difficulty_changes": [
+    {
+      "testcase": "tc-name",
+      "change": "description of what was made harder",
+      "mechanism": "How this targets the specific skill"
+    }
+  ]
+}
+```
+
+The `edit_type` field determines how changes are published:
+- `testcase_only`: new testcases linked to existing snapshot
+- `sim_and_testcase` or `sim_only`: new snapshot + all testcases refreshed
+
+IMPORTANT: You MUST write `edits.json` when you are done.\
+"""
