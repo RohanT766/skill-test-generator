@@ -766,6 +766,15 @@ class SkillTestGeneratorWorld(
 
                 preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
 
+                # Ensure `node` is on PATH — Next.js Turbopack spawns node
+                # subprocesses for webpack loaders even when run via bun
+                await _exec(
+                    f'{preamble} && '
+                    'command -v node >/dev/null 2>&1 || '
+                    'ln -sf "$(command -v bun)" /usr/local/bin/node',
+                    timeout=10,
+                )
+
                 out, _ = await _exec(
                     f"{preamble} && cd {app_dir} && bun install 2>&1 | tail -10",
                     timeout=300,
@@ -2807,6 +2816,13 @@ else:
                 app_dir = "/tmp/variant/web"
 
                 preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
+
+                await _exec(
+                    f'{preamble} && '
+                    'command -v node >/dev/null 2>&1 || '
+                    'ln -sf "$(command -v bun)" /usr/local/bin/node',
+                    timeout=10,
+                )
 
                 # Upload edited sim code as tarball
                 tarball = self._tar_variant(sim_dir.parent, f"hc-{vs.slug}")
