@@ -1089,8 +1089,12 @@ else:
                 from plato._generated.models import (
                     CreateSimulatorRequest,
                     SimulatorConfig,
-                    Type6,
                 )
+
+                try:
+                    _sim_config = SimulatorConfig(type="docker_app")  # type: ignore[arg-type]
+                except Exception:
+                    _sim_config = SimulatorConfig.from_dict({"type": "docker_app"})
 
                 PLATO_LOGO = "https://plato.so/favicon.ico"
                 sim_description = (
@@ -1103,7 +1107,7 @@ else:
                             name=sim_name,
                             description=sim_description,
                             simType="docker_app",
-                            config=SimulatorConfig(type=Type6.docker_app),
+                            config=_sim_config,
                             enabled=True,
                             imgUrl=PLATO_LOGO,
                             internalAppPort=3000,
