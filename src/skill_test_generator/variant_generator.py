@@ -18,6 +18,51 @@ from .json_utils import extract_json as _extract_json
 from .prompts import VARIANT_CODE_SYSTEM_PROMPT, VARIANT_DESIGN_SYSTEM_PROMPT
 from .skill_ingestion import _slugify
 
+_TRANSIENT_API_ERRORS = (
+    anthropic.APIConnectionError,
+    anthropic.RateLimitError,
+    anthropic.InternalServerError,
+    anthropic.APIStatusError,
+)
+
+
+async def _api_call_with_retry(
+    call_fn,
+    *,
+    max_retries: int = 4,
+    base_delay: float = 2.0,
+    max_delay: float = 15.0,
+    label: str = "API call",
+):
+    """Retry an async Anthropic API call on transient errors with exponential backoff."""
+    for attempt in range(1, max_retries + 1):
+        try:
+            return await call_fn()
+        except _TRANSIENT_API_ERRORS as e:
+            is_overloaded = (
+                isinstance(e, anthropic.APIStatusError) and e.status_code == 529
+            )
+            is_rate_limit = isinstance(e, anthropic.RateLimitError)
+            is_server_err = isinstance(e, anthropic.InternalServerError)
+            is_transient = is_overloaded or is_rate_limit or is_server_err
+
+            if not is_transient or attempt == max_retries:
+                raise
+
+            delay = min(
+                base_delay * (1.5 ** (attempt - 1)), max_delay
+            ) + random.uniform(0, 1)
+            logger.warning(
+                "%s attempt %d/%d failed (%s), retrying in %.1fs…",
+                label,
+                attempt,
+                max_retries,
+                type(e).__name__,
+                delay,
+            )
+            await asyncio.sleep(delay)
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -405,13 +450,16 @@ async def design_variant(
     )
     content_blocks.append({"type": "text", "text": user_text})
 
-    async with client.messages.stream(
-        model=model,
-        max_tokens=16384,
-        system=VARIANT_DESIGN_SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": content_blocks}],
-    ) as stream:
-        response = await stream.get_final_message()
+    async def _design_call():
+        async with client.messages.stream(
+            model=model,
+            max_tokens=16384,
+            system=VARIANT_DESIGN_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": content_blocks}],
+        ) as stream:
+            return await stream.get_final_message()
+
+    response = await _api_call_with_retry(_design_call, label="Design LLM")
     if response.stop_reason == "max_tokens":
         logger.warning("Design LLM hit max_tokens — output may be truncated")
 
@@ -490,15 +538,18 @@ async def generate_variant_code(
     )
     content_blocks.append({"type": "text", "text": user_text})
 
-    last_err: Exception | None = None
-    for codegen_attempt in range(3):
+    async def _codegen_call():
         async with client.messages.stream(
             model=model,
             max_tokens=64000,
             system=VARIANT_CODE_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": content_blocks}],
         ) as stream:
-            response = await stream.get_final_message()
+            return await stream.get_final_message()
+
+    last_err: Exception | None = None
+    for codegen_attempt in range(3):
+        response = await _api_call_with_retry(_codegen_call, label="Codegen LLM")
         try:
             return _extract_json(response.content[0].text)
         except (ValueError, KeyError, json.JSONDecodeError) as e:
