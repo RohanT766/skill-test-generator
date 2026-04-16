@@ -620,7 +620,8 @@ class SkillTestGeneratorWorld(
             tasks = self._all_tasks.get(vs.slug, [])
             if tasks and artifact_id:
                 try:
-                    await self._create_testcases(vs, tasks, artifact_id)
+                    new_ids = await self._create_testcases(vs, tasks, artifact_id)
+                    vs.testcase_ids.extend(new_ids)
                     vs.stage = "published"
                 except Exception as e:
                     logger.error("  [%s] Testcase creation error: %s", vs.slug, e)
@@ -1293,8 +1294,11 @@ else:
         vs: VariantStatus,
         tasks: list[dict],
         artifact_id: str,
-    ) -> None:
-        """Create Plato testcases for each task in a variant."""
+    ) -> list[str]:
+        """Create Plato testcases for each task in a variant.
+
+        Returns the list of created testcase IDs.
+        """
         from .task_generator import _build_v2_scoring_config
 
         config = self.config
@@ -1308,6 +1312,7 @@ else:
 
         skill_tag = _slug(vs.short_name or vs.skill_name)
         tc_tags = ["skill-test-generator", skill_tag]
+        created_ids: list[str] = []
 
         async with httpx.AsyncClient(
             base_url=config.plato_api_url,
@@ -1330,6 +1335,15 @@ else:
             for task in tasks:
                 scoring_type = task.get("scoring_type", "output")
                 v2_scoring_config = _build_v2_scoring_config(task, sim_name)
+
+                if not v2_scoring_config and task.get("scoring_config"):
+                    logger.warning(
+                        "  [%s] scoring_config present but "
+                        "_build_v2_scoring_config returned None for '%s' — "
+                        "testcase may be ungradeable",
+                        vs.slug,
+                        task.get("name", "unnamed"),
+                    )
 
                 tc_name = f"{vs.slug}-{task.get('name', 'unnamed')}"
                 req = CreateTestCaseRequest(
@@ -1358,11 +1372,13 @@ else:
                         or tc.get("public_id")
                         or str(tc.get("id", ""))
                     )
-                    vs.testcase_ids.append(tc_id)
+                    created_ids.append(tc_id)
                     task["_testcase_id"] = tc_id
                     logger.info("  Created testcase '%s' -> %s", tc_name, tc_id)
                 except Exception as e:
                     logger.error("  Testcase creation error for '%s': %s", tc_name, e)
+
+        return created_ids
 
     # ------------------------------------------------------------------
     # RUN: launch CUA benchmark sessions via Chronos, wait for completion
@@ -2264,8 +2280,25 @@ else:
                     current_artifact_id = new_artifact_id
 
                     # Sim changed → republish ALL testcases against new snapshot
-                    all_new_ids = await self._hc_publish_testcases(
-                        vs, workspace_dir, new_artifact_id
+                    tc_dir = workspace_dir / "testcases"
+                    all_tasks: list[dict] = []
+                    for tc_file in sorted(tc_dir.glob("tc-*.json")):
+                        try:
+                            tc_data = json.loads(tc_file.read_text())
+                        except (json.JSONDecodeError, OSError):
+                            continue
+                        all_tasks.append({
+                            "name": tc_data.get("name", tc_file.stem),
+                            "instruction": tc_data.get("instruction", ""),
+                            "start_url": tc_data.get("start_url", "/"),
+                            "scoring_type": tc_data.get("scoring_type", "output"),
+                            "output_schema": tc_data.get("output_schema"),
+                            "expected_output": tc_data.get("expected_output"),
+                            "scoring_config": tc_data.get("scoring_config"),
+                            "expected_mutations": tc_data.get("expected_mutations"),
+                        })
+                    all_new_ids = await self._create_testcases(
+                        vs, all_tasks, new_artifact_id
                     )
                     if not all_new_ids:
                         logger.error(
@@ -2282,10 +2315,36 @@ else:
                     )
                 else:
                     # Testcase-only → publish just the edited testcase
-                    published = await self._hc_publish_single_testcase(
-                        vs, workspace_dir, current_artifact_id, tc_idx
-                    )
-                    new_tc_id = published[0] if published else None
+                    tc_file = workspace_dir / "testcases" / f"tc-{tc_idx:03d}.json"
+                    if not tc_file.exists():
+                        logger.error(
+                            "HILLCLIMB [%s] testcase file %s not found",
+                            vs.slug,
+                            tc_file,
+                        )
+                        new_tc_id = None
+                    else:
+                        try:
+                            tc_data = json.loads(tc_file.read_text())
+                        except (json.JSONDecodeError, OSError):
+                            tc_data = None
+                        if tc_data:
+                            task = {
+                                "name": tc_data.get("name", tc_file.stem),
+                                "instruction": tc_data.get("instruction", ""),
+                                "start_url": tc_data.get("start_url", "/"),
+                                "scoring_type": tc_data.get("scoring_type", "output"),
+                                "output_schema": tc_data.get("output_schema"),
+                                "expected_output": tc_data.get("expected_output"),
+                                "scoring_config": tc_data.get("scoring_config"),
+                                "expected_mutations": tc_data.get("expected_mutations"),
+                            }
+                            published = await self._create_testcases(
+                                vs, [task], current_artifact_id
+                            )
+                            new_tc_id = published[0] if published else None
+                        else:
+                            new_tc_id = None
 
                 if not new_tc_id:
                     logger.error(
@@ -2951,203 +3010,6 @@ else:
                         )
                     except Exception:
                         pass
-
-    async def _hc_publish_testcases(
-        self,
-        vs: VariantStatus,
-        workspace_dir: Path,
-        artifact_id: str,
-    ) -> list[str]:
-        """Create new testcases from the (possibly edited) workspace testcase files."""
-        from .task_generator import _build_v2_scoring_config
-
-        config = self.config
-        tc_dir = workspace_dir / "testcases"
-        if not tc_dir.is_dir():
-            return []
-
-        from plato._generated.api.v1.simulator import get_simulator_id
-        from plato._generated.api.v2.testcases import create_testcase
-        from plato._generated.models import CreateTestCaseRequest
-
-        from .skill_ingestion import _slugify as _slug
-
-        skill_tag = _slug(vs.short_name or vs.skill_name)
-        tc_tags = ["skill-test-generator", "hillclimb", skill_tag]
-        new_ids: list[str] = []
-
-        async with httpx.AsyncClient(
-            base_url=config.plato_api_url,
-            timeout=httpx.Timeout(60.0),
-        ) as http:
-            simulator_id: int | None = None
-            try:
-                sid_resp = await get_simulator_id.asyncio(
-                    client=http,
-                    simulator_name=vs.sim_name,
-                    x_api_key=config.plato_api_key,
-                )
-                simulator_id = sid_resp.simulator_id
-            except Exception:
-                pass
-
-            tc_files = sorted(tc_dir.glob("tc-*.json"))
-            for tc_file in tc_files:
-                try:
-                    tc_data = json.loads(tc_file.read_text())
-                except (json.JSONDecodeError, OSError):
-                    continue
-
-                tc_name = f"{vs.slug}-hc-{tc_data.get('name', tc_file.stem)}"
-                v2_scoring = _build_v2_scoring_config(tc_data, vs.sim_name)
-
-                req = CreateTestCaseRequest(
-                    name=tc_name,
-                    prompt=tc_data.get("instruction", ""),
-                    start_url=tc_data.get("start_url", "/"),
-                    simulator_artifact_ids=[artifact_id],
-                    simulator_id=simulator_id,
-                    tags=tc_tags,
-                )
-                if v2_scoring:
-                    req.v2_scoring_config = v2_scoring
-                if tc_data.get("scoring_type") == "output" and tc_data.get(
-                    "output_schema"
-                ):
-                    req.output_schema = tc_data["output_schema"]
-
-                try:
-                    resp = await create_testcase.asyncio(
-                        client=http,
-                        body=req,
-                        x_api_key=config.plato_api_key,
-                    )
-                    tc = resp.test_case
-                    tc_id = (
-                        tc.get("publicId")
-                        or tc.get("public_id")
-                        or str(tc.get("id", ""))
-                    )
-                    new_ids.append(tc_id)
-                    logger.info(
-                        "HILLCLIMB [%s] created testcase '%s' -> %s",
-                        vs.slug,
-                        tc_name,
-                        tc_id,
-                    )
-                except Exception as e:
-                    logger.error(
-                        "HILLCLIMB [%s] testcase creation error for '%s': %s",
-                        vs.slug,
-                        tc_name,
-                        e,
-                    )
-
-        return new_ids
-
-    async def _hc_publish_single_testcase(
-        self,
-        vs: VariantStatus,
-        workspace_dir: Path,
-        artifact_id: str,
-        tc_idx: int,
-    ) -> list[str]:
-        """Publish a single edited testcase file (testcase-only hillclimb)."""
-        from .task_generator import _build_v2_scoring_config
-
-        config = self.config
-        tc_file = workspace_dir / "testcases" / f"tc-{tc_idx:03d}.json"
-        if not tc_file.exists():
-            logger.error(
-                "HILLCLIMB [%s] testcase file %s not found", vs.slug, tc_file
-            )
-            return []
-
-        try:
-            tc_data = json.loads(tc_file.read_text())
-        except (json.JSONDecodeError, OSError):
-            return []
-
-        from plato._generated.api.v1.simulator import get_simulator_id
-        from plato._generated.api.v2.testcases import create_testcase
-        from plato._generated.models import CreateTestCaseRequest
-
-        from .skill_ingestion import _slugify as _slug
-
-        skill_tag = _slug(vs.short_name or vs.skill_name)
-        tc_tags = ["skill-test-generator", "hillclimb", skill_tag]
-
-        async with httpx.AsyncClient(
-            base_url=config.plato_api_url,
-            timeout=httpx.Timeout(60.0),
-        ) as http:
-            simulator_id: int | None = None
-            try:
-                sid_resp = await get_simulator_id.asyncio(
-                    client=http,
-                    simulator_name=vs.sim_name,
-                    x_api_key=config.plato_api_key,
-                )
-                simulator_id = sid_resp.simulator_id
-            except Exception:
-                pass
-
-            tc_name = f"{vs.slug}-hc-{tc_data.get('name', tc_file.stem)}"
-            v2_scoring = _build_v2_scoring_config(tc_data, vs.sim_name)
-
-            if not v2_scoring and tc_data.get("scoring_config"):
-                logger.warning(
-                    "HILLCLIMB [%s] scoring_config present but "
-                    "_build_v2_scoring_config returned None for %s — "
-                    "testcase may be ungradeable",
-                    vs.slug,
-                    tc_file.name,
-                )
-
-            req = CreateTestCaseRequest(
-                name=tc_name,
-                prompt=tc_data.get("instruction", ""),
-                start_url=tc_data.get("start_url", "/"),
-                simulator_artifact_ids=[artifact_id],
-                simulator_id=simulator_id,
-                tags=tc_tags,
-            )
-            if v2_scoring:
-                req.v2_scoring_config = v2_scoring
-            if tc_data.get("scoring_type") == "output" and tc_data.get(
-                "output_schema"
-            ):
-                req.output_schema = tc_data["output_schema"]
-
-            try:
-                resp = await create_testcase.asyncio(
-                    client=http,
-                    body=req,
-                    x_api_key=config.plato_api_key,
-                )
-                tc = resp.test_case
-                tc_id = (
-                    tc.get("publicId")
-                    or tc.get("public_id")
-                    or str(tc.get("id", ""))
-                )
-                logger.info(
-                    "HILLCLIMB [%s] published testcase '%s' -> %s "
-                    "(has_scoring=%s)",
-                    vs.slug,
-                    tc_name,
-                    tc_id,
-                    bool(v2_scoring),
-                )
-                return [tc_id]
-            except Exception as e:
-                logger.error(
-                    "HILLCLIMB [%s] testcase creation error for '%s': %s",
-                    vs.slug,
-                    tc_name,
-                    e,
-                )
-                return []
 
     async def _hc_rerun_benchmark(
         self, vs: VariantStatus, testcase_ids: list[str]

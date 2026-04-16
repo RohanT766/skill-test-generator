@@ -1,6 +1,6 @@
 {
   "world": {
-    "package": "plato-world-skill-test-generator:0.3.89",
+    "package": "plato-world-skill-test-generator:0.3.90",
     "runtime": {
       "type": "vm",
       "vm": {
@@ -51,7 +51,7 @@
       "plato_api_key": "${PLATO_API_KEY}",
       "nova_act_workflow_name": "${NOVA_ACT_WORKFLOW_NAME}",
       "hillclimb": {
-        "enabled": false,
+        "enabled": true,
         "total_failures": 1,
         "max_retries": 2
       }

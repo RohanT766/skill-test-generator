@@ -520,24 +520,65 @@ CRITICAL RULES:
 - Do NOT change the fundamental nature of the app or its chrome/layout.
 - Prefer bold structural changes over many small tweaks.
 
+## Task Design Guidelines
+
+When editing testcases, follow these principles — they are the same rules \
+used when creating testcases from scratch:
+
+- PRESERVE THE TASK TYPE. If the original testcase has scoring_type "output", \
+your edited version must remain "output". If it has scoring_type "mutations", \
+keep it "mutations". Never change the scoring type.
+- Pick data points that MAXIMALLY exploit the skill gap. Choose records \
+where the naive shortcut gives a confident wrong answer. If the data \
+contains decoys or near-matches designed to trip up agents, target those \
+specific records.
+- Ask for the minimum number of values needed to prove the skill was used. \
+Usually this is ONE value. Only ask for multiple values when the skill \
+itself is about extracting or correlating multiple pieces of information.
+- The instruction should be the shortest unambiguous sentence that requires \
+the skill. Include only what the agent strictly needs to identify the task.
+- Do NOT mention, describe, or allude to the skill, the UI mechanism, or \
+the challenge the agent will face — e.g. never mention pagination, \
+scrolling, hidden content, tabs, dropdowns, expanding sections, truncation, \
+or similar mechanisms. The agent must discover these on its own.
+- State what to find, not how to find it. Never reference UI elements, \
+navigation, or workflow steps.
+- The correct answer must only be reachable by exercising the skill. A \
+naive approach (e.g. looking only at initially visible data) must give a \
+WRONG answer. Verify there is no workaround — no other page, shortcut, \
+or surface in the app that leaks the answer without the skill.
+- expected_output values must match how the data appears in the UI, not \
+how it is stored in the database. If the UI displays "1,234.56" or \
+"$1,234.56", the expected value is the string "1,234.56" or "$1,234.56". \
+If a number is displayed with decimals (e.g. 99.00), use a float (99.0), \
+not an int (99). When in doubt, prefer strings over numbers in expected_output.
+
 ### Step 4: Execute edits
 
 Write your changes to the workspace. For each file you modify:
 - Testcase files: edit in `testcases/` directory
 - Sim code: edit in `sim/` directory
 
-**CRITICAL — Scoring config rules for testcase edits:**
-When you edit a testcase JSON file, you MUST keep the scoring config \
-consistent with your changes. The scoring fields are:
-- `scoring_config.scoring_schema` — the expected JSON output values \
-  used to grade the agent. If you change the question, you MUST update \
-  the scoring schema to match the new correct answer.
-- `expected_output` — set this to the SAME dict as `scoring_schema` \
-  (duplication is required by the publishing pipeline).
-- `output_schema` — if present, update to match the new structure.
+**CRITICAL — Testcase JSON structure:**
+When you edit a testcase JSON file, the file MUST contain these fields \
+(keep them consistent with your changes):
+- `name`: short kebab-case identifier (keep the original or use a similar name)
+- `instruction`: the prompt text the agent sees
+- `start_url`: where the agent starts (default "/")
+- `scoring_type`: "output" or "mutations" — PRESERVE from the original testcase
+- `output_schema`: (for output tasks) JSON Schema describing the answer \
+  structure. MUST always be populated for output tasks.
+- `expected_output`: (for output tasks) the correct answer dict. MUST match \
+  the keys defined in output_schema.
+- `scoring_config`: `{"type": "json_schema", "scoring_schema": {the expected values}}` \
+  — the scoring_schema MUST equal expected_output (duplication is required \
+  by the publishing pipeline).
+- `expected_mutations`: (for mutation tasks) array of mutation objects, each \
+  with `table`, `action`, `row_filter`, and `values`.
 
-If you change the instruction but forget to update the scoring schema, \
-the testcase will be UNGRADEABLE and show 0% for the wrong reason.
+If you change the instruction but forget to update scoring_schema and \
+expected_output, the testcase will be UNGRADEABLE and show 0% for the \
+wrong reason.
 
 ### Step 5: Output manifest
 
