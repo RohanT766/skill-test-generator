@@ -1,6 +1,6 @@
 {
   "world": {
-    "package": "plato-world-skill-test-generator:0.4.12",
+    "package": "plato-world-skill-test-generator:0.4.13",
     "runtime": {
       "type": "vm",
       "vm": {
@@ -12,24 +12,34 @@
     },
     "config": {
       "s3_skills": [
-        "Account for pagination when counting rows in data grid",
-        "Accurately transcribe visually dense text from detail panel fields",
-        "Aggregate values across data grid rows before selecting maximum",
-        "Disambiguate similarly-named entities in autocomplete dropdown",
+        "Maintain correct task objective without hallucinating constraints",
+        "Locate settings entry point among visually similar project navigation elements",
+        "Verify actual UI feedback before confirming task success",
         "Distinguish between similarly-named record types in navigation menus",
-        "Distinguish entity subtypes via dedicated navigation tabs",
         "Exhaustively paginate list before identifying extremum record",
-        "Extract complete structured value from multi-component display field",
         "Resolve truncated text in data grid cells before using value",
-        "Systematically aggregate across filtered pages instead of visual scanning"
+        "Systematically aggregate across filtered pages instead of visual scanning",
+        "Aggregate values across data grid rows before selecting maximum",
+        "Account for pagination when counting rows in data grid",
+        "Disambiguate similarly-named entities in autocomplete dropdown",
+        "Distinguish between conceptually unrelated modules with domain-ambiguous names",
+        "Distinguish entity subtypes via dedicated navigation tabs",
+        "Scope action to correct hierarchy level in nested entity tree",
+        "Disambiguate similarly-named modules in sidebar navigation",
+        "Use status column instead of heuristic field to classify row state",
+        "Apply correct status filter before counting records per entity",
+        "Extract complete structured value from multi-component display field",
+        "Explore tabbed sub-navigation to locate feature configuration panel",
+        "Accurately transcribe visually dense text from detail panel fields",
+        "Distinguish validation error from success confirmation in form submission"
       ],
-      "specs_per_skill": 2,
+      "specs_per_skill": 4,
       "design_concurrency": 10,
-      "max_skills": 10,
+      "max_skills": 20,
       "output_tasks_per_variant": 2,
       "mutation_tasks_per_variant": 0,
-      "sessions_per_testcase": 3,
-      "run_concurrency": 30,
+      "sessions_per_testcase": 4,
+      "run_concurrency": 20,
       "vm_concurrency": 10,
       "pipeline_vm_cpus": 2,
       "pipeline_vm_memory": 4096,
@@ -51,7 +61,7 @@
       "plato_api_key": "${PLATO_API_KEY}",
       "nova_act_workflow_name": "${NOVA_ACT_WORKFLOW_NAME}",
       "hillclimb": {
-        "enabled": true,
+        "enabled": false,
         "total_failures": 1,
         "max_retries": 2
       }

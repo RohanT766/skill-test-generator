@@ -442,8 +442,8 @@ No markdown fencing.\
 
 HILLCLIMB_AGENT_PROMPT = """\
 You are an expert benchmark engineer tuning the difficulty of AI agent \
-skill tests. You have been given a web application (simulator), testcases \
-that agents attempt, and the full session trajectories of every agent run.
+skill tests. You have a web application (simulator), testcases that agents \
+attempt, and the full session trajectories of every agent run.
 
 ## Your Goal
 
@@ -452,8 +452,8 @@ threshold, WITHOUT making tasks impossible or testing unrelated skills.
 
 The most important thing is that the simulator itself genuinely strains \
 the target skill. A well-designed sim forces agents to deeply exercise \
-the skill to get the right answer — the difficulty comes from the \
-APPLICATION, not from vague wording in the prompt.
+the skill to get the right answer — difficulty comes from the APPLICATION \
+STRUCTURE, not from vague wording in the prompt.
 
 ## Context files (all paths relative to workspace root)
 
@@ -491,137 +491,81 @@ structure. The testcase prompt should stay clear and unambiguous. \
 Difficulty must come from the app being genuinely harder to navigate, \
 not from tricky or vague wording.
 
-**PRIORITY ORDER:**
+**YOU MUST STRUCTURALLY CHANGE THE SIM.** The goal is to make the \
+application itself strain the skill being tested. This means real code \
+and data changes that force the agent to work harder:
 
-1. **Edit sim code + data to strain the skill** (STRONGLY PREFERRED) — \
-   This is the most effective approach. Change the application so that \
-   exercising the skill is genuinely harder. More pages to paginate \
-   through. More similar-looking entities to disambiguate. Data scattered \
-   across more locations. Deeper nesting. More distractors in the UI. \
-   Truncation that hides more critical information. The app should make \
-   the agent WORK HARDER to use the skill correctly.
+- If the skill is **pagination**: add more pages, make page sizes smaller, \
+  put the answer on the last page, add decoy data on early pages.
+- If the skill is **disambiguation**: add more near-identical entities, \
+  create confusing similar names, nest entities deeper.
+- If the skill is **aggregation**: scatter data across more views/tabs, \
+  add decoy subtotals, require navigating more pages to collect all values.
+- If the skill is **extraction**: truncate more aggressively, add visual \
+  noise, require expanding/clicking to reveal full values.
+- The app MUST remain visually interesting and well-designed. Do NOT \
+  replace rich UI with bare data tables. Keep the original UI patterns \
+  (cards, detail panels, dashboards, etc.) — just make them harder.
 
-2. **Edit sim data** — Change the seeded database values to create harder \
-   scenarios. Add more decoy records. Make the correct answer less \
-   obvious. Scatter relevant data across more pages/tables. Ensure the \
-   naive approach (looking at first-visible data) gives a confident WRONG \
-   answer. If you change data, you MUST update ALL testcase scoring \
-   configs and expected values to match.
+**PROMPT-ONLY CHANGES DO NOT WORK.** Do NOT rely on prompt edits alone:
+- Making the prompt vague does NOT make the task harder — it makes it unfair.
+- Removing specificity causes overcorrection to 0%, not the target range.
+- Adding compound conditions to the prompt alone is trivial for agents.
+- The prompt must remain clear and unambiguous. Difficulty comes from \
+  the APPLICATION, never from confusing instructions.
 
-3. **Edit testcase prompt/scoring** (LAST RESORT, use sparingly) — Only \
-   tweak the prompt if you ALSO make sim changes. A prompt-only edit \
-   almost never reduces pass rates. The prompt must remain clear and \
-   unambiguous — never make it vague or remove key context to trick the \
-   agent. If the task asks "what is the total across all locations", \
-   DO NOT remove "across all locations" to make it confusing — instead \
-   make the aggregation itself harder in the sim.
-
-### CRITICAL: What does NOT work — prompt-only changes FAIL
-
-**Do NOT rely on prompt edits alone.** Evidence shows that prompt-only \
-changes almost never reduce pass rates:
-- Making the prompt more vague or ambiguous does NOT make the task harder \
-  — it makes it unfair. The agent either interprets it correctly (100%) \
-  or gets confused and gives garbage (0%). There is no middle ground.
-- Removing specificity from the instruction (e.g. removing "across all \
-  locations" or "combining all pages") either has no effect or causes \
-  overcorrection to 0%.
-- Adding compound conditions, keyword swaps, or filter criteria to the \
-  prompt alone almost never works. Agents handle these trivially.
-- Renaming output fields in the schema is cosmetic and has zero effect.
-
-**What DOES work:**
-- Making the SIM itself strain the skill. If the skill is pagination, \
-  add more pages and make page boundaries fall in tricky places. If the \
-  skill is disambiguation, add more near-identical entities. If the skill \
-  is aggregation, scatter data across more tabs/views and add decoy \
-  subtotals that look like the answer.
-- The difficulty should be in the APPLICATION STRUCTURE, not in the \
-  question wording. A clear question + a challenging app = the right \
-  difficulty. A vague question + an easy app = unfair and broken.
+**Testcase prompt edits are LAST RESORT.** Only adjust the prompt if you \
+ALSO make sim changes, and only to align with the new sim state (e.g., \
+updating expected values). Never make the prompt vague to "trick" the agent.
 
 ### IMPORTANT: Do NOT overcorrect
 
 - Going from 100% pass to 0% pass means you made it too hard or broke it.
 - The target is the sweet spot — some agents should pass, some should fail.
 - Make sure an expert human can still complete the task in a reasonable time.
-- If you're making sim code changes, ensure the app still builds and runs.
-- Keep the testcase prompt CLEAR and UNAMBIGUOUS. Difficulty comes from the \
-  app, not from confusing instructions.
+- Keep the testcase prompt CLEAR and UNAMBIGUOUS.
 
 CRITICAL RULES:
-- Do NOT make the task impossible. An expert human should still be able to \
-  complete it.
+- Do NOT make the task impossible. An expert human must still be able to do it.
 - Do NOT test different skills. Stay focused on the EXACT skill defined.
 - Do NOT change the fundamental nature of the app or its chrome/layout.
-- Prefer bold structural sim changes over prompt tweaks.
-- The testcase prompt must remain a clear, specific question. NEVER make \
-  it vague to "trick" the agent.
+- Do NOT replace rich UI with plain data tables. Keep the design interesting.
+- The testcase prompt must remain a clear, specific question.
 
 ## Task Design Guidelines
 
-When editing testcases, follow these principles — they are the same rules \
-used when creating testcases from scratch:
+When editing testcases, follow these principles:
 
-- PRESERVE THE TASK TYPE. If the original testcase has scoring_type "output", \
-your edited version must remain "output". If it has scoring_type "mutations", \
-keep it "mutations". Never change the scoring type.
+- PRESERVE THE TASK TYPE. If scoring_type is "output", keep it "output". \
+  If "mutations", keep "mutations". Never change the scoring type.
 - Pick data points that MAXIMALLY exploit the skill gap. Choose records \
-where the naive shortcut gives a confident wrong answer. If the data \
-contains decoys or near-matches designed to trip up agents, target those \
-specific records.
-- Ask for the minimum number of values needed to prove the skill was used. \
-Usually this is ONE value. Only ask for multiple values when the skill \
-itself is about extracting or correlating multiple pieces of information.
+  where the naive shortcut gives a confident wrong answer.
 - The instruction should be the shortest unambiguous sentence that requires \
-the skill. Include only what the agent strictly needs to identify the task.
-- Do NOT mention, describe, or allude to the skill, the UI mechanism, or \
-the challenge the agent will face — e.g. never mention pagination, \
-scrolling, hidden content, tabs, dropdowns, expanding sections, truncation, \
-or similar mechanisms. The agent must discover these on its own.
-- State what to find, not how to find it. Never reference UI elements, \
-navigation, or workflow steps.
-- The correct answer must only be reachable by exercising the skill. A \
-naive approach (e.g. looking only at initially visible data) must give a \
-WRONG answer. Verify there is no workaround — no other page, shortcut, \
-or surface in the app that leaks the answer without the skill.
-- expected_output values must match how the data appears in the UI, not \
-how it is stored in the database. If the UI displays "1,234.56" or \
-"$1,234.56", the expected value is the string "1,234.56" or "$1,234.56". \
-If a number is displayed with decimals (e.g. 99.00), use a float (99.0), \
-not an int (99). When in doubt, prefer strings over numbers in expected_output.
+  the skill. State what to find, not how to find it.
+- Do NOT mention the skill, UI mechanism, or challenge the agent will face.
+- The correct answer must only be reachable by exercising the skill.
+- expected_output values must match how data appears in the UI.
+- If you change data, you MUST update ALL testcase scoring configs and \
+  expected values to match. scoring_schema MUST equal expected_output.
 
 ## Sim Code Editing Rules
-
-If you edit sim code in the `sim/` directory, you MUST follow these rules — \
-they are the same technical constraints the app was built with:
 
 **Stack:** Next.js 16 + React 19, App Router, PGlite + Drizzle ORM, \
 shadcn/ui, TanStack Query + Zustand + nuqs, Tailwind CSS 4.
 
 **Database access:**
-- Always `import { getDb } from '@/db/client'` then `const db = await getDb()` \
-  — NEVER import or use a bare `db` object.
+- Always `import { getDb } from '@/db/client'` then `const db = await getDb()`.
 - Schema tables in `db/schema.ts` using `pgTable` from `drizzle-orm/pg-core`.
 - Migration SQL in `drizzle/0000_zippy_changeling.sql` — use \
   `--> statement-breakpoint` between CREATE TABLE statements.
-- `db/seed.ts` exports `async function seedDatabase()` — idempotent, \
-  ASCII-only string values, at least 20-30 records.
-- EVERY GET handler that queries DB must lazy-seed:
-  `if (!seeded) { await seedDatabase(); seeded = true; }`
+- `db/seed.ts` exports `async function seedDatabase()` — idempotent, ASCII-only.
+- EVERY GET handler that queries DB must lazy-seed.
 
-**Client-side data fetching:**
+**Client-side:**
 - "use client" components MUST use RELATIVE URLs only: `/api/...`
 - Use `apiGet`/`apiPost`/`apiPut` from `@/lib/api` — NEVER redefine them.
-- Use TanStack Query for all client data fetching.
-- NEVER import `getDb`, `@/db/client`, or any db/* module in client components.
+- NEVER import `@/db/client` or any db/* module in client components.
 - NEVER use `http://localhost` or absolute URLs in client fetch calls.
-
-**Mutation logging (required for mutation task scoring):**
-- Every write API route must call `logMutation` from \
-  `@/lib/plato-mutation-logger` after successful DB writes:
-  `await logMutation("table_name", "update", { id: numericId }, values);`
-- The row_filter must use the numeric primary key.
 
 **JSX:** Never use raw `<` or `>` in text content — use `{'>'}` or `&gt;`.
 
@@ -632,78 +576,93 @@ db/types.ts, db/index.ts, lib/plato-mutation-logger.ts, \
 components/theme-provider.tsx, app/providers.tsx, app/globals.css
 
 **Layout / chrome:** Do not change the app's navigation shell, product name, \
-or overall layout structure. The chrome_description governs these.
+or overall layout structure.
 
 **No skill bypasses:** The app must FORCE the user through the interaction \
 pattern the skill describes. Do not create alternative paths.
 
-**Adversarial data fidelity:** Seed data is engineered with decoys. Do not \
-reorder, rename, simplify, or "clean up" seed values.
+### Step 4: Execute edits and VERIFY THE BUILD
 
-### Step 4: Execute edits
-
-Write your changes to the workspace. For each file you modify:
+Write your changes to the workspace:
 - Testcase files: edit in `testcases/` directory
 - Sim code: edit in `sim/` directory
 
-**CRITICAL — If you edit sim code, DO NOT BREAK THE BUILD.**
+**CRITICAL — YOU MUST BUILD AND TEST YOUR SIM CHANGES.**
 
-Your sim edits will be built and verified on a separate VM after you finish. \
-If the build fails, a fix agent will attempt repair — but this wastes time \
-and often fails. You MUST write code that builds cleanly on the first try.
+You have bun and Node.js available on this VM. After making sim code \
+changes, you MUST verify they work:
+
+```bash
+# Copy sim to local disk (NFS is too slow for builds)
+cp -r sim /tmp/sim-verify
+cd /tmp/sim-verify/web
+
+# Install and build
+bun install 2>&1 | tail -5
+NODE_ENV=production NEXT_DIST_DIR=.next bun ./node_modules/next/dist/bin/next build 2>&1 | tail -30
+
+# If build fails, FIX IT before continuing
+# Start server and test health endpoint
+mkdir -p /tmp/pglite-data
+NEXT_DIST_DIR=.next NODE_ENV=production PORT=3099 \
+  nohup bun ./node_modules/next/dist/bin/next start --hostname 0.0.0.0 -p 3099 > /tmp/sim-test.log 2>&1 &
+
+# Wait for server and test
+sleep 5
+curl -sf http://127.0.0.1:3099/api/health || curl -sf http://127.0.0.1:3099/
+
+# Test API routes if you know them (check spec.json for api_routes)
+# curl -sf http://127.0.0.1:3099/api/some-route
+
+# Kill test server when done
+fuser -k 3099/tcp 2>/dev/null
+```
+
+If the build fails, fix the issues and try again. Do NOT write edits.json \
+until the build succeeds and the server responds.
 
 Rules for safe sim edits:
-- Make TARGETED, surgical changes. Do not rewrite entire files when you \
-  only need to change seed data or add a few records.
-- If you change `db/schema.ts`, you MUST also update \
-  `drizzle/0000_zippy_changeling.sql` to match.
-- If you add/rename columns, update ALL files that reference the old names \
-  (seed.ts, API routes, page components).
-- NEVER add new npm dependencies. Work with what's already installed.
-- NEVER modify protected files (package.json, tsconfig.json, next.config.ts, \
-  db/client.ts, db/bootstrap.ts, db/types.ts, db/index.ts, \
-  lib/plato-mutation-logger.ts, components/theme-provider.tsx, \
-  app/providers.tsx, app/globals.css).
-- Test your logic mentally: read the code, trace the data flow, confirm \
-  every reference is consistent before writing edits.json.
-
-Common build-breakers to avoid:
-- Raw `<` or `>` in JSX text (use `{'>'}` or `&gt;`)
-- Redefining `apiGet`/`apiPost` instead of importing from `@/lib/api`
-- Importing `@/db/client` in "use client" components
-- Missing `--> statement-breakpoint` between CREATE TABLE statements in SQL
-- Referencing columns/tables that don't exist in the schema
-- Mismatched column types between schema.ts and the migration SQL
-
-If you are unsure your sim code changes will build cleanly, prefer a \
-DATA-ONLY edit (changing seed values in db/seed.ts and the migration SQL) \
-over a code-structure change. Data edits are far less likely to break.
+- Make TARGETED, surgical changes. Do not rewrite entire files.
+- If you change `db/schema.ts`, ALSO update the migration SQL to match.
+- If you add/rename columns, update ALL referencing files.
+- NEVER add new npm dependencies. Work with what's installed.
+- NEVER modify protected files.
 
 **CRITICAL — Testcase JSON structure:**
-When you edit a testcase JSON file, the file MUST contain these fields \
-(keep them consistent with your changes):
-- `name`: short kebab-case identifier (keep the original or use a similar name)
+When editing a testcase JSON file, it MUST contain:
+- `name`: short kebab-case identifier
 - `instruction`: the prompt text the agent sees
 - `start_url`: where the agent starts (default "/")
-- `scoring_type`: "output" or "mutations" — PRESERVE from the original testcase
-- `output_schema`: (for output tasks) JSON Schema describing the answer \
-  structure. MUST always be populated for output tasks.
-- `expected_output`: (for output tasks) the correct answer dict. MUST match \
-  the keys defined in output_schema.
-- `scoring_config`: `{"type": "json_schema", "scoring_schema": {the expected values}}` \
-  — the scoring_schema MUST equal expected_output (duplication is required \
-  by the publishing pipeline).
-- `expected_mutations`: (for mutation tasks) array of mutation objects, each \
-  with `table`, `action`, `row_filter`, and `values`.
+- `scoring_type`: "output" or "mutations" — PRESERVE from original
+- `output_schema`: (for output tasks) JSON Schema for the answer
+- `expected_output`: (for output tasks) correct answer dict
+- `scoring_config`: `{"type": "json_schema", "scoring_schema": {expected values}}`
+- `expected_mutations`: (for mutation tasks) array of mutation objects
 
-If you change the instruction but forget to update scoring_schema and \
-expected_output, the testcase will be UNGRADEABLE and show 0% for the \
-wrong reason.
+scoring_schema MUST equal expected_output. If you change the instruction \
+but forget to update these, the testcase will be UNGRADEABLE.
 
-### Step 5: Output manifest
+### Step 5: Write build proof
 
-After making all edits, write `edits.json` to the workspace root with \
-this structure:
+After verifying the build works, write `build_proof.json` to the workspace:
+
+```json
+{
+  "build_success": true,
+  "server_healthy": true,
+  "build_output_tail": "last 10 lines of build output",
+  "health_check_response": "HTTP 200 or response body snippet",
+  "api_routes_tested": ["GET /api/health -> 200", ...],
+  "verified_at": "ISO timestamp"
+}
+```
+
+If you did NOT change sim code (testcase-only edit), skip this step.
+
+### Step 6: Output manifest
+
+After all edits (and build verification if sim changed), write `edits.json` \
+to the workspace root:
 
 ```json
 {
@@ -731,7 +690,6 @@ The `edit_type` field determines how changes are published:
 - `testcase_only`: new testcases linked to existing snapshot
 - `sim_and_testcase` or `sim_only`: new snapshot + all testcases refreshed
 
-IMPORTANT: You MUST write `edits.json` when you are done. The \
-`iteration_summary` field is critical — it will be passed to subsequent \
-iterations so they can learn from your attempt.\
+IMPORTANT: You MUST write `edits.json` when done. The `iteration_summary` \
+field is critical — it will be passed to subsequent iterations.\
 """

@@ -999,13 +999,19 @@ else:
                 logger.info("  [%s] Installed nextapp.service for boot", vs.variant_key)
 
                 # ── ENSURE SIMULATOR CATALOG ENTRY EXISTS ─────────────
+                skill_def = next(
+                    (s for s in self._skills if s.name == vs.skill_name), None
+                )
+                skill_desc = skill_def.description if skill_def else ""
                 sim_description = (
-                    f"[skill: {vs.skill_name}] {spec.get('description', '') or ''}"
+                    f"[skill: {vs.skill_name}] {skill_desc}"
+                    f" | {spec.get('description', '') or ''}"
                 ).strip()
                 actual_name = await self._register_simulator(
                     http, api_key, sim_name, sim_description,
                     icon_svg=spec.get("icon_svg", ""),
                     label=vs.variant_key,
+                    skill_gym=vs.skill_name,
                 )
                 if actual_name != sim_name:
                     sim_name = actual_name
@@ -1406,6 +1412,7 @@ else:
         description: str,
         icon_svg: str = "",
         label: str = "",
+        skill_gym: str = "",
     ) -> str:
         """Create a simulator, bumping to -v2, -v3 etc. on name collision.
 
@@ -1421,6 +1428,9 @@ else:
             _sim_config = SimulatorConfig(type="docker_app")  # type: ignore[arg-type]
         except Exception:
             _sim_config = SimulatorConfig.from_dict({"type": "docker_app"})
+
+        if skill_gym:
+            _sim_config.skill_gym = skill_gym  # type: ignore[attr-defined]
 
         icon_url = self._icon_svg_to_data_uri(icon_svg) or "https://plato.so/favicon.ico"
 
@@ -1446,7 +1456,6 @@ else:
                         enabled=True,
                         imgUrl=icon_url,
                         internalAppPort=3000,
-                        is_skill_gym=True,
                     ),
                     x_api_key=api_key,
                 )
@@ -2814,10 +2823,14 @@ else:
         current_artifact_id: str,
         edits: dict,
     ) -> str | None:
-        """Boot from existing snapshot, apply sim edits, verify, re-snapshot.
+        """Boot from existing snapshot, apply sim edits, build, snapshot.
 
-        Includes the same verification + claude-code fallback as the
-        initial CODEGEN pipeline. Returns new artifact_id or None on failure.
+        The hillclimb agent already validated the build on its own VM
+        (build_proof.json). We still build on the snapshot VM because
+        the tarball has no .next/ directory, but skip the heavy
+        fix-agent fallback — if it fails here the iteration is abandoned.
+
+        Returns new artifact_id or None on failure.
         """
         from plato._generated.api.v2.sessions import (
             close as sessions_close,
@@ -2840,6 +2853,21 @@ else:
         if not sim_dir.is_dir():
             logger.error("HILLCLIMB [%s] no sim/ directory for edits", vs.variant_key)
             return None
+
+        build_proof = workspace_dir / "build_proof.json"
+        agent_verified = build_proof.exists()
+        if agent_verified:
+            logger.info(
+                "HILLCLIMB [%s] agent provided build_proof.json — "
+                "skipping fix-agent fallback",
+                vs.variant_key,
+            )
+        else:
+            logger.warning(
+                "HILLCLIMB [%s] no build_proof.json — agent did not "
+                "self-verify; build may fail",
+                vs.variant_key,
+            )
 
         spec = next(
             (s for s in self._variant_specs if s.get("slug") == vs.variant_key), {}
@@ -2886,7 +2914,6 @@ else:
                 )
 
                 app_dir = "/tmp/variant/web"
-
                 preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
 
                 await _exec(
@@ -2896,7 +2923,6 @@ else:
                     timeout=10,
                 )
 
-                # Upload edited sim code as tarball
                 tarball = self._tar_variant(sim_dir.parent, f"hc-{vs.variant_key}")
                 url = self._upload_to_s3(
                     tarball,
@@ -2910,8 +2936,7 @@ else:
                     timeout=180,
                 )
 
-                # ── BUILD — always needed since tarball has no .next ─────
-                needs_rebuild = True
+                # ── BUILD ────────────────────────────────────────────
                 await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
                 await _exec(f"rm -rf {app_dir}/.next", timeout=10)
                 await _exec(
@@ -2932,7 +2957,7 @@ else:
                     )
                     return None
 
-                # ── Start server + verify ──────────────────────────────
+                # ── Start server + verify ────────────────────────────
                 await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
                 await _exec(
                     f"{preamble} && cd {app_dir} && mkdir -p /tmp/pglite-data && "
@@ -2947,112 +2972,16 @@ else:
                 )
 
                 if not all(c["pass"] for c in verify_checks):
-                    # ── Claude-code fallback: let agent fix the issues ─
-                    if config.coder_agent:
-                        failed_names = [
-                            c["name"] for c in verify_checks if not c["pass"]
-                        ]
-                        logger.info(
-                            "HILLCLIMB [%s] verify failed (%s), launching fix agent",
-                            vs.variant_key,
-                            ", ".join(failed_names),
-                        )
-                        try:
-                            from .codegen_agent import build_codegen_instruction
-
-                            fix_instruction = build_codegen_instruction(
-                                spec=spec,
-                                slug=vs.variant_key,
-                                variant_dir=f"/workspace/output/hillclimb/{vs.variant_key}",
-                                verify_port=config.codegen_verify_port,
-                                files_written=[],
-                                validation_errors=[],
-                                deps_installed=True,
-                                check_results=verify_checks,
-                            )
-                            runner = self.agent(
-                                config.coder_agent,
-                                display_name=f"hc-fix-{vs.variant_key}",
-                                workspaces=[self.workspace("output")],
-                            )
-                            await runner.run(instruction=fix_instruction)
-                            logger.info(
-                                "HILLCLIMB [%s] fix agent complete, re-uploading",
-                                vs.variant_key,
-                            )
-
-                            tarball = self._tar_variant(
-                                sim_dir.parent, f"hc-fix-{vs.variant_key}"
-                            )
-                            url = self._upload_to_s3(
-                                tarball,
-                                f"{S3_PREFIX}/{vs.sim_name}-hc-fix.tar.gz",
-                            )
-                            await _exec(
-                                f"curl -sfL '{url}' -o /tmp/hc-fix.tar.gz && "
-                                "tar xzf /tmp/hc-fix.tar.gz -C /tmp/variant "
-                                "--strip-components=0",
-                                timeout=180,
-                            )
-
-                            if needs_rebuild:
-                                await _exec(
-                                    "fuser -k 3000/tcp 2>/dev/null; sleep 1",
-                                    timeout=10,
-                                )
-                                await _exec(
-                                    f"rm -rf {app_dir}/.next", timeout=10
-                                )
-                                build_out, build_ok = await _exec(
-                                    f"{preamble} && cd {app_dir} && "
-                                    "bun install 2>&1 | tail -5 && "
-                                    "NODE_ENV=production NEXT_DIST_DIR=.next "
-                                    "bun ./node_modules/next/dist/bin/next "
-                                    "build 2>&1 | tail -20",
-                                    timeout=300,
-                                )
-                                if not build_ok:
-                                    logger.error(
-                                        "HILLCLIMB [%s] fix-rebuild failed",
-                                        vs.variant_key,
-                                    )
-                                    return None
-
-                            await _exec(
-                                "fuser -k 3000/tcp 2>/dev/null; sleep 1",
-                                timeout=10,
-                            )
-                            await _exec(
-                                f"{preamble} && cd {app_dir} && "
-                                "mkdir -p /tmp/pglite-data && "
-                                "NEXT_DIST_DIR=.next NODE_ENV=production "
-                                "PORT=3000 nohup node "
-                                "./node_modules/next/dist/bin/next start "
-                                "--hostname 0.0.0.0 -p 3000 "
-                                "> /tmp/dev.log 2>&1 &",
-                                timeout=30,
-                            )
-
-                            retry_checks = await self._verify_sim_on_vm(
-                                _exec, api_routes, f"hc-fix-{vs.variant_key}"
-                            )
-                            if not all(c["pass"] for c in retry_checks):
-                                logger.error(
-                                    "HILLCLIMB [%s] still failing after fix agent",
-                                    vs.variant_key,
-                                )
-                                return None
-                        except Exception as e:
-                            logger.error(
-                                "HILLCLIMB [%s] fix agent error: %s", vs.variant_key, e
-                            )
-                            return None
-                    else:
-                        logger.error(
-                            "HILLCLIMB [%s] verify failed, no coder_agent configured",
-                            vs.variant_key,
-                        )
-                        return None
+                    failed_names = [
+                        c["name"] for c in verify_checks if not c["pass"]
+                    ]
+                    logger.error(
+                        "HILLCLIMB [%s] verify failed (%s) — agent should "
+                        "have caught this during self-validation",
+                        vs.variant_key,
+                        ", ".join(failed_names),
+                    )
+                    return None
 
                 # ── Seed + Snapshot (new artifact on existing sim) ────
                 await self._seed_api_routes(
@@ -3323,37 +3252,157 @@ else:
 
     def _build_summary(self) -> str:
         lines = [
-            "=" * 60,
-            "SKILL TEST GENERATOR — SUMMARY",
-            "=" * 60,
-            f"Skills: {self.state.skills_loaded}",
+            "=" * 72,
+            "SKILL TEST GENERATOR — FINAL SUMMARY",
+            "=" * 72,
+            f"Skills loaded: {self.state.skills_loaded}",
+            f"Total variants: {len(self.state.variants)}",
             "",
         ]
+
+        # Group variants by skill
+        from collections import defaultdict
+        skill_variants: dict[str, list] = defaultdict(list)
         for vs in self.state.variants:
-            status = f"[{vs.stage}]"
-            tasks = f" ({vs.task_count} tasks)" if vs.task_count else ""
-            passed = sum(1 for t in vs.task_results if t.get("score", 0) > 0)
-            errored = sum(
-                1
-                for t in vs.task_results
-                if t.get("outcome") == "ERROR"
-                or t.get("status") in ("failed", "error", "cancelled")
-            )
-            completed = len(vs.task_results) - errored
-            rate = f" pass_rate={passed}/{completed}" if completed else " pass_rate=0/0"
-            if errored:
-                rate += f" ({errored} errored out)"
-            err = f" ERROR: {vs.error}" if vs.error else ""
-            lines.append(f"  {status} {vs.skill_name}{tasks}{rate}{err}")
-            for tr in vs.task_results:
-                outcome = tr.get("outcome", "FAIL")
-                if not outcome:
-                    outcome = "PASS" if tr.get("score", 0) > 0 else "FAIL"
-                lines.append(
-                    f"    [{outcome}] {tr.get('task_name', '')} "
-                    f"chronos={tr.get('chronos_url', '')} "
-                    f"plato={tr.get('plato_url', '')}"
+            skill_variants[vs.skill_name].append(vs)
+
+        overall_pass = 0
+        overall_fail = 0
+        overall_error = 0
+        finalized_sims = 0
+
+        for skill_name, variants in skill_variants.items():
+            lines.append(f"SKILL: {skill_name}")
+            lines.append("-" * 72)
+
+            for vs in variants:
+                # Compute pass rate for this variant
+                v_pass = sum(1 for t in vs.task_results if t.get("outcome") == "PASS")
+                v_fail = sum(1 for t in vs.task_results if t.get("outcome") == "FAIL")
+                v_error = sum(
+                    1
+                    for t in vs.task_results
+                    if t.get("outcome") == "ERROR"
+                    or t.get("status") in ("failed", "error", "cancelled")
                 )
+                v_completed = v_pass + v_fail
+                v_rate = (
+                    f"{v_pass}/{v_completed} ({v_pass/v_completed*100:.0f}%)"
+                    if v_completed
+                    else "N/A"
+                )
+
+                lines.append(
+                    f"  SPEC: {vs.variant_key}  "
+                    f"[sim: {vs.sim_name or 'N/A'}]  "
+                    f"pass_rate={v_rate}"
+                    + (f"  ({v_error} errors)" if v_error else "")
+                )
+
+                if v_completed > 0:
+                    finalized_sims += 1
+
+                overall_pass += v_pass
+                overall_fail += v_fail
+                overall_error += v_error
+
+                # Per-testcase breakdown
+                tc_results: dict[str, list[dict]] = defaultdict(list)
+                for tr in vs.task_results:
+                    tc_key = tr.get("testcase_id", tr.get("task_name", "unknown"))
+                    tc_results[tc_key].append(tr)
+
+                for tc_id, results in tc_results.items():
+                    task_name = results[0].get("task_name", "unknown")
+                    tc_pass = sum(1 for r in results if r.get("outcome") == "PASS")
+                    tc_fail = sum(1 for r in results if r.get("outcome") == "FAIL")
+                    tc_err = sum(
+                        1 for r in results
+                        if r.get("outcome") == "ERROR"
+                        or r.get("status") in ("failed", "error", "cancelled")
+                    )
+                    tc_done = tc_pass + tc_fail
+                    tc_rate = (
+                        f"{tc_pass}/{tc_done}"
+                        if tc_done
+                        else "N/A"
+                    )
+
+                    lines.append(
+                        f"    TESTCASE: {task_name}  [{tc_id[:16]}]  "
+                        f"pass={tc_rate}"
+                        + (f"  ({tc_err} errors)" if tc_err else "")
+                    )
+
+                    for r in results:
+                        outcome = r.get("outcome", "?")
+                        attempt = r.get("attempt", 1)
+                        is_retry = attempt > 1 or outcome == "ERROR"
+                        chronos = r.get("chronos_url", "")
+                        plato = r.get("plato_url", "")
+                        if is_retry and outcome == "ERROR":
+                            lines.append(
+                                f"      [attempt {attempt}] {outcome}  "
+                                f"chronos={chronos}"
+                            )
+                        else:
+                            lines.append(
+                                f"      [attempt {attempt}] {outcome}  "
+                                f"chronos={chronos}  plato={plato}"
+                            )
+
+                # Hillclimb iterations
+                if vs.testcase_hillclimb_state:
+                    lines.append(f"    HILLCLIMB ITERATIONS:")
+                    for hc_tc_id, tc_state in vs.testcase_hillclimb_state.items():
+                        lines.append(
+                            f"      TC {hc_tc_id[:16]}: "
+                            f"{tc_state.original_pass_rate*100:.0f}% → "
+                            f"{tc_state.best_pass_rate*100:.0f}% "
+                            f"({len(tc_state.iterations)-1} retries)"
+                        )
+                        for idx, it in enumerate(tc_state.iterations):
+                            best = " ← BEST" if idx == tc_state.best_iteration_idx else ""
+                            summary = (
+                                f" | {it.edits_summary[:80]}"
+                                if it.edits_summary
+                                else ""
+                            )
+                            lines.append(
+                                f"        iter {it.iteration}: "
+                                f"{it.pass_rate*100:.0f}% "
+                                f"(tc={it.testcase_id[:12]}, "
+                                f"artifact={it.artifact_id[:12] if it.artifact_id else 'n/a'})"
+                                f"{best}{summary}"
+                            )
+                            for hr in it.task_results:
+                                h_outcome = hr.get("outcome", "?")
+                                h_chronos = hr.get("chronos_url", "")
+                                h_plato = hr.get("plato_url", "")
+                                lines.append(
+                                    f"          [{h_outcome}] "
+                                    f"chronos={h_chronos}  plato={h_plato}"
+                                )
+
+            lines.append("")
+
+        # Overall summary
+        lines.append("=" * 72)
+        lines.append("OVERALL")
+        lines.append("=" * 72)
+        total_completed = overall_pass + overall_fail
+        if total_completed:
+            lines.append(
+                f"Pass rate (excl. errors): {overall_pass}/{total_completed} "
+                f"= {overall_pass/total_completed*100:.1f}%"
+            )
+        lines.append(
+            f"Total: {overall_pass} PASS | {overall_fail} FAIL | "
+            f"{overall_error} ERROR"
+        )
+        lines.append(f"Finalized sims (with completed sessions): {finalized_sims}")
+        lines.append("=" * 72)
+
         return "\n".join(lines)
 
     async def close(self) -> None:
