@@ -285,16 +285,36 @@ async def generate_tasks_for_variant(
             f"from the data above."
         )
 
-    async with client.messages.stream(
-        model=model,
-        max_tokens=8192,
-        system=system_prompt,
-        messages=[{"role": "user", "content": user_prompt}],
-    ) as stream:
-        response = await stream.get_final_message()
+    max_attempts = 3
+    last_err: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            async with client.messages.stream(
+                model=model,
+                max_tokens=8192,
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_prompt}],
+            ) as stream:
+                response = await stream.get_final_message()
 
-    parsed = _extract_json(response.content[0].text)
-    return parsed.get("tasks", [])
+            raw_text = response.content[0].text
+            parsed = _extract_json(raw_text)
+            tasks = parsed.get("tasks", [])
+            if not tasks:
+                raise ValueError("LLM returned valid JSON but 'tasks' array is empty")
+            return tasks
+        except (ValueError, json.JSONDecodeError, KeyError, IndexError) as e:
+            last_err = e
+            logger.warning(
+                "Task generation attempt %d/%d failed for '%s': %s",
+                attempt,
+                max_attempts,
+                spec.get("slug", "?"),
+                e,
+            )
+            if attempt < max_attempts:
+                await asyncio.sleep(2 * attempt)
+    raise last_err  # type: ignore[misc]
 
 
 async def generate_all_tasks(
@@ -329,6 +349,9 @@ async def generate_all_tasks(
                     output_tasks=output_tasks,
                     mutation_tasks=mutation_tasks,
                 )
+                if not tasks:
+                    logger.error("No tasks generated for '%s' after retries", slug)
+                    return slug, []
 
                 tasks_path.parent.mkdir(parents=True, exist_ok=True)
                 tasks_path.write_text(json.dumps({"tasks": tasks}, indent=2))

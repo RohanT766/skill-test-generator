@@ -459,11 +459,21 @@ async def design_variant(
         ) as stream:
             return await stream.get_final_message()
 
-    response = await _api_call_with_retry(_design_call, label="Design LLM")
-    if response.stop_reason == "max_tokens":
-        logger.warning("Design LLM hit max_tokens — output may be truncated")
-
-    spec = _extract_json(response.content[0].text)
+    last_parse_err: Exception | None = None
+    for parse_attempt in range(3):
+        response = await _api_call_with_retry(_design_call, label="Design LLM")
+        if response.stop_reason == "max_tokens":
+            logger.warning("Design LLM hit max_tokens — output may be truncated")
+        try:
+            spec = _extract_json(response.content[0].text)
+            break
+        except (ValueError, KeyError, json.JSONDecodeError) as e:
+            last_parse_err = e
+            logger.warning(
+                "Design JSON parse attempt %d/3 failed: %s", parse_attempt + 1, e
+            )
+    else:
+        raise last_parse_err  # type: ignore[misc]
 
     if ref:
         spec["_reference_screenshot"] = ref_meta.get("filename", "")

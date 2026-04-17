@@ -315,7 +315,24 @@ def extract_json(text: str) -> dict:
             except json.JSONDecodeError:
                 continue
 
+    # Array fallback: LLM may have returned a bare JSON array instead of an
+    # object.  Wrap it as {"tasks": [...]}.
+    arr_match = re.search(r"\[[\s\S]*\]", text)
+    if arr_match:
+        arr_text = arr_match.group(0)
+        for attempt in (arr_text, _clean_js(arr_text), _fix_json_strings(arr_text)):
+            try:
+                parsed = json.loads(attempt)
+                if isinstance(parsed, list) and parsed:
+                    logger.warning(
+                        "LLM returned a bare JSON array (%d items); wrapping as {tasks: [...]}",
+                        len(parsed),
+                    )
+                    return {"tasks": parsed}
+            except json.JSONDecodeError:
+                continue
+
     raise ValueError(
         f"Failed to parse JSON from LLM output (first 500 chars): "
-        f"{text[text.index('{') : text.index('{') + 500]}"
+        f"{text[text.index('{') if '{' in text else 0 : (text.index('{') if '{' in text else 0) + 500]}"
     )
