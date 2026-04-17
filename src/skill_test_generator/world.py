@@ -958,7 +958,7 @@ else:
 
                 # ── SEED API ROUTES (server still running from verify) ──
                 await self._seed_api_routes(
-                    _exec, api_routes, vs.variant_key, retries=10
+                    _exec, api_routes, vs.variant_key, retries=2
                 )
 
                 # ── BOOT SERVICE (so app starts on snapshot restore) ──
@@ -1261,6 +1261,7 @@ else:
         label: str,
         *,
         retries: int = 1,
+        hard_timeout: float = 120,
     ) -> None:
         """Hit non-dynamic API routes to seed the database before snapshot."""
         seed_routes = [
@@ -1272,12 +1273,21 @@ else:
         ]
         if not seed_routes and retries > 1:
             seed_routes = ["/api/items", "/api/data"]
+        deadline = asyncio.get_event_loop().time() + hard_timeout
         for route in seed_routes:
             for attempt in range(retries):
+                if asyncio.get_event_loop().time() > deadline:
+                    logger.warning(
+                        "  [%s] Seed hard timeout (%.0fs) reached, skipping remaining routes",
+                        label,
+                        hard_timeout,
+                    )
+                    await asyncio.sleep(1)
+                    return
                 out, _ = await _exec(
                     f"curl -s -w '\\nHTTP_CODE:%{{http_code}}' "
                     f"http://127.0.0.1:3000{route} 2>&1 | tail -c 2000",
-                    timeout=30,
+                    timeout=15,
                 )
                 if "HTTP_CODE:200" in out and len(out) > 30:
                     if retries > 1:
@@ -1289,8 +1299,21 @@ else:
                         )
                     break
                 if attempt < retries - 1:
-                    await asyncio.sleep(3)
-        await asyncio.sleep(3)
+                    logger.debug(
+                        "  [%s] Seed %s attempt %d failed, retrying…",
+                        label,
+                        route,
+                        attempt,
+                    )
+                    await asyncio.sleep(2)
+                else:
+                    logger.warning(
+                        "  [%s] Seed %s failed after %d attempts, skipping",
+                        label,
+                        route,
+                        retries,
+                    )
+        await asyncio.sleep(2)
 
     @staticmethod
     def _classify_session_outcome(result: dict) -> str:
