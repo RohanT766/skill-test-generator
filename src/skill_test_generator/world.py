@@ -1432,6 +1432,7 @@ else:
             _sim_config = SimulatorConfig.from_dict({"type": "docker_app"})
 
         if skill_gym:
+            _sim_config.is_skill_gym = True  # type: ignore[attr-defined]
             _sim_config.skill_gym = skill_gym  # type: ignore[attr-defined]
         if skill_name:
             _sim_config.skill_name = skill_name  # type: ignore[attr-defined]
