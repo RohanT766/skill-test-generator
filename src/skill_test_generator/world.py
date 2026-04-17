@@ -1012,6 +1012,7 @@ else:
                     icon_svg=spec.get("icon_svg", ""),
                     label=vs.variant_key,
                     skill_gym=vs.skill_name,
+                    skill_name=skill_desc,
                 )
                 if actual_name != sim_name:
                     sim_name = actual_name
@@ -1413,6 +1414,7 @@ else:
         icon_svg: str = "",
         label: str = "",
         skill_gym: str = "",
+        skill_name: str = "",
     ) -> str:
         """Create a simulator, bumping to -v2, -v3 etc. on name collision.
 
@@ -1431,6 +1433,8 @@ else:
 
         if skill_gym:
             _sim_config.skill_gym = skill_gym  # type: ignore[attr-defined]
+        if skill_name:
+            _sim_config.skill_name = skill_name  # type: ignore[attr-defined]
 
         icon_url = self._icon_svg_to_data_uri(icon_svg) or "https://plato.so/favicon.ico"
 
