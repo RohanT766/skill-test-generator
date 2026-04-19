@@ -1524,9 +1524,11 @@ else:
                     )
 
                 tc_name = f"{vs.slug}-{task.get('name', 'unnamed')}"
+                hint = task.get("hint", "") or ""
                 req = CreateTestCaseRequest(
                     name=tc_name,
                     prompt=task.get("instruction", ""),
+                    hint=hint or None,
                     start_url=task.get("start_url", "/"),
                     simulator_artifact_ids=[artifact_id],
                     tags=tc_tags,
