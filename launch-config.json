@@ -64,7 +64,8 @@
         "enabled": false,
         "total_failures": 1,
         "max_retries": 2
-      }
+      },
+      "dry_run": false
     }
   },
   "retry": {

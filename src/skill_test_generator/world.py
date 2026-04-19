@@ -256,6 +256,9 @@ class SkillTestGeneratorWorld(
             await handler()
             state.stage_completed[stage.value] = True
 
+        if config.dry_run:
+            await self._cleanup_dry_run()
+
         return StepResult(
             observation=Observation(text=self._build_summary()),
             done=True,
@@ -3254,6 +3257,183 @@ else:
                     logger.info(
                         "Loaded %d tasks from API for %s", len(tasks), vs.variant_key
                     )
+
+    # ------------------------------------------------------------------
+    # DRY RUN CLEANUP: archive testcases + set sims out of service
+    # ------------------------------------------------------------------
+
+    async def _cleanup_dry_run(self) -> None:
+        """Archive all testcases and set sims out of service for this run.
+
+        Collects every artifact_id, testcase_id, and sim_name produced during
+        the pipeline (including hillclimb iterations), then tears everything
+        down via the Plato API so the run leaves no active resources behind.
+        """
+        config = self.config
+        variants = self.state.variants
+
+        all_sim_names: set[str] = set()
+        all_testcase_public_ids: set[str] = set()
+        all_artifact_ids: set[str] = set()
+
+        for vs in variants:
+            if vs.sim_name:
+                all_sim_names.add(vs.sim_name)
+            if vs.artifact_id:
+                all_artifact_ids.add(vs.artifact_id)
+            for tc_id in vs.testcase_ids:
+                if tc_id:
+                    all_testcase_public_ids.add(tc_id)
+
+            for tc_state in vs.testcase_hillclimb_state.values():
+                if tc_state.best_testcase_id:
+                    all_testcase_public_ids.add(tc_state.best_testcase_id)
+                for it in tc_state.iterations:
+                    if it.testcase_id:
+                        all_testcase_public_ids.add(it.testcase_id)
+                    if it.artifact_id:
+                        all_artifact_ids.add(it.artifact_id)
+
+        logger.info("=" * 60)
+        logger.info("DRY RUN CLEANUP")
+        logger.info("=" * 60)
+        logger.info(
+            "Resources to clean up: %d sims, %d testcase IDs, %d artifact IDs",
+            len(all_sim_names),
+            len(all_testcase_public_ids),
+            len(all_artifact_ids),
+        )
+        for name in sorted(all_sim_names):
+            logger.info("  sim: %s", name)
+
+        if not all_sim_names:
+            logger.info("No sims to clean up, skipping dry-run cleanup")
+            return
+
+        async with httpx.AsyncClient(
+            base_url=config.plato_api_url,
+            timeout=httpx.Timeout(30.0),
+            headers={"X-API-Key": config.plato_api_key},
+        ) as http:
+            # Step 1: Resolve sim names → numeric sim IDs
+            sim_name_to_id: dict[str, int] = {}
+            try:
+                resp = await http.get("/api/v1/simulator/list")
+                resp.raise_for_status()
+                for s in resp.json():
+                    if s.get("name") in all_sim_names:
+                        sim_name_to_id[s["name"]] = s["id"]
+            except Exception as e:
+                logger.error("Failed to fetch simulator list: %s", e)
+                return
+
+            logger.info(
+                "Resolved %d/%d sim names to IDs",
+                len(sim_name_to_id),
+                len(all_sim_names),
+            )
+            for name, sid in sorted(sim_name_to_id.items()):
+                logger.info("  %s -> ID %d", name, sid)
+
+            unresolved = all_sim_names - set(sim_name_to_id.keys())
+            if unresolved:
+                logger.warning("Could not resolve sims: %s", sorted(unresolved))
+
+            # Step 2: Find testcase numeric IDs linked to our sims
+            sim_id_set = set(sim_name_to_id.values())
+            tc_numeric_ids: list[int] = []
+            page = 1
+            page_size = 200
+            total_pages = None
+
+            while sim_id_set:
+                try:
+                    resp = await http.get(
+                        "/api/v1/testcases",
+                        params={
+                            "simulator_name": config.sim_name_prefix,
+                            "page": page,
+                            "page_size": page_size,
+                        },
+                    )
+                    resp.raise_for_status()
+                    data = resp.json()
+                except Exception as e:
+                    logger.error("Failed to fetch testcases page %d: %s", page, e)
+                    break
+
+                pagination = data.get("pagination", {})
+                if total_pages is None:
+                    total_pages = pagination.get("total_pages", 1)
+
+                for tc in data.get("testcases", []):
+                    tc_sim_ids = set(tc.get("testcaseSimulatorIds") or [])
+                    tc_public_id = tc.get("publicId") or tc.get("public_id", "")
+                    if (tc_sim_ids & sim_id_set) or (
+                        tc_public_id in all_testcase_public_ids
+                    ):
+                        tc_numeric_ids.append(tc["id"])
+
+                if page >= (total_pages or 1):
+                    break
+                page += 1
+
+            logger.info("Found %d testcases to archive", len(tc_numeric_ids))
+
+            # Step 3: Bulk archive testcases
+            batch_size = 50
+            archived_ok = 0
+            archived_fail = 0
+            for i in range(0, len(tc_numeric_ids), batch_size):
+                batch = tc_numeric_ids[i : i + batch_size]
+                try:
+                    resp = await http.post(
+                        "/api/v1/testcases/bulk-archive",
+                        json={"test_case_ids": batch},
+                    )
+                    resp.raise_for_status()
+                    archived_ok += len(batch)
+                except Exception as e:
+                    logger.error(
+                        "Failed to archive batch %d-%d: %s", i, i + len(batch), e
+                    )
+                    archived_fail += len(batch)
+
+            logger.info(
+                "Archived testcases: %d ok, %d failed", archived_ok, archived_fail
+            )
+
+            # Step 4: Set sims to out_of_service
+            oos_ok = 0
+            oos_fail = 0
+            for sim_name, sim_id in sorted(sim_name_to_id.items()):
+                try:
+                    resp = await http.post(
+                        f"/api/v1/simulator/{sim_id}/status",
+                        json={"status": "out_of_service"},
+                    )
+                    resp.raise_for_status()
+                    oos_ok += 1
+                    logger.info("  Set sim '%s' (ID %d) to out_of_service", sim_name, sim_id)
+                except Exception as e:
+                    logger.warning(
+                        "  Failed to set sim '%s' (ID %d) OOS: %s",
+                        sim_name, sim_id, e,
+                    )
+                    oos_fail += 1
+
+            logger.info(
+                "Sim status updates: %d ok, %d failed", oos_ok, oos_fail
+            )
+
+        logger.info("=" * 60)
+        logger.info(
+            "DRY RUN CLEANUP COMPLETE — %d testcases archived, %d sims set OOS",
+            archived_ok,
+            oos_ok,
+        )
+        logger.info("Tracked artifact IDs: %s", sorted(all_artifact_ids))
+        logger.info("=" * 60)
 
     def _build_summary(self) -> str:
         lines = [

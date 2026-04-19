@@ -349,6 +349,15 @@ class SkillTestGeneratorConfig(RunConfig):
         description="Hillclimb difficulty-tuning configuration.",
     )
 
+    dry_run: bool = Field(
+        default=False,
+        description=(
+            "When enabled, automatically cleans up after the run completes: "
+            "archives all testcases created during this run and sets all "
+            "simulators created during this run to out_of_service."
+        ),
+    )
+
 
 class SkillTestGeneratorState(BaseModel):
     """Tracks pipeline progress across steps."""
