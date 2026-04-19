@@ -71,13 +71,8 @@ Respond with a JSON object (no markdown fencing):
   - "scoring_type": always "output"
   - "output_schema": JSON Schema for the answer (minimal keys needed)
   - "expected_output": the correct answer matching output_schema
-  - "hint": a 1-3 sentence guidance for the agent explaining the approach \
-needed to solve this task correctly. Do NOT reveal the answer or expected \
-values. Instead, describe the general strategy — e.g. "Check all pages of \
-results, not just the first page" or "Expand truncated values by clicking \
-on them before reading". The hint should make the skill explicit without \
-giving away the specific data. Think of it as coaching the agent on what \
-technique to use, not what the answer is.
+  - "hint": coaching for the agent on what technique or approach to use, \
+without revealing the answer
   - "scoring_hint": what to verify (internal, not shown to agent)
   - "skill_required": why this task needs the tested skill (internal)\
 """
@@ -130,13 +125,8 @@ Respond with a JSON object (no markdown fencing):
     - "action": "insert" | "update" | "delete"
     - "row_filter": identifies the row (e.g. {"id": 5})
     - "values": expected field values after the change
-  - "hint": a 1-3 sentence guidance for the agent explaining the approach \
-needed to solve this task correctly. Do NOT reveal the answer or expected \
-values. Instead, describe the general strategy — e.g. "Navigate to the \
-record's detail view and edit from there, not from the list view" or \
-"Make sure you are modifying the correct record by verifying all \
-identifying fields, not just the name". The hint should make the skill \
-explicit without giving away the specific data.
+  - "hint": coaching for the agent on what technique or approach to use, \
+without revealing the answer
   - "scoring_hint": what to verify (internal, not shown to agent)
   - "skill_required": why this task needs the tested skill (internal)\
 """
@@ -203,12 +193,8 @@ Respond with a JSON object (no markdown fencing):
     - "action": "insert" | "update" | "delete"
     - "row_filter": identifies the row (e.g. {"id": 5})
     - "values": expected field values after the change
-  - "hint": a 1-3 sentence guidance for the agent explaining the approach \
-needed to solve this task correctly. Do NOT reveal the answer or expected \
-values. Instead, describe the general strategy — e.g. "Check all pages of \
-results before answering" or "Look for similar names and verify you have \
-the right one by cross-referencing other fields". The hint should make the \
-skill explicit without giving away the specific data.
+  - "hint": coaching for the agent on what technique or approach to use, \
+without revealing the answer
   - "scoring_hint": what to verify (internal, not shown to agent)
   - "skill_required": why this task needs the tested skill (internal)\
 """
