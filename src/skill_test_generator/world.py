@@ -394,9 +394,10 @@ class SkillTestGeneratorWorld(
         snapshot → task-gen → testcase-creation on its own isolated VM.
         Replaces the old sequential CODEGEN → TASKS → PUBLISH stages.
 
-        Two independent semaphores gate concurrency:
+        Three independent semaphores gate concurrency:
           • llm_sem  — concurrent LLM API calls  (config.design_concurrency)
           • vm_sem   — concurrent pipeline VMs    (config.vm_concurrency)
+          • av_sem   — concurrent autoverify sessions (config.run_concurrency)
         """
         import anthropic as _anthropic
 
@@ -427,6 +428,7 @@ class SkillTestGeneratorWorld(
         llm_client = _anthropic.AsyncAnthropic(api_key=config.anthropic_api_key)
         llm_sem = asyncio.Semaphore(config.design_concurrency)
         vm_sem = asyncio.Semaphore(config.vm_concurrency)
+        av_sem = asyncio.Semaphore(config.run_concurrency)
 
         eligible = [vs for vs in self.state.variants if vs.stage == "designed"]
         logger.info(
@@ -637,8 +639,15 @@ class SkillTestGeneratorWorld(
                     json.dumps({"tasks": generated_tasks}, indent=2),
                 )
 
-            # ── Phase 3: Create testcases ─────────────────────────────
+            # ── Phase 2c: Autoverify (optional) ───────────────────────
             tasks = self._all_tasks.get(vs.variant_key, [])
+            if config.autoverify and tasks and artifact_id:
+                try:
+                    await self._autoverify_tasks(vs, tasks, artifact_id, av_sem)
+                except Exception as e:
+                    logger.error("  [%s] Autoverify error: %s", vs.variant_key, e)
+
+            # ── Phase 3: Create testcases ─────────────────────────────
             if tasks and artifact_id:
                 try:
                     new_ids = await self._create_testcases(vs, tasks, artifact_id)
@@ -1512,12 +1521,22 @@ else:
         ) as http:
             for task in tasks:
                 scoring_type = task.get("scoring_type", "output")
-                v2_scoring_config = _build_v2_scoring_config(task, sim_name)
+
+                # Prefer autoverify-generated scoring config over LLM-generated
+                av_config = task.get("_av_scoring_config")
+                if av_config:
+                    v2_scoring_config = av_config
+                    logger.info(
+                        "  [%s] Using autoverify scoring config for '%s'",
+                        vs.variant_key, task.get("name", "unnamed"),
+                    )
+                else:
+                    v2_scoring_config = _build_v2_scoring_config(task, sim_name)
 
                 if not v2_scoring_config and task.get("scoring_config"):
                     logger.warning(
                         "  [%s] scoring_config present but "
-                        "_build_v2_scoring_config returned None for '%s' — "
+                        "no scoring config available for '%s' — "
                         "testcase may be ungradeable",
                         vs.variant_key,
                         task.get("name", "unnamed"),
@@ -1536,6 +1555,9 @@ else:
 
                 if v2_scoring_config:
                     req.v2_scoring_config = v2_scoring_config
+                av_gen_result = task.get("_av_generation_result")
+                if av_gen_result:
+                    req.v2_scoring_generation_result = av_gen_result
                 if scoring_type == "output" and task.get("output_schema"):
                     req.output_schema = task["output_schema"]
 
@@ -1558,6 +1580,277 @@ else:
                     logger.error("  Testcase creation error for '%s': %s", tc_name, e)
 
         return created_ids
+
+    # ------------------------------------------------------------------
+    # AUTOVERIFY: run agent sessions → call v2 auto_verify → get scoring config
+    # ------------------------------------------------------------------
+
+    async def _autoverify_tasks(
+        self,
+        vs: VariantStatus,
+        tasks: list[dict],
+        artifact_id: str,
+        av_sem: asyncio.Semaphore,
+    ) -> None:
+        """Run autoverify for each task: launch agent sessions, extract output,
+        call the v2 auto_verify endpoint, and replace the LLM-generated scoring
+        config with the one derived from real agent runs.
+        """
+        config = self.config
+        sim_name = vs.sim_name
+
+        from plato.chronos.api.jobs import launch_job
+        from plato.chronos.api.sessions import get_session_logs
+        from plato.chronos.models import (
+            LaunchJobRequest,
+            VMResources,
+            WorldConfigInput,
+            WorldRuntimeConfig,
+        )
+
+        for task_idx, task in enumerate(tasks):
+            task_name = task.get("name", f"task-{task_idx}")
+            scoring_type = task.get("scoring_type", "output")
+            instruction = task.get("instruction", "")
+            hint = task.get("hint", "")
+            start_url = task.get("start_url", "/")
+            output_schema = task.get("output_schema") if scoring_type == "output" else None
+
+            prompt = instruction
+            if hint:
+                prompt = f"{instruction}\n\nHint: {hint}"
+
+            logger.info(
+                "  [%s] Autoverify '%s' (%s) — %d sessions",
+                vs.variant_key, task_name, scoring_type, config.autoverify_sessions,
+            )
+
+            collected: list[dict] = []
+
+            async with httpx.AsyncClient(
+                base_url=config.chronos_url, timeout=httpx.Timeout(120.0)
+            ) as chronos_http:
+                for sess_num in range(config.autoverify_sessions):
+                    async with av_sem:
+                        try:
+                            result = await self._run_autoverify_session(
+                                chronos_http, config, sim_name, artifact_id,
+                                prompt, start_url, task_name, sess_num,
+                                vs.variant_key,
+                                launch_job, LaunchJobRequest, WorldConfigInput,
+                                WorldRuntimeConfig, VMResources,
+                            )
+                            if result:
+                                agent_output = await self._extract_agent_output(
+                                    chronos_http, result["chronos_id"], config.plato_api_key,
+                                    get_session_logs,
+                                )
+                                session_id = result.get("plato_id") or result["chronos_id"]
+                                collected.append({
+                                    "session_id": session_id,
+                                    "agent_output": agent_output,
+                                })
+                                logger.info(
+                                    "    [%d/%d] session=%s output=%s",
+                                    sess_num + 1, config.autoverify_sessions,
+                                    session_id,
+                                    "yes" if agent_output is not None else "none",
+                                )
+                        except Exception as e:
+                            logger.error(
+                                "    [%d/%d] autoverify session error: %s",
+                                sess_num + 1, config.autoverify_sessions, e,
+                            )
+
+            if not collected:
+                logger.warning("  [%s] No autoverify sessions for '%s', keeping LLM config",
+                               vs.variant_key, task_name)
+                continue
+
+            av_sessions = []
+            for idx, s in enumerate(collected):
+                entry: dict = {
+                    "session_id": s["session_id"],
+                    "is_imposter": False,
+                    "use_for_generation": idx == 0,
+                }
+                if s.get("agent_output") is not None:
+                    entry["output"] = s["agent_output"]
+                av_sessions.append(entry)
+
+            payload: dict = {
+                "sessions": av_sessions,
+                "simulator_names": [sim_name],
+                "task_prompt": instruction,
+            }
+            if output_schema:
+                payload["output_schema"] = output_schema
+
+            try:
+                async with httpx.AsyncClient(timeout=httpx.Timeout(180.0)) as http:
+                    resp = await http.post(
+                        f"{config.plato_api_url}/v2/testcases/auto_verify",
+                        json=payload,
+                        headers={"X-API-Key": config.plato_api_key},
+                    )
+                    resp.raise_for_status()
+                    av_result = resp.json()
+
+                if av_result.get("success") and av_result.get("scoring_config"):
+                    task["_av_scoring_config"] = av_result["scoring_config"]
+                    task["_av_generation_result"] = av_result.get("generation_result")
+                    logger.info("  [%s] Autoverify PASSED for '%s'", vs.variant_key, task_name)
+                else:
+                    logger.warning(
+                        "  [%s] Autoverify FAILED for '%s': %s",
+                        vs.variant_key, task_name, av_result.get("error", "unknown"),
+                    )
+            except Exception as e:
+                logger.error("  [%s] Autoverify API error for '%s': %s",
+                             vs.variant_key, task_name, e)
+
+    async def _run_autoverify_session(
+        self, http, config, sim_name, artifact_id,
+        prompt, start_url, task_name, sess_num, variant_key,
+        launch_job_mod, LaunchJobRequest, WorldConfigInput,
+        WorldRuntimeConfig, VMResources,
+    ) -> dict | None:
+        """Launch a single CUA benchmark session for autoverify and wait for completion."""
+        agent_config: dict = {
+            "model_name": config.autoverify_model,
+            "max_turns": config.eval_max_turns,
+            "display_width": config.eval_display_width,
+            "display_height": config.eval_display_height,
+        }
+        if "anthropic" in config.autoverify_model or "claude" in config.autoverify_model:
+            if config.anthropic_api_key:
+                agent_config["anthropic_api_key"] = config.anthropic_api_key
+        if config.aws_access_key_id:
+            agent_config["aws_access_key_id"] = config.aws_access_key_id
+            agent_config["envgen_aws_access_key_id"] = config.aws_access_key_id
+        if config.aws_secret_access_key:
+            agent_config["aws_secret_access_key"] = config.aws_secret_access_key
+            agent_config["envgen_aws_secret_access_key"] = config.aws_secret_access_key
+        if config.aws_session_token:
+            agent_config["aws_session_token"] = config.aws_session_token
+            agent_config["envgen_aws_session_token"] = config.aws_session_token
+        agent_config.setdefault("envgen_aws_region", "us-west-1")
+        agent_config.setdefault("envgen_aws_s3_bucket", "plato-browser-session-data-prod")
+
+        world_config = {
+            "version": "2",
+            "instruction": prompt,
+            "start_url": start_url,
+            "envs": [{"type": "artifact", "artifact_id": artifact_id, "alias": sim_name}],
+            "login_flow": True,
+            "login_flow_retries": 4,
+            "login_flow_retry_delay_ms": 10000,
+            "record_session": False,
+            "agent": {
+                "package": config.cua_agent_package,
+                "config": agent_config,
+                "runtime": {
+                    "type": "vm",
+                    "vm": {"cpus": 2, "memory": 4096, "timeout": 3600},
+                },
+            },
+            "plato_api_key": config.plato_api_key,
+        }
+
+        request = LaunchJobRequest(
+            world=WorldConfigInput(
+                package=config.cua_world_package,
+                runtime=WorldRuntimeConfig(type="vm", vm=VMResources(cpus=2, memory=4096)),
+                config=world_config,
+            ),
+        )
+
+        resp = await launch_job_mod.asyncio(
+            client=http, body=request, x_api_key=config.plato_api_key,
+        )
+        chronos_id = resp.session_id
+        logger.info(
+            "    [%s] AV session %d launched: %s",
+            variant_key, sess_num + 1, chronos_id,
+        )
+
+        status = await self._poll_until_done(http, chronos_id, config.plato_api_key)
+
+        if status.get("status") not in ("completed",):
+            logger.warning(
+                "    AV session %s ended with status=%s",
+                chronos_id, status.get("status"),
+            )
+            return None
+
+        return {
+            "chronos_id": chronos_id,
+            "plato_id": status.get("plato_session_id", ""),
+        }
+
+    async def _extract_agent_output(
+        self, http, chronos_id: str, api_key: str, get_session_logs_mod,
+    ) -> dict | None:
+        """Extract structured agent output from Chronos OTel logs."""
+        import json as _json
+
+        try:
+            logs_resp = await get_session_logs_mod.asyncio(
+                client=http, public_id=chronos_id, limit=10000, x_api_key=api_key,
+            )
+            logs = logs_resp.logs or []
+
+            def _get(log, field):
+                if isinstance(log, dict):
+                    return log.get(field)
+                return getattr(log, field, None)
+
+            raw_output: str | None = None
+            for log in reversed(logs):
+                name = _get(log, "name")
+                attrs = _get(log, "attributes")
+                if name == "computer_use_session" and attrs:
+                    result = attrs.get("computer_use.result")
+                    if result:
+                        raw_output = _json.dumps(result) if isinstance(result, (dict, list)) else str(result)
+                        break
+            if raw_output is None:
+                for log in reversed(logs):
+                    name = _get(log, "name")
+                    attrs = _get(log, "attributes")
+                    if name == "session" and attrs:
+                        result = attrs.get("atif.session.result")
+                        if result:
+                            raw_output = _json.dumps(result) if isinstance(result, (dict, list)) else str(result)
+                            break
+
+            if raw_output is None:
+                return None
+
+            try:
+                parsed = _json.loads(raw_output)
+                if isinstance(parsed, dict):
+                    return parsed
+            except (ValueError, _json.JSONDecodeError):
+                pass
+
+            # Try extracting JSON from markdown code blocks or brace matching
+            for pattern in [r"```(?:json)?\s*(\{.*?\})\s*```", r"(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})"]:
+                import re as _re
+                match = _re.search(pattern, raw_output, _re.DOTALL)
+                if match:
+                    try:
+                        parsed = _json.loads(match.group(1))
+                        if isinstance(parsed, dict):
+                            return parsed
+                    except (ValueError, _json.JSONDecodeError):
+                        continue
+
+            return None
+
+        except Exception as e:
+            logger.warning("Failed to extract output from session %s: %s", chronos_id, e)
+            return None
 
     # ------------------------------------------------------------------
     # RUN: launch CUA benchmark sessions via Chronos, wait for completion

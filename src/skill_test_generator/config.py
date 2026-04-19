@@ -344,6 +344,20 @@ class SkillTestGeneratorConfig(RunConfig):
         description="Computer-use agent package.",
     )
 
+    autoverify: bool = Field(
+        default=False,
+        description="Run autoverify sessions before uploading testcases to generate scoring configs from real agent runs.",
+    )
+    autoverify_sessions: int = Field(
+        default=3,
+        ge=1,
+        description="Number of agent sessions to run per task during autoverify.",
+    )
+    autoverify_model: str = Field(
+        default="anthropic/claude-opus-4-6",
+        description="Agent model for autoverify sessions.",
+    )
+
     hillclimb: HillclimbConfig = Field(
         default_factory=HillclimbConfig,
         description="Hillclimb difficulty-tuning configuration.",

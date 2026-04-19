@@ -632,8 +632,9 @@ Rules for safe sim edits:
 When editing a testcase JSON file, it MUST contain:
 - `name`: short kebab-case identifier
 - `instruction`: the prompt text the agent sees
-- `hint`: coaching for the agent on what technique or approach to use, \
-without revealing the answer. Update if you change the sim or task.
+- `hint`: explain how to solve this task given how the sim is designed — \
+what the skill demands and how to navigate the app correctly. Do not \
+reveal expected values. Update if you change the sim or task.
 - `start_url`: where the agent starts (default "/")
 - `scoring_type`: "output" or "mutations" — PRESERVE from original
 - `output_schema`: (for output tasks) JSON Schema for the answer

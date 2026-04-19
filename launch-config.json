@@ -60,6 +60,9 @@
       "anthropic_api_key": "${ANTHROPIC_API_KEY}",
       "plato_api_key": "${PLATO_API_KEY}",
       "nova_act_workflow_name": "${NOVA_ACT_WORKFLOW_NAME}",
+      "autoverify": false,
+      "autoverify_sessions": 3,
+      "autoverify_model": "anthropic/claude-opus-4-6",
       "hillclimb": {
         "enabled": false,
         "total_failures": 1,

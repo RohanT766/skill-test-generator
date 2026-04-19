@@ -71,8 +71,10 @@ Respond with a JSON object (no markdown fencing):
   - "scoring_type": always "output"
   - "output_schema": JSON Schema for the answer (minimal keys needed)
   - "expected_output": the correct answer matching output_schema
-  - "hint": coaching for the agent on what technique or approach to use, \
-without revealing the answer
+  - "hint": explain how to solve this task given how the sim is designed. \
+The sim is built to strain a specific skill — the hint should tell the \
+agent what that skill demands and how to navigate the app to get the \
+right answer. Do not reveal the expected values.
   - "scoring_hint": what to verify (internal, not shown to agent)
   - "skill_required": why this task needs the tested skill (internal)\
 """
@@ -125,8 +127,10 @@ Respond with a JSON object (no markdown fencing):
     - "action": "insert" | "update" | "delete"
     - "row_filter": identifies the row (e.g. {"id": 5})
     - "values": expected field values after the change
-  - "hint": coaching for the agent on what technique or approach to use, \
-without revealing the answer
+  - "hint": explain how to solve this task given how the sim is designed. \
+The sim is built to strain a specific skill — the hint should tell the \
+agent what that skill demands and how to navigate the app to get the \
+right answer. Do not reveal the expected values.
   - "scoring_hint": what to verify (internal, not shown to agent)
   - "skill_required": why this task needs the tested skill (internal)\
 """
@@ -193,8 +197,10 @@ Respond with a JSON object (no markdown fencing):
     - "action": "insert" | "update" | "delete"
     - "row_filter": identifies the row (e.g. {"id": 5})
     - "values": expected field values after the change
-  - "hint": coaching for the agent on what technique or approach to use, \
-without revealing the answer
+  - "hint": explain how to solve this task given how the sim is designed. \
+The sim is built to strain a specific skill — the hint should tell the \
+agent what that skill demands and how to navigate the app to get the \
+right answer. Do not reveal the expected values.
   - "scoring_hint": what to verify (internal, not shown to agent)
   - "skill_required": why this task needs the tested skill (internal)\
 """
