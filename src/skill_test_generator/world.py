@@ -1667,40 +1667,43 @@ else:
 
             collected: list[dict] = []
 
+            async def _av_one(sess_num: int, chronos_http):
+                async with av_sem:
+                    try:
+                        result = await self._run_autoverify_session(
+                            chronos_http, config, sim_name, artifact_id,
+                            prompt, task_name, sess_num,
+                            vs.variant_key,
+                            launch_job, LaunchJobRequest, WorldConfigInput,
+                            WorldRuntimeConfig, VMResources,
+                        )
+                        if result:
+                            agent_output = await self._extract_agent_output(
+                                chronos_http, result["chronos_id"], config.plato_api_key,
+                                get_session_logs,
+                            )
+                            session_id = result.get("plato_id") or result["chronos_id"]
+                            logger.info(
+                                "    [%d/%d] session=%s output=%s",
+                                sess_num + 1, config.autoverify_sessions,
+                                session_id,
+                                "yes" if agent_output is not None else "none",
+                            )
+                            return {"session_id": session_id, "agent_output": agent_output}
+                    except Exception as e:
+                        logger.error(
+                            "    [%d/%d] autoverify session error: %s",
+                            sess_num + 1, config.autoverify_sessions, e,
+                        )
+                    return None
+
             async with httpx.AsyncClient(
                 base_url=config.chronos_url, timeout=httpx.Timeout(120.0)
             ) as chronos_http:
-                for sess_num in range(config.autoverify_sessions):
-                    async with av_sem:
-                        try:
-                            result = await self._run_autoverify_session(
-                                chronos_http, config, sim_name, artifact_id,
-                                prompt, task_name, sess_num,
-                                vs.variant_key,
-                                launch_job, LaunchJobRequest, WorldConfigInput,
-                                WorldRuntimeConfig, VMResources,
-                            )
-                            if result:
-                                agent_output = await self._extract_agent_output(
-                                    chronos_http, result["chronos_id"], config.plato_api_key,
-                                    get_session_logs,
-                                )
-                                session_id = result.get("plato_id") or result["chronos_id"]
-                                collected.append({
-                                    "session_id": session_id,
-                                    "agent_output": agent_output,
-                                })
-                                logger.info(
-                                    "    [%d/%d] session=%s output=%s",
-                                    sess_num + 1, config.autoverify_sessions,
-                                    session_id,
-                                    "yes" if agent_output is not None else "none",
-                                )
-                        except Exception as e:
-                            logger.error(
-                                "    [%d/%d] autoverify session error: %s",
-                                sess_num + 1, config.autoverify_sessions, e,
-                            )
+                results = await asyncio.gather(
+                    *[_av_one(i, chronos_http) for i in range(config.autoverify_sessions)]
+                )
+                collected = [r for r in results if r is not None]
 
             if not collected:
                 logger.warning("  [%s] No autoverify sessions for '%s', keeping LLM config",
