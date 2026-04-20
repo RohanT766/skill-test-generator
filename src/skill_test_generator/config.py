@@ -336,7 +336,7 @@ class SkillTestGeneratorConfig(RunConfig):
     chronos_url: str = Field(default="https://chronos.plato.so")
 
     cua_world_package: str = Field(
-        default="plato-world-cua-benchmark:3.3.27",
+        default="plato-world-cua-benchmark:3.6.1",
         description="CUA benchmark world package for agent evaluation.",
     )
     cua_agent_package: str = Field(
@@ -349,7 +349,7 @@ class SkillTestGeneratorConfig(RunConfig):
         description="Run autoverify sessions before uploading testcases to generate scoring configs from real agent runs.",
     )
     autoverify_sessions: int = Field(
-        default=3,
+        default=4,
         ge=1,
         description="Number of agent sessions to run per task during autoverify.",
     )

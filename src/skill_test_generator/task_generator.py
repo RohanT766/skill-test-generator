@@ -71,10 +71,11 @@ Respond with a JSON object (no markdown fencing):
   - "scoring_type": always "output"
   - "output_schema": JSON Schema for the answer (minimal keys needed)
   - "expected_output": the correct answer matching output_schema
-  - "hint": explain how to solve this task given how the sim is designed. \
-The sim is built to strain a specific skill — the hint should tell the \
-agent what that skill demands and how to navigate the app to get the \
-right answer. Do not reveal the expected values.
+  - "hint": a strategic nudge that helps a skilled agent solve the task \
+WITHOUT giving away the answer. Describe the navigation strategy, data \
+layout, and traps/decoys the sim contains, but NEVER mention the actual \
+expected answer value, entity name, number, or any specific data that \
+appears in expected_output. The hint must be useful but not a spoiler.
   - "scoring_hint": what to verify (internal, not shown to agent)
   - "skill_required": why this task needs the tested skill (internal)\
 """
@@ -127,10 +128,12 @@ Respond with a JSON object (no markdown fencing):
     - "action": "insert" | "update" | "delete"
     - "row_filter": identifies the row (e.g. {"id": 5})
     - "values": expected field values after the change
-  - "hint": explain how to solve this task given how the sim is designed. \
-The sim is built to strain a specific skill — the hint should tell the \
-agent what that skill demands and how to navigate the app to get the \
-right answer. Do not reveal the expected values.
+  - "hint": a strategic nudge that helps a skilled agent solve the task \
+WITHOUT giving away the answer. Describe the navigation strategy, data \
+layout, and traps/decoys the sim contains, but NEVER mention the actual \
+expected answer value, entity name, number, or any specific data that \
+appears in expected_output or expected_mutations. The hint must be \
+useful but not a spoiler.
   - "scoring_hint": what to verify (internal, not shown to agent)
   - "skill_required": why this task needs the tested skill (internal)\
 """
@@ -197,10 +200,12 @@ Respond with a JSON object (no markdown fencing):
     - "action": "insert" | "update" | "delete"
     - "row_filter": identifies the row (e.g. {"id": 5})
     - "values": expected field values after the change
-  - "hint": explain how to solve this task given how the sim is designed. \
-The sim is built to strain a specific skill — the hint should tell the \
-agent what that skill demands and how to navigate the app to get the \
-right answer. Do not reveal the expected values.
+  - "hint": a strategic nudge that helps a skilled agent solve the task \
+WITHOUT giving away the answer. Describe the navigation strategy, data \
+layout, and traps/decoys the sim contains, but NEVER mention the actual \
+expected answer value, entity name, number, or any specific data that \
+appears in expected_output or expected_mutations. The hint must be \
+useful but not a spoiler.
   - "scoring_hint": what to verify (internal, not shown to agent)
   - "skill_required": why this task needs the tested skill (internal)\
 """

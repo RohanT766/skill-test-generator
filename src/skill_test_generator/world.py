@@ -1645,9 +1645,6 @@ else:
             output_schema = task.get("output_schema") if scoring_type == "output" else None
 
             prompt = instruction
-            if hint:
-                prompt = f"{instruction}\n\nHint: {hint}"
-
             if output_schema:
                 import json as _json
                 schema_json = _json.dumps(output_schema, indent=2)
@@ -1672,7 +1669,7 @@ else:
                     try:
                         result = await self._run_autoverify_session(
                             chronos_http, config, sim_name, artifact_id,
-                            prompt, task_name, sess_num,
+                            prompt, hint, task_name, sess_num,
                             vs.variant_key,
                             launch_job, LaunchJobRequest, WorldConfigInput,
                             WorldRuntimeConfig, VMResources,
@@ -1753,7 +1750,7 @@ else:
 
     async def _run_autoverify_session(
         self, http, config, sim_name, artifact_id,
-        prompt, task_name, sess_num, variant_key,
+        prompt, hint, task_name, sess_num, variant_key,
         launch_job_mod, LaunchJobRequest, WorldConfigInput,
         WorldRuntimeConfig, VMResources,
     ) -> dict | None:
@@ -1782,6 +1779,7 @@ else:
         world_config = {
             "version": "2",
             "instruction": prompt,
+            "hint": hint or None,
             "envs": [{"type": "artifact", "artifact_id": artifact_id, "alias": sim_name}],
             "login_flow": True,
             "login_flow_retries": 4,
