@@ -639,30 +639,19 @@ class SkillTestGeneratorWorld(
                     json.dumps({"tasks": generated_tasks}, indent=2),
                 )
 
-            # ── Phase 2c: Autoverify (optional) ───────────────────────
+            # ── Phase 2c+3: Autoverify (optional) + Create testcases ──
             tasks = self._all_tasks.get(vs.variant_key, [])
-            if config.autoverify and tasks and artifact_id:
-                try:
-                    await self._autoverify_tasks(vs, tasks, artifact_id, av_sem)
-                except Exception as e:
-                    logger.error("  [%s] Autoverify error: %s", vs.variant_key, e)
-
-            # ── Phase 3: Create testcases ─────────────────────────────
-            if config.autoverify and tasks:
-                verified = [t for t in tasks if t.get("_av_scoring_config")]
-                skipped = len(tasks) - len(verified)
-                if skipped:
-                    logger.info(
-                        "  [%s] Autoverify gate: publishing %d/%d tasks (%d failed verification)",
-                        vs.variant_key, len(verified), len(tasks), skipped,
-                    )
-                tasks = verified
-
             if tasks and artifact_id:
                 try:
-                    new_ids = await self._create_testcases(vs, tasks, artifact_id)
-                    vs.testcase_ids.extend(new_ids)
-                    vs.stage = "published"
+                    new_ids = await self._autoverify_and_publish(
+                        vs, tasks, artifact_id, av_sem=av_sem,
+                    )
+                    if new_ids:
+                        vs.testcase_ids.extend(new_ids)
+                        vs.stage = "published"
+                    else:
+                        vs.stage = "pipeline_failed"
+                        vs.error = "no testcases passed autoverify"
                 except Exception as e:
                     logger.error("  [%s] Testcase creation error: %s", vs.variant_key, e)
                     vs.stage = "pipeline_failed"
@@ -1494,6 +1483,39 @@ else:
                 )
                 return base_name
         return base_name
+
+    async def _autoverify_and_publish(
+        self,
+        vs: VariantStatus,
+        tasks: list[dict],
+        artifact_id: str,
+        av_sem: asyncio.Semaphore | None = None,
+    ) -> list[str]:
+        """Run autoverify (if enabled), filter to verified tasks, then publish.
+
+        Returns the list of created testcase IDs (only for verified tasks
+        when autoverify is enabled).
+        """
+        config = self.config
+        if config.autoverify and tasks and artifact_id:
+            sem = av_sem or asyncio.Semaphore(config.run_concurrency)
+            try:
+                await self._autoverify_tasks(vs, tasks, artifact_id, sem)
+            except Exception as e:
+                logger.error("  [%s] Autoverify error: %s", vs.variant_key, e)
+
+            verified = [t for t in tasks if t.get("_av_scoring_config")]
+            skipped = len(tasks) - len(verified)
+            if skipped:
+                logger.info(
+                    "  [%s] Autoverify gate: publishing %d/%d tasks (%d failed verification)",
+                    vs.variant_key, len(verified), len(tasks), skipped,
+                )
+            tasks = verified
+
+        if not tasks:
+            return []
+        return await self._create_testcases(vs, tasks, artifact_id)
 
     async def _create_testcases(
         self,
@@ -2755,14 +2777,14 @@ else:
                         continue
                     current_artifact_id = new_artifact_id
 
-                    # Sim changed → republish ALL testcases against new snapshot
+                    # Sim changed → autoverify + republish ALL testcases against new snapshot
                     tc_dir = workspace_dir / "testcases"
                     all_tasks: list[dict] = []
                     for tc_file in sorted(tc_dir.glob("tc-*.json")):
                         task = self._task_dict_from_file(tc_file)
                         if task:
                             all_tasks.append(task)
-                    all_new_ids = await self._create_testcases(
+                    all_new_ids = await self._autoverify_and_publish(
                         vs, all_tasks, new_artifact_id
                     )
                     if not all_new_ids:
@@ -2779,7 +2801,7 @@ else:
                         else None
                     )
                 else:
-                    # Testcase-only → publish just the edited testcase
+                    # Testcase-only → autoverify + publish just the edited testcase
                     tc_file = workspace_dir / "testcases" / f"tc-{tc_idx:03d}.json"
                     if not tc_file.exists():
                         logger.error(
@@ -2791,7 +2813,7 @@ else:
                     else:
                         task = self._task_dict_from_file(tc_file)
                         if task:
-                            published = await self._create_testcases(
+                            published = await self._autoverify_and_publish(
                                 vs, [task], current_artifact_id
                             )
                             new_tc_id = published[0] if published else None
