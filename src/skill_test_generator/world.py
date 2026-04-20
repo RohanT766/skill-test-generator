@@ -1663,7 +1663,7 @@ else:
                         try:
                             result = await self._run_autoverify_session(
                                 chronos_http, config, sim_name, artifact_id,
-                                prompt, start_url, task_name, sess_num,
+                                prompt, task_name, sess_num,
                                 vs.variant_key,
                                 launch_job, LaunchJobRequest, WorldConfigInput,
                                 WorldRuntimeConfig, VMResources,
@@ -1739,7 +1739,7 @@ else:
 
     async def _run_autoverify_session(
         self, http, config, sim_name, artifact_id,
-        prompt, start_url, task_name, sess_num, variant_key,
+        prompt, task_name, sess_num, variant_key,
         launch_job_mod, LaunchJobRequest, WorldConfigInput,
         WorldRuntimeConfig, VMResources,
     ) -> dict | None:
