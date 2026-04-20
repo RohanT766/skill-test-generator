@@ -336,7 +336,7 @@ class SkillTestGeneratorConfig(RunConfig):
     chronos_url: str = Field(default="https://chronos.plato.so")
 
     cua_world_package: str = Field(
-        default="plato-world-cua-benchmark:3.1.58",
+        default="plato-world-cua-benchmark:3.3.27",
         description="CUA benchmark world package for agent evaluation.",
     )
     cua_agent_package: str = Field(
