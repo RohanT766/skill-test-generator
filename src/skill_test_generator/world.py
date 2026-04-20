@@ -1642,7 +1642,6 @@ else:
             scoring_type = task.get("scoring_type", "output")
             instruction = task.get("instruction", "")
             hint = task.get("hint", "")
-            start_url = "/"
             output_schema = task.get("output_schema") if scoring_type == "output" else None
 
             prompt = instruction
@@ -1769,7 +1768,6 @@ else:
         world_config = {
             "version": "2",
             "instruction": prompt,
-            "start_url": start_url,
             "envs": [{"type": "artifact", "artifact_id": artifact_id, "alias": sim_name}],
             "login_flow": True,
             "login_flow_retries": 4,
