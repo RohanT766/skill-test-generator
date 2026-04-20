@@ -648,6 +648,16 @@ class SkillTestGeneratorWorld(
                     logger.error("  [%s] Autoverify error: %s", vs.variant_key, e)
 
             # ── Phase 3: Create testcases ─────────────────────────────
+            if config.autoverify and tasks:
+                verified = [t for t in tasks if t.get("_av_scoring_config")]
+                skipped = len(tasks) - len(verified)
+                if skipped:
+                    logger.info(
+                        "  [%s] Autoverify gate: publishing %d/%d tasks (%d failed verification)",
+                        vs.variant_key, len(verified), len(tasks), skipped,
+                    )
+                tasks = verified
+
             if tasks and artifact_id:
                 try:
                     new_ids = await self._create_testcases(vs, tasks, artifact_id)
