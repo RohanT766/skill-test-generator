@@ -1648,6 +1648,18 @@ else:
             if hint:
                 prompt = f"{instruction}\n\nHint: {hint}"
 
+            if output_schema:
+                import json as _json
+                schema_json = _json.dumps(output_schema, indent=2)
+                prompt = (
+                    f"{prompt}\n\n"
+                    "## CRITICAL OUTPUT REQUIREMENT\n\n"
+                    "You MUST return ONLY a JSON object matching this EXACT schema:\n\n"
+                    f"```json\n{schema_json}\n```\n\n"
+                    "Copy all values EXACTLY as they appear on the page. "
+                    "Return ONLY the raw JSON object — no markdown, no explanation."
+                )
+
             logger.info(
                 "  [%s] Autoverify '%s' (%s) — %d sessions",
                 vs.variant_key, task_name, scoring_type, config.autoverify_sessions,
