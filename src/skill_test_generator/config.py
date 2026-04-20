@@ -354,7 +354,7 @@ class SkillTestGeneratorConfig(RunConfig):
         description="Number of agent sessions to run per task during autoverify.",
     )
     autoverify_model: str = Field(
-        default="anthropic/claude-opus-4-6",
+        default="anthropic/claude-sonnet-4-6",
         description="Agent model for autoverify sessions.",
     )
 
