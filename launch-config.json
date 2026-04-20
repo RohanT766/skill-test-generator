@@ -1,6 +1,6 @@
 {
   "world": {
-    "package": "plato-world-skill-test-generator:0.4.32",
+    "package": "plato-world-skill-test-generator:0.4.40",
     "runtime": {
       "type": "vm",
       "vm": {
@@ -20,19 +20,19 @@
       "max_skills": 2,
       "output_tasks_per_variant": 2,
       "mutation_tasks_per_variant": 0,
-      "sessions_per_testcase": 3,
+      "sessions_per_testcase": 2,
       "run_concurrency": 10,
       "vm_concurrency": 4,
       "pipeline_vm_cpus": 2,
       "pipeline_vm_memory": 4096,
       "eval_agent_model": "amazon/nova-act",
-      "cua_world_package": "plato-world-cua-benchmark:3.6.1",
+      "cua_world_package": "plato-world-cua-benchmark:3.8.1",
       "cua_agent_package": "computer-use-agent:3.2.61",
       "coder_agent": {
         "package": "claude-code:latest",
         "config": {
-          "model_name": "claude-opus-4-6",
-          "max_turns": 150,
+          "model_name": "claude-sonnet-4-6",
+          "max_turns": 200,
           "anthropic_api_key": "${ANTHROPIC_API_KEY}"
         }
       },

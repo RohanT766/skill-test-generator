@@ -287,7 +287,7 @@ class SkillTestGeneratorConfig(RunConfig):
             package="claude-code:latest",
             config={
                 "model_name": "claude-opus-4-6",
-                "max_turns": 75,
+                "max_turns": 200,
             },
         )
     )

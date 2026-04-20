@@ -1406,6 +1406,49 @@ else:
         logger.info("  Uploaded to s3://%s/%s", S3_BUCKET, key)
         return url
 
+    def _download_sim_from_s3(self, sim_name: str, dest: Path) -> None:
+        """Download sim source tarball from S3 for resume/hillclimb scenarios.
+
+        Tries the pipeline tarball keys (pipe-0, pipe-1, pipe-2) until one is
+        found, then extracts the ``web/`` subtree into *dest*.
+        """
+        import boto3
+
+        config = self.config
+        kwargs: dict = {"region_name": "us-west-1"}
+        if config.aws_access_key_id:
+            kwargs["aws_access_key_id"] = config.aws_access_key_id
+            kwargs["aws_secret_access_key"] = config.aws_secret_access_key
+            if config.aws_session_token:
+                kwargs["aws_session_token"] = config.aws_session_token
+        s3 = boto3.Session(**kwargs).client("s3")
+
+        for attempt in range(3):
+            key = f"{S3_PREFIX}/{sim_name}-pipe-{attempt}.tar.gz"
+            try:
+                resp = s3.get_object(Bucket=S3_BUCKET, Key=key)
+                data = resp["Body"].read()
+                break
+            except s3.exceptions.NoSuchKey:
+                continue
+        else:
+            logger.warning(
+                "  Could not find sim tarball in S3 for %s", sim_name
+            )
+            return
+
+        dest.mkdir(parents=True, exist_ok=True)
+        buf = io.BytesIO(data)
+        with tarfile.open(fileobj=buf, mode="r:gz") as tar:
+            for member in tar.getmembers():
+                if member.name.startswith("web/"):
+                    member.name = member.name[len("web/"):]
+                    if member.name:
+                        tar.extract(member, dest)
+        logger.info(
+            "  Downloaded sim source from s3://%s/%s → %s", S3_BUCKET, key, dest
+        )
+
     @staticmethod
     def _icon_svg_to_data_uri(icon_svg: str) -> str | None:
         """Convert an SVG string to a data URI for use as imgUrl."""
@@ -1778,10 +1821,13 @@ else:
         agent_config.setdefault("envgen_aws_region", "us-west-1")
         agent_config.setdefault("envgen_aws_s3_bucket", "plato-browser-session-data-prod")
 
+        av_instruction = prompt
+        if hint:
+            av_instruction = f"{prompt}\n\n## HINT\n\n{hint}"
+
         world_config = {
             "version": "2",
-            "instruction": prompt,
-            "hint": hint or None,
+            "instruction": av_instruction,
             "envs": [{"type": "artifact", "artifact_id": artifact_id, "alias": sim_name}],
             "login_flow": True,
             "login_flow_retries": 4,
@@ -2653,6 +2699,21 @@ else:
             len([v for v in self.state.variants if v.task_results]),
             target_max_pass_rate * 100,
         )
+
+        for vs in variants_with_work:
+            tc_list = []
+            for tc_id, tc_state in vs.testcase_hillclimb_state.items():
+                status = "NEEDS_WORK" if tc_state.best_pass_rate > target_max_pass_rate else "OK"
+                tc_list.append(f"{tc_id[:12]} ({status}, {tc_state.best_pass_rate*100:.0f}%)")
+            logger.info(
+                "HILLCLIMB [%s] %d/%d testcases exceed target, processing sequentially",
+                vs.variant_key,
+                sum(1 for s in vs.testcase_hillclimb_state.values() if s.best_pass_rate > target_max_pass_rate),
+                len(vs.testcase_hillclimb_state),
+            )
+            for tc_info in tc_list:
+                logger.info("  HILLCLIMB [%s]   %s", vs.variant_key, tc_info)
+
         if not variants_with_work:
             logger.info("HILLCLIMB: nothing to do — all testcases within target")
             self._log_hillclimb_summary(target_max_pass_rate)
@@ -2864,14 +2925,26 @@ else:
                 )
                 tc_state.iterations.append(iter_record)
 
+                session_urls = [
+                    r.get("chronos_url", r.get("plato_url", ""))
+                    for r in new_results if r.get("chronos_url") or r.get("plato_url")
+                ]
                 logger.info(
-                    "HILLCLIMB [%s][tc-%03d] iteration %d: %.1f%% → %.1f%%",
+                    "HILLCLIMB [%s][tc-%03d] iteration %d: %.1f%% → %.1f%%  "
+                    "tc=%s artifact=%s",
                     vs.variant_key,
                     tc_idx,
                     retry,
                     tc_state.best_pass_rate * 100,
                     new_rate * 100,
+                    new_tc_id[:12],
+                    new_artifact_id[:12] if new_artifact_id else "n/a",
                 )
+                for url in session_urls:
+                    logger.info(
+                        "  HILLCLIMB [%s][tc-%03d]   session: %s",
+                        vs.variant_key, tc_idx, url,
+                    )
 
                 if new_rate < tc_state.best_pass_rate:
                     tc_state.best_iteration_idx = len(tc_state.iterations) - 1
@@ -3061,6 +3134,8 @@ else:
                     "node_modules", ".next", ".next-*", ".turbo", "__pycache__"
                 ),
             )
+        elif not sim_dest.is_dir():
+            self._download_sim_from_s3(vs.sim_name, sim_dest)
 
     async def _hc_run_agent(
         self,
@@ -3258,8 +3333,22 @@ else:
                     http, session_id, api_key, f"hc-{vs.variant_key}"
                 )
 
-                app_dir = "/tmp/variant/web"
+                app_dir = "/tmp/variant/sim"
                 preamble = 'export PATH="/root/.bun/bin:/usr/local/bin:$PATH"'
+                kill_port = (
+                    "for p in $(ss -tlnp 2>/dev/null | grep ':3000 ' "
+                    "| sed -n 's/.*pid=\\([0-9]*\\).*/\\1/p'); "
+                    "do kill -9 $p 2>/dev/null; done; sleep 1"
+                )
+
+                await _exec(
+                    "if ! command -v bun >/dev/null 2>&1; then "
+                    "  curl -fsSL https://bun.sh/install | bash && "
+                    "  ln -sf /root/.bun/bin/bun /usr/local/bin/bun && "
+                    "  ln -sf /root/.bun/bin/bunx /usr/local/bin/bunx; "
+                    "fi",
+                    timeout=120,
+                )
 
                 await _exec(
                     f'{preamble} && '
@@ -3282,7 +3371,7 @@ else:
                 )
 
                 # ── BUILD ────────────────────────────────────────────
-                await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
+                await _exec(kill_port, timeout=10)
                 await _exec(f"rm -rf {app_dir}/.next", timeout=10)
                 await _exec(
                     f"{preamble} && cd {app_dir} && bun install 2>&1 | tail -5",
@@ -3303,7 +3392,7 @@ else:
                     return None
 
                 # ── Start server + verify ────────────────────────────
-                await _exec("fuser -k 3000/tcp 2>/dev/null; sleep 1", timeout=10)
+                await _exec(kill_port, timeout=10)
                 await _exec(
                     f"{preamble} && cd {app_dir} && mkdir -p /tmp/pglite-data && "
                     "NEXT_DIST_DIR=.next NODE_ENV=production PORT=3000 "
@@ -3317,15 +3406,23 @@ else:
                 )
 
                 if not all(c["pass"] for c in verify_checks):
-                    failed_names = [
-                        c["name"] for c in verify_checks if not c["pass"]
+                    failed_checks = [
+                        c for c in verify_checks if not c["pass"]
                     ]
+                    failed_names = [c["name"] for c in failed_checks]
                     logger.error(
                         "HILLCLIMB [%s] verify failed (%s) — agent should "
                         "have caught this during self-validation",
                         vs.variant_key,
                         ", ".join(failed_names),
                     )
+                    for fc in failed_checks:
+                        logger.error(
+                            "HILLCLIMB [%s] check '%s' error: %s",
+                            vs.variant_key,
+                            fc["name"],
+                            fc.get("error", "")[:1000],
+                        )
                     return None
 
                 # ── Seed + Snapshot (new artifact on existing sim) ────
