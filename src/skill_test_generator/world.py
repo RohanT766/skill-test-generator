@@ -1707,50 +1707,46 @@ else:
                                vs.variant_key, task_name)
                 continue
 
-            av_sessions = []
-            for idx, s in enumerate(collected):
-                entry: dict = {
-                    "session_id": s["session_id"],
-                    "is_imposter": False,
-                    "use_for_generation": idx == 0,
-                }
-                if s.get("agent_output") is not None:
-                    entry["output"] = s["agent_output"]
-                av_sessions.append(entry)
+            outputs_with_data = [s for s in collected if s.get("agent_output") is not None]
+            if not outputs_with_data:
+                logger.warning(
+                    "  [%s] Autoverify FAILED for '%s': no sessions returned output",
+                    vs.variant_key, task_name,
+                )
+                continue
 
-            payload: dict = {
-                "sessions": av_sessions,
-                "simulator_names": [sim_name],
-                "task_prompt": instruction,
-            }
-            if output_schema:
-                payload["output_schema"] = output_schema
-
-            try:
-                async with httpx.AsyncClient(timeout=httpx.Timeout(180.0)) as http:
-                    base = config.plato_api_url.rstrip("/")
-                    if not base.endswith("/api"):
-                        base = f"{base}/api"
-                    resp = await http.post(
-                        f"{base}/v2/testcases/auto_verify",
-                        json=payload,
-                        headers={"X-API-Key": config.plato_api_key},
-                    )
-                    resp.raise_for_status()
-                    av_result = resp.json()
-
-                if av_result.get("success") and av_result.get("scoring_config"):
-                    task["_av_scoring_config"] = av_result["scoring_config"]
-                    task["_av_generation_result"] = av_result.get("generation_result")
-                    logger.info("  [%s] Autoverify PASSED for '%s'", vs.variant_key, task_name)
-                else:
+            first_output = outputs_with_data[0]["agent_output"]
+            all_match = True
+            for s in outputs_with_data[1:]:
+                if s["agent_output"] != first_output:
+                    all_match = False
                     logger.warning(
-                        "  [%s] Autoverify FAILED for '%s': %s",
-                        vs.variant_key, task_name, av_result.get("error", "unknown"),
+                        "  [%s] Autoverify FAILED for '%s': outputs differ "
+                        "(session %s vs %s)",
+                        vs.variant_key, task_name,
+                        outputs_with_data[0]["session_id"], s["session_id"],
                     )
-            except Exception as e:
-                logger.error("  [%s] Autoverify API error for '%s': %s",
-                             vs.variant_key, task_name, e)
+                    break
+
+            if all_match and scoring_type == "output":
+                import time as _time
+                now_ms = int(_time.time() * 1000)
+                n_used = len(outputs_with_data)
+                task["_av_scoring_config"] = {
+                    "mutation_configs": {},
+                    "output_config": {
+                        "type": "json_schema",
+                        "scoring_schema": first_output,
+                        "num_sessions_used": n_used,
+                        "created_at": now_ms,
+                    },
+                    "num_sessions_used": n_used,
+                    "created_at": now_ms,
+                }
+                logger.info(
+                    "  [%s] Autoverify PASSED for '%s' (%d/%d sessions agree)",
+                    vs.variant_key, task_name, n_used, len(collected),
+                )
 
     async def _run_autoverify_session(
         self, http, config, sim_name, artifact_id,
