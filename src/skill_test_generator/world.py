@@ -1353,6 +1353,7 @@ else:
         return {
             "name": tc_data.get("name", tc_file.stem),
             "instruction": tc_data.get("instruction", ""),
+            "hint": tc_data.get("hint", ""),
             "start_url": tc_data.get("start_url", "/"),
             "scoring_type": tc_data.get("scoring_type", "output"),
             "output_schema": tc_data.get("output_schema"),
@@ -2944,6 +2945,7 @@ else:
                         "testcase_id": tc_id,
                         "name": task.get("name", ""),
                         "instruction": task.get("instruction", ""),
+                        "hint": task.get("hint", ""),
                         "start_url": task.get("start_url", "/"),
                         "scoring_type": task.get("scoring_type", "output"),
                         "expected_output": task.get("expected_output"),
