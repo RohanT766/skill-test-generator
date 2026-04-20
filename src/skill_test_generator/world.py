@@ -1852,28 +1852,39 @@ else:
             ),
         )
 
-        resp = await launch_job_mod.asyncio(
-            client=http, body=request, x_api_key=config.plato_api_key,
-        )
-        chronos_id = resp.session_id
-        logger.info(
-            "    [%s] AV session %d launched: %s",
-            variant_key, sess_num + 1, chronos_id,
-        )
+        for attempt in range(1, 3):
+            resp = await launch_job_mod.asyncio(
+                client=http, body=request, x_api_key=config.plato_api_key,
+            )
+            chronos_id = resp.session_id
+            logger.info(
+                "    [%s] AV session %d launched: %s (attempt %d)",
+                variant_key, sess_num + 1, chronos_id, attempt,
+            )
 
-        status = await self._poll_until_done(http, chronos_id, config.plato_api_key)
+            status = await self._poll_until_done(http, chronos_id, config.plato_api_key)
 
-        if status.get("status") not in ("completed",):
+            if status.get("status") in ("completed",):
+                return {
+                    "chronos_id": chronos_id,
+                    "plato_id": status.get("plato_session_id", ""),
+                }
+
+            is_infra = status.get("status") in ("failed", "error", "cancelled")
+            if is_infra and attempt < 2:
+                logger.warning(
+                    "    AV session %s infra failure (status=%s), retrying…",
+                    chronos_id, status.get("status"),
+                )
+                continue
+
             logger.warning(
                 "    AV session %s ended with status=%s",
                 chronos_id, status.get("status"),
             )
             return None
 
-        return {
-            "chronos_id": chronos_id,
-            "plato_id": status.get("plato_session_id", ""),
-        }
+        return None
 
     async def _extract_agent_output(
         self, http, chronos_id: str, api_key: str, get_session_logs_mod,
