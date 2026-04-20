@@ -1762,8 +1762,6 @@ else:
         agent_config: dict = {
             "model_name": config.autoverify_model,
             "max_turns": config.eval_max_turns,
-            "display_width": config.eval_display_width,
-            "display_height": config.eval_display_height,
         }
         if "anthropic" in config.autoverify_model or "claude" in config.autoverify_model:
             if config.anthropic_api_key:
