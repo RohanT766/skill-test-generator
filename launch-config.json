@@ -1,6 +1,6 @@
 {
   "world": {
-    "package": "plato-world-skill-test-generator:0.4.19",
+    "package": "plato-world-skill-test-generator:0.4.20",
     "runtime": {
       "type": "vm",
       "vm": {
@@ -12,35 +12,17 @@
     },
     "config": {
       "s3_skills": [
-        "Maintain correct task objective without hallucinating constraints",
-        "Locate settings entry point among visually similar project navigation elements",
-        "Verify actual UI feedback before confirming task success",
-        "Distinguish between similarly-named record types in navigation menus",
         "Exhaustively paginate list before identifying extremum record",
-        "Resolve truncated text in data grid cells before using value",
-        "Systematically aggregate across filtered pages instead of visual scanning",
-        "Aggregate values across data grid rows before selecting maximum",
-        "Account for pagination when counting rows in data grid",
-        "Disambiguate similarly-named entities in autocomplete dropdown",
-        "Distinguish between conceptually unrelated modules with domain-ambiguous names",
-        "Distinguish entity subtypes via dedicated navigation tabs",
-        "Scope action to correct hierarchy level in nested entity tree",
-        "Disambiguate similarly-named modules in sidebar navigation",
-        "Use status column instead of heuristic field to classify row state",
-        "Apply correct status filter before counting records per entity",
-        "Extract complete structured value from multi-component display field",
-        "Explore tabbed sub-navigation to locate feature configuration panel",
-        "Accurately transcribe visually dense text from detail panel fields",
-        "Distinguish validation error from success confirmation in form submission"
+        "Distinguish between similarly-named record types in navigation menus"
       ],
-      "specs_per_skill": 4,
-      "design_concurrency": 10,
-      "max_skills": 20,
+      "specs_per_skill": 2,
+      "design_concurrency": 4,
+      "max_skills": 2,
       "output_tasks_per_variant": 2,
       "mutation_tasks_per_variant": 0,
-      "sessions_per_testcase": 4,
-      "run_concurrency": 20,
-      "vm_concurrency": 10,
+      "sessions_per_testcase": 3,
+      "run_concurrency": 10,
+      "vm_concurrency": 4,
       "pipeline_vm_cpus": 2,
       "pipeline_vm_memory": 4096,
       "eval_agent_model": "amazon/nova-act",
@@ -60,11 +42,11 @@
       "anthropic_api_key": "${ANTHROPIC_API_KEY}",
       "plato_api_key": "${PLATO_API_KEY}",
       "nova_act_workflow_name": "${NOVA_ACT_WORKFLOW_NAME}",
-      "autoverify": false,
+      "autoverify": true,
       "autoverify_sessions": 3,
       "autoverify_model": "anthropic/claude-opus-4-6",
       "hillclimb": {
-        "enabled": false,
+        "enabled": true,
         "total_failures": 1,
         "max_retries": 2
       },

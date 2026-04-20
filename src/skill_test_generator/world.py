@@ -1642,7 +1642,7 @@ else:
             scoring_type = task.get("scoring_type", "output")
             instruction = task.get("instruction", "")
             hint = task.get("hint", "")
-            start_url = task.get("start_url", "/")
+            start_url = "/"
             output_schema = task.get("output_schema") if scoring_type == "output" else None
 
             prompt = instruction
