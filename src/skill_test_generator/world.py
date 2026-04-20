@@ -609,7 +609,12 @@ class SkillTestGeneratorWorld(
 
             # ── Phase 2b: Task generation (off-VM, uses fetched API data) ──
             generated_tasks: list[dict] = []
-            if llm_client is not None and live_api_data:
+            if llm_client is not None:
+                if not live_api_data:
+                    logger.warning(
+                        "  [%s] No live API data — falling back to spec-only task generation",
+                        vs.variant_key,
+                    )
                 gen_coro = generate_tasks_for_variant(
                     llm_client,
                     spec,
@@ -625,9 +630,10 @@ class SkillTestGeneratorWorld(
                     generated_tasks = await gen_coro
 
                 logger.info(
-                    "  [%s] Generated %d tasks (off-VM)",
+                    "  [%s] Generated %d tasks (off-VM%s)",
                     vs.variant_key,
                     len(generated_tasks),
+                    "" if live_api_data else ", spec-only fallback",
                 )
 
             if generated_tasks:
@@ -909,15 +915,24 @@ else:
 
                 # ── FETCH LIVE API DATA (for taskgen after VM closes) ──
                 live_api_data: dict[str, str] = {}
+
+                list_routes = []
+                dynamic_routes = []
                 for r in api_routes:
                     route = r.get("route", "")
-                    if not route or "[" in route or "/health" in route:
+                    if not route or "/health" in route:
                         continue
                     methods = r.get("methods", [r.get("method", "GET")])
                     if isinstance(methods, str):
                         methods = [methods]
                     if "GET" not in methods:
                         continue
+                    if "[" in route:
+                        dynamic_routes.append(route)
+                    else:
+                        list_routes.append(route)
+
+                for route in list_routes:
                     all_data = ""
                     page = 1
                     while page <= 20:
@@ -959,6 +974,27 @@ else:
                         page += 1
                     if all_data:
                         live_api_data[route] = all_data
+
+                # Fallback: probe dynamic routes with common IDs
+                if not live_api_data and dynamic_routes:
+                    logger.info(
+                        "  [%s] No list endpoints — probing dynamic routes with sample IDs",
+                        vs.variant_key,
+                    )
+                    for route in dynamic_routes:
+                        for sample_id in ("1", "2", "3"):
+                            concrete = re.sub(r"\[[^\]]+\]", sample_id, route)
+                            out, ok = await _exec(
+                                f"curl -s 'http://127.0.0.1:3000{concrete}' 2>&1",
+                                timeout=10,
+                            )
+                            if ok and out and len(out) > 5:
+                                try:
+                                    json.loads(out)
+                                    key = f"{route} (id={sample_id})"
+                                    live_api_data[key] = out
+                                except (json.JSONDecodeError, ValueError):
+                                    pass
 
                 if live_api_data:
                     logger.info(
