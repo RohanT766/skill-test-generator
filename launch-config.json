@@ -1,6 +1,6 @@
 {
   "world": {
-    "package": "plato-world-skill-test-generator:0.4.27",
+    "package": "plato-world-skill-test-generator:0.4.28",
     "runtime": {
       "type": "vm",
       "vm": {
@@ -43,7 +43,7 @@
       "plato_api_key": "${PLATO_API_KEY}",
       "nova_act_workflow_name": "${NOVA_ACT_WORKFLOW_NAME}",
       "autoverify": true,
-      "autoverify_sessions": 3,
+      "autoverify_sessions": 4,
       "autoverify_model": "anthropic/claude-opus-4-6",
       "hillclimb": {
         "enabled": true,

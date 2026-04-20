@@ -1710,31 +1710,32 @@ else:
                                vs.variant_key, task_name)
                 continue
 
+            MIN_AGREE = 3
             outputs_with_data = [s for s in collected if s.get("agent_output") is not None]
-            if not outputs_with_data:
+            if len(outputs_with_data) < MIN_AGREE:
                 logger.warning(
-                    "  [%s] Autoverify FAILED for '%s': no sessions returned output",
-                    vs.variant_key, task_name,
+                    "  [%s] Autoverify FAILED for '%s': only %d/%d sessions returned output (need %d)",
+                    vs.variant_key, task_name, len(outputs_with_data), len(collected), MIN_AGREE,
                 )
                 continue
 
             first_output = outputs_with_data[0]["agent_output"]
-            all_match = True
+            agreeing = [outputs_with_data[0]]
             for s in outputs_with_data[1:]:
-                if s["agent_output"] != first_output:
-                    all_match = False
-                    logger.warning(
-                        "  [%s] Autoverify FAILED for '%s': outputs differ "
-                        "(session %s vs %s)",
-                        vs.variant_key, task_name,
-                        outputs_with_data[0]["session_id"], s["session_id"],
-                    )
-                    break
+                if s["agent_output"] == first_output:
+                    agreeing.append(s)
 
-            if all_match and scoring_type == "output":
+            if len(agreeing) < MIN_AGREE:
+                logger.warning(
+                    "  [%s] Autoverify FAILED for '%s': only %d/%d outputs agree (need %d)",
+                    vs.variant_key, task_name, len(agreeing), len(outputs_with_data), MIN_AGREE,
+                )
+                continue
+
+            if scoring_type == "output":
                 import time as _time
                 now_ms = int(_time.time() * 1000)
-                n_used = len(outputs_with_data)
+                n_used = len(agreeing)
                 task["_av_scoring_config"] = {
                     "output_config": {
                         "type": "json_schema",
