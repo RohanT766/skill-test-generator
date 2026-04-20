@@ -1689,6 +1689,45 @@ else:
 
         return created_ids
 
+    async def _archive_testcases(self, public_ids: list[str]) -> int:
+        """Archive testcases by public ID. Returns count successfully archived."""
+        if not public_ids:
+            return 0
+        config = self.config
+        archived = 0
+        async with httpx.AsyncClient(
+            base_url=config.plato_api_url,
+            timeout=httpx.Timeout(30.0),
+            headers={"X-API-Key": config.plato_api_key},
+        ) as http:
+            numeric_ids: list[int] = []
+            for pub_id in public_ids:
+                try:
+                    resp = await http.get(
+                        "/api/v1/testcases",
+                        params={"public_id": pub_id, "page_size": 1},
+                    )
+                    resp.raise_for_status()
+                    for tc in resp.json().get("testcases", []):
+                        pid = tc.get("publicId") or tc.get("public_id", "")
+                        if pid == pub_id:
+                            numeric_ids.append(tc["id"])
+                            break
+                except Exception as e:
+                    logger.warning("Failed to resolve testcase %s: %s", pub_id, e)
+
+            if numeric_ids:
+                try:
+                    resp = await http.post(
+                        "/api/v1/testcases/bulk-archive",
+                        json={"test_case_ids": numeric_ids},
+                    )
+                    resp.raise_for_status()
+                    archived = len(numeric_ids)
+                except Exception as e:
+                    logger.error("Failed to bulk-archive testcases: %s", e)
+        return archived
+
     # ------------------------------------------------------------------
     # AUTOVERIFY: run agent sessions → call v2 auto_verify → get scoring config
     # ------------------------------------------------------------------
@@ -2904,6 +2943,15 @@ else:
                         task = self._task_dict_from_file(tc_file)
                         if task:
                             all_tasks.append(task)
+
+                    # Collect previous testcase IDs to archive after publishing new ones
+                    prev_tc_ids: list[str] = []
+                    for _tc_id, _tc_st in vs.testcase_hillclimb_state.items():
+                        if _tc_st.iterations:
+                            last_iter = _tc_st.iterations[-1]
+                            if last_iter.testcase_id:
+                                prev_tc_ids.append(last_iter.testcase_id)
+
                     all_new_ids = await self._autoverify_and_publish(
                         vs, all_tasks, new_artifact_id
                     )
@@ -2915,6 +2963,15 @@ else:
                             tc_idx,
                         )
                         continue
+
+                    # Archive superseded testcases from previous iteration
+                    if prev_tc_ids:
+                        n = await self._archive_testcases(prev_tc_ids)
+                        logger.info(
+                            "HILLCLIMB [%s] archived %d superseded testcases",
+                            vs.variant_key, n,
+                        )
+
                     new_tc_id = (
                         all_new_ids[tc_idx]
                         if tc_idx < len(all_new_ids)
@@ -2931,6 +2988,9 @@ else:
                         )
                         new_tc_id = None
                     else:
+                        # Get previous testcase ID for this specific TC
+                        prev_tc_id = tc_state.iterations[-1].testcase_id if tc_state.iterations else None
+
                         task = self._task_dict_from_file(tc_file)
                         if task:
                             published = await self._autoverify_and_publish(
@@ -2939,6 +2999,15 @@ else:
                             new_tc_id = published[0] if published else None
                         else:
                             new_tc_id = None
+
+                        # Archive the superseded testcase
+                        if new_tc_id and prev_tc_id and prev_tc_id != new_tc_id:
+                            n = await self._archive_testcases([prev_tc_id])
+                            if n:
+                                logger.info(
+                                    "HILLCLIMB [%s][tc-%03d] archived superseded testcase %s",
+                                    vs.variant_key, tc_idx, prev_tc_id[:12],
+                                )
 
                 if not new_tc_id:
                     logger.error(
