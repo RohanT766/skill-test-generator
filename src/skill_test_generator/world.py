@@ -1733,7 +1733,6 @@ else:
                 now_ms = int(_time.time() * 1000)
                 n_used = len(outputs_with_data)
                 task["_av_scoring_config"] = {
-                    "mutation_configs": {},
                     "output_config": {
                         "type": "json_schema",
                         "scoring_schema": first_output,
