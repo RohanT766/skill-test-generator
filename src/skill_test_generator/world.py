@@ -1728,8 +1728,11 @@ else:
 
             try:
                 async with httpx.AsyncClient(timeout=httpx.Timeout(180.0)) as http:
+                    base = config.plato_api_url.rstrip("/")
+                    if not base.endswith("/api"):
+                        base = f"{base}/api"
                     resp = await http.post(
-                        f"{config.plato_api_url}/v2/testcases/auto_verify",
+                        f"{base}/v2/testcases/auto_verify",
                         json=payload,
                         headers={"X-API-Key": config.plato_api_key},
                     )
