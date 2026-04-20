@@ -2936,26 +2936,28 @@ else:
                         continue
                     current_artifact_id = new_artifact_id
 
-                    # Sim changed → autoverify + republish ALL testcases against new snapshot
-                    tc_dir = workspace_dir / "testcases"
-                    all_tasks: list[dict] = []
-                    for tc_file in sorted(tc_dir.glob("tc-*.json")):
-                        task = self._task_dict_from_file(tc_file)
-                        if task:
-                            all_tasks.append(task)
+                    # Sim changed → only republish the TARGET testcase against the new artifact
+                    tc_file = workspace_dir / "testcases" / f"tc-{tc_idx:03d}.json"
+                    if not tc_file.exists():
+                        logger.error(
+                            "HILLCLIMB [%s][tc-%03d] testcase file not found after sim change",
+                            vs.variant_key, tc_idx,
+                        )
+                        continue
+                    target_task = self._task_dict_from_file(tc_file)
+                    if not target_task:
+                        logger.error(
+                            "HILLCLIMB [%s][tc-%03d] could not parse testcase file",
+                            vs.variant_key, tc_idx,
+                        )
+                        continue
 
-                    # Collect previous testcase IDs to archive after publishing new ones
-                    prev_tc_ids: list[str] = []
-                    for _tc_id, _tc_st in vs.testcase_hillclimb_state.items():
-                        if _tc_st.iterations:
-                            last_iter = _tc_st.iterations[-1]
-                            if last_iter.testcase_id:
-                                prev_tc_ids.append(last_iter.testcase_id)
+                    prev_tc_id = tc_state.iterations[-1].testcase_id if tc_state.iterations else None
 
-                    all_new_ids = await self._autoverify_and_publish(
-                        vs, all_tasks, new_artifact_id
+                    published = await self._autoverify_and_publish(
+                        vs, [target_task], new_artifact_id
                     )
-                    if not all_new_ids:
+                    if not published:
                         logger.error(
                             "HILLCLIMB [%s][tc-%03d] testcase publish failed "
                             "after sim change",
@@ -2963,20 +2965,16 @@ else:
                             tc_idx,
                         )
                         continue
+                    new_tc_id = published[0]
 
-                    # Archive superseded testcases from previous iteration
-                    if prev_tc_ids:
-                        n = await self._archive_testcases(prev_tc_ids)
-                        logger.info(
-                            "HILLCLIMB [%s] archived %d superseded testcases",
-                            vs.variant_key, n,
-                        )
-
-                    new_tc_id = (
-                        all_new_ids[tc_idx]
-                        if tc_idx < len(all_new_ids)
-                        else None
-                    )
+                    # Archive the superseded testcase
+                    if prev_tc_id and prev_tc_id != new_tc_id:
+                        n = await self._archive_testcases([prev_tc_id])
+                        if n:
+                            logger.info(
+                                "HILLCLIMB [%s][tc-%03d] archived superseded testcase %s",
+                                vs.variant_key, tc_idx, prev_tc_id[:12],
+                            )
                 else:
                     # Testcase-only → autoverify + publish just the edited testcase
                     tc_file = workspace_dir / "testcases" / f"tc-{tc_idx:03d}.json"
