@@ -1637,7 +1637,11 @@ else:
             WorldRuntimeConfig,
         )
 
-        for task_idx, task in enumerate(tasks):
+        import json as _json
+        import time as _time
+
+        async def _av_task(task_idx: int, task: dict, chronos_http):
+            """Run all AV sessions for a single task, evaluate agreement."""
             task_name = task.get("name", f"task-{task_idx}")
             scoring_type = task.get("scoring_type", "output")
             instruction = task.get("instruction", "")
@@ -1646,7 +1650,6 @@ else:
 
             prompt = instruction
             if output_schema:
-                import json as _json
                 schema_json = _json.dumps(output_schema, indent=2)
                 prompt = (
                     f"{prompt}\n\n"
@@ -1662,9 +1665,7 @@ else:
                 vs.variant_key, task_name, scoring_type, config.autoverify_sessions,
             )
 
-            collected: list[dict] = []
-
-            async def _av_one(sess_num: int, chronos_http):
+            async def _av_one(sess_num: int):
                 async with av_sem:
                     try:
                         result = await self._run_autoverify_session(
@@ -1681,31 +1682,28 @@ else:
                             )
                             session_id = result.get("plato_id") or result["chronos_id"]
                             logger.info(
-                                "    [%d/%d] session=%s output=%s",
-                                sess_num + 1, config.autoverify_sessions,
+                                "    [%s/%d/%d] session=%s output=%s",
+                                task_name, sess_num + 1, config.autoverify_sessions,
                                 session_id,
                                 "yes" if agent_output is not None else "none",
                             )
                             return {"session_id": session_id, "agent_output": agent_output}
                     except Exception as e:
                         logger.error(
-                            "    [%d/%d] autoverify session error: %s",
-                            sess_num + 1, config.autoverify_sessions, e,
+                            "    [%s/%d/%d] autoverify session error: %s",
+                            task_name, sess_num + 1, config.autoverify_sessions, e,
                         )
                     return None
 
-            async with httpx.AsyncClient(
-                base_url=config.chronos_url, timeout=httpx.Timeout(120.0)
-            ) as chronos_http:
-                results = await asyncio.gather(
-                    *[_av_one(i, chronos_http) for i in range(config.autoverify_sessions)]
-                )
-                collected = [r for r in results if r is not None]
+            results = await asyncio.gather(
+                *[_av_one(i) for i in range(config.autoverify_sessions)]
+            )
+            collected = [r for r in results if r is not None]
 
             if not collected:
                 logger.warning("  [%s] No autoverify sessions for '%s', keeping LLM config",
                                vs.variant_key, task_name)
-                continue
+                return
 
             MIN_AGREE = 3
             outputs_with_data = [s for s in collected if s.get("agent_output") is not None]
@@ -1714,7 +1712,7 @@ else:
                     "  [%s] Autoverify FAILED for '%s': only %d/%d sessions returned output (need %d)",
                     vs.variant_key, task_name, len(outputs_with_data), len(collected), MIN_AGREE,
                 )
-                continue
+                return
 
             first_output = outputs_with_data[0]["agent_output"]
             agreeing = [outputs_with_data[0]]
@@ -1727,10 +1725,9 @@ else:
                     "  [%s] Autoverify FAILED for '%s': only %d/%d outputs agree (need %d)",
                     vs.variant_key, task_name, len(agreeing), len(outputs_with_data), MIN_AGREE,
                 )
-                continue
+                return
 
             if scoring_type == "output":
-                import time as _time
                 now_ms = int(_time.time() * 1000)
                 n_used = len(agreeing)
                 task["_av_scoring_config"] = {
@@ -1747,6 +1744,13 @@ else:
                     "  [%s] Autoverify PASSED for '%s' (%d/%d sessions agree)",
                     vs.variant_key, task_name, n_used, len(collected),
                 )
+
+        async with httpx.AsyncClient(
+            base_url=config.chronos_url, timeout=httpx.Timeout(120.0)
+        ) as chronos_http:
+            await asyncio.gather(
+                *[_av_task(i, t, chronos_http) for i, t in enumerate(tasks)]
+            )
 
     async def _run_autoverify_session(
         self, http, config, sim_name, artifact_id,
