@@ -1927,14 +1927,15 @@ else:
             ),
         )
 
-        for attempt in range(1, 3):
+        max_attempts = 4
+        for attempt in range(1, max_attempts + 1):
             resp = await launch_job_mod.asyncio(
                 client=http, body=request, x_api_key=config.plato_api_key,
             )
             chronos_id = resp.session_id
             logger.info(
-                "    [%s] AV session %d launched: %s (attempt %d)",
-                variant_key, sess_num + 1, chronos_id, attempt,
+                "    [%s] AV session %d launched: %s (attempt %d/%d)",
+                variant_key, sess_num + 1, chronos_id, attempt, max_attempts,
             )
 
             status = await self._poll_until_done(http, chronos_id, config.plato_api_key)
@@ -1946,10 +1947,10 @@ else:
                 }
 
             is_infra = status.get("status") in ("failed", "error", "cancelled")
-            if is_infra and attempt < 2:
+            if is_infra and attempt < max_attempts:
                 logger.warning(
-                    "    AV session %s infra failure (status=%s), retrying…",
-                    chronos_id, status.get("status"),
+                    "    AV session %s infra failure (status=%s), retrying (%d/%d)…",
+                    chronos_id, status.get("status"), attempt, max_attempts,
                 )
                 continue
 
