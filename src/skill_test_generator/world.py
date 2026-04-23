@@ -1213,15 +1213,30 @@ else:
         from plato._generated.models import ExecuteCommandRequest
 
         async def _exec(cmd: str, timeout: int = 30) -> tuple[str, bool]:
-            r = await sessions_execute.asyncio(
-                client=http,
-                session_id=session_id,
-                body=ExecuteCommandRequest(command=cmd, timeout=timeout),
-                x_api_key=api_key,
-            )
-            for _, v in r.results.items():
-                return (v.stdout or "").strip(), bool(v.success)
-            return "", False
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    r = await sessions_execute.asyncio(
+                        client=http,
+                        session_id=session_id,
+                        body=ExecuteCommandRequest(command=cmd, timeout=timeout),
+                        x_api_key=api_key,
+                    )
+                    for _, v in r.results.items():
+                        return (v.stdout or "").strip(), bool(v.success)
+                    return "", False
+                except Exception as e:
+                    err_str = str(e)
+                    is_transient = any(code in err_str for code in ("502", "503", "504"))
+                    if is_transient and attempt < max_retries - 1:
+                        delay = 5 * (attempt + 1)
+                        logger.warning(
+                            "_exec transient error (attempt %d/%d), retrying in %ds: %s",
+                            attempt + 1, max_retries, delay, err_str[:200],
+                        )
+                        await asyncio.sleep(delay)
+                        continue
+                    raise
 
         return _exec
 
