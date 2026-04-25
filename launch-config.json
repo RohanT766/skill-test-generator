@@ -1,46 +1,38 @@
 {
   "world": {
-    "package": "plato-world-skill-test-generator:0.3.82",
+    "package": "plato-world-skill-test-generator:0.4.46",
     "runtime": {
       "type": "vm",
       "vm": {
         "cpus": 2,
         "memory": 4096,
-        "disk": 10240,
+        "disk": 20480,
         "timeout": 14400
       }
     },
     "config": {
       "s3_skills": [
-        "Account for pagination when counting rows in data grid",
-        "Accurately transcribe visually dense text from detail panel fields",
-        "Aggregate values across data grid rows before selecting maximum",
-        "Disambiguate similarly-named entities in autocomplete dropdown",
-        "Distinguish between similarly-named record types in navigation menus",
-        "Distinguish entity subtypes via dedicated navigation tabs",
         "Exhaustively paginate list before identifying extremum record",
-        "Extract complete structured value from multi-component display field",
-        "Resolve truncated text in data grid cells before using value",
-        "Systematically aggregate across filtered pages instead of visual scanning"
+        "Distinguish between similarly-named record types in navigation menus"
       ],
       "specs_per_skill": 2,
-      "design_concurrency": 10,
-      "max_skills": 10,
+      "design_concurrency": 4,
+      "max_skills": 2,
       "output_tasks_per_variant": 2,
       "mutation_tasks_per_variant": 0,
-      "sessions_per_testcase": 3,
-      "run_concurrency": 30,
-      "vm_concurrency": 10,
+      "sessions_per_testcase": 2,
+      "run_concurrency": 10,
+      "vm_concurrency": 4,
       "pipeline_vm_cpus": 2,
       "pipeline_vm_memory": 4096,
       "eval_agent_model": "amazon/nova-act",
-      "cua_world_package": "plato-world-cua-benchmark:3.3.26",
-      "cua_agent_package": "computer-use-agent:3.2.52",
+      "cua_world_package": "plato-world-cua-benchmark:3.8.1",
+      "cua_agent_package": "computer-use-agent:3.2.61",
       "coder_agent": {
         "package": "claude-code:latest",
         "config": {
-          "model_name": "claude-opus-4-6",
-          "max_turns": 150,
+          "model_name": "claude-sonnet-4-6",
+          "max_turns": 200,
           "anthropic_api_key": "${ANTHROPIC_API_KEY}"
         }
       },
@@ -49,7 +41,16 @@
       "aws_session_token": "${AWS_SESSION_TOKEN}",
       "anthropic_api_key": "${ANTHROPIC_API_KEY}",
       "plato_api_key": "${PLATO_API_KEY}",
-      "nova_act_workflow_name": "${NOVA_ACT_WORKFLOW_NAME}"
+      "nova_act_workflow_name": "${NOVA_ACT_WORKFLOW_NAME}",
+      "autoverify": true,
+      "autoverify_sessions": 4,
+      "autoverify_model": "anthropic/claude-sonnet-4-6",
+      "hillclimb": {
+        "enabled": true,
+        "total_failures": 1,
+        "max_retries": 2
+      },
+      "dry_run": false
     }
   },
   "retry": {
