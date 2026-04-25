@@ -9,7 +9,6 @@ import json
 import logging
 import re
 import tarfile
-import time
 from pathlib import Path
 
 import httpx
@@ -304,15 +303,18 @@ class SkillTestGeneratorWorld(
             if sps == 1:
                 variants.append(
                     VariantStatus(
-                        skill_name=s.name, short_name=short,
-                        slug=base_slug, variant_key=base_slug,
+                        skill_name=s.name,
+                        short_name=short,
+                        slug=base_slug,
+                        variant_key=base_slug,
                     )
                 )
             else:
                 for vi in range(1, sps + 1):
                     variants.append(
                         VariantStatus(
-                            skill_name=s.name, short_name=short,
+                            skill_name=s.name,
+                            short_name=short,
                             slug=base_slug,
                             variant_key=f"{base_slug}-{vi}",
                         )
@@ -516,7 +518,9 @@ class SkillTestGeneratorWorld(
                         code_files,
                         spec=spec,
                     )
-                    logger.info("  [%s] Wrote %d files", vs.variant_key, len(files_written))
+                    logger.info(
+                        "  [%s] Wrote %d files", vs.variant_key, len(files_written)
+                    )
                 except Exception as e:
                     logger.error("  [%s] Codegen failed: %s", vs.variant_key, e)
                     vs.stage = "pipeline_failed"
@@ -541,7 +545,9 @@ class SkillTestGeneratorWorld(
                 )
 
                 async with vm_sem:
-                    logger.info("  [%s] Pipeline VM attempt %d …", vs.variant_key, attempt + 1)
+                    logger.info(
+                        "  [%s] Pipeline VM attempt %d …", vs.variant_key, attempt + 1
+                    )
                     try:
                         result = await self._pipeline_vm_verify_build_publish(
                             vs=vs,
@@ -567,7 +573,9 @@ class SkillTestGeneratorWorld(
                     break
 
                 if failure_type == "code" and attempt == 0 and config.coder_agent:
-                    logger.info("  [%s] Code error, launching agent fix …", vs.variant_key)
+                    logger.info(
+                        "  [%s] Code error, launching agent fix …", vs.variant_key
+                    )
                     try:
                         instruction = build_codegen_instruction(
                             spec=spec,
@@ -650,7 +658,10 @@ class SkillTestGeneratorWorld(
             if tasks and artifact_id:
                 try:
                     new_ids = await self._autoverify_and_publish(
-                        vs, tasks, artifact_id, av_sem=av_sem,
+                        vs,
+                        tasks,
+                        artifact_id,
+                        av_sem=av_sem,
                     )
                     if new_ids:
                         vs.testcase_ids.extend(new_ids)
@@ -659,7 +670,9 @@ class SkillTestGeneratorWorld(
                         vs.stage = "pipeline_failed"
                         vs.error = "no testcases passed autoverify"
                 except Exception as e:
-                    logger.error("  [%s] Testcase creation error: %s", vs.variant_key, e)
+                    logger.error(
+                        "  [%s] Testcase creation error: %s", vs.variant_key, e
+                    )
                     vs.stage = "pipeline_failed"
                     vs.error = f"testcase creation: {e}"
             else:
@@ -745,7 +758,6 @@ class SkillTestGeneratorWorld(
             base_url=api_url,
             timeout=httpx.Timeout(300.0, connect=30.0),
         ) as http:
-
             try:
                 # ── Create VM ─────────────────────────────────────────
                 env = EnvFromResource(
@@ -804,8 +816,8 @@ class SkillTestGeneratorWorld(
                 # Ensure `node` is on PATH — Next.js Turbopack spawns node
                 # subprocesses for webpack loaders even when run via bun
                 await _exec(
-                    f'{preamble} && '
-                    'command -v node >/dev/null 2>&1 || '
+                    f"{preamble} && "
+                    "command -v node >/dev/null 2>&1 || "
                     'ln -sf "$(command -v bun)" /usr/local/bin/node',
                     timeout=10,
                 )
@@ -823,7 +835,8 @@ class SkillTestGeneratorWorld(
                 )
                 if "MISSING" in chk:
                     logger.warning(
-                        "  [%s] @electric-sql/pglite missing, reinstalling …", vs.variant_key
+                        "  [%s] @electric-sql/pglite missing, reinstalling …",
+                        vs.variant_key,
                     )
                     await _exec(
                         f"{preamble} && cd {app_dir} && bun install --no-save @electric-sql/pglite 2>&1 | tail -5",
@@ -1055,7 +1068,10 @@ else:
                     f" | {spec.get('description', '') or ''}"
                 ).strip()
                 actual_name = await self._register_simulator(
-                    http, api_key, sim_name, sim_description,
+                    http,
+                    api_key,
+                    sim_name,
+                    sim_description,
                     icon_svg=spec.get("icon_svg", ""),
                     label=vs.variant_key,
                     skill_gym=vs.skill_name,
@@ -1135,14 +1151,14 @@ else:
             await asyncio.sleep(3)
 
         if not prod_ok:
-            log_tail, _ = await _exec(
-                "tail -50 /tmp/dev.log 2>/dev/null", timeout=10
+            log_tail, _ = await _exec("tail -50 /tmp/dev.log 2>/dev/null", timeout=10)
+            checks.append(
+                {
+                    "name": "server_startup",
+                    "pass": False,
+                    "error": f"Production server never healthy. Log: {log_tail[-500:]}",
+                }
             )
-            checks.append({
-                "name": "server_startup",
-                "pass": False,
-                "error": f"Production server never healthy. Log: {log_tail[-500:]}",
-            })
             return checks
 
         checks.append({"name": "server_startup", "pass": True, "error": ""})
@@ -1157,40 +1173,37 @@ else:
                 f"http://127.0.0.1:3000{route} 2>&1 | tail -c 2000",
                 timeout=15,
             )
-            body = (
-                out.split("HTTP_CODE:")[0].strip()
-                if "HTTP_CODE:" in out
-                else out
-            )
+            body = out.split("HTTP_CODE:")[0].strip() if "HTTP_CODE:" in out else out
             ok = "HTTP_CODE:200" in out and len(body) >= 2
-            checks.append({
-                "name": f"GET {route}",
-                "pass": ok,
-                "error": "" if ok else out[:300],
-            })
+            checks.append(
+                {
+                    "name": f"GET {route}",
+                    "pass": ok,
+                    "error": "" if ok else out[:300],
+                }
+            )
 
         page_html, _ = await _exec(
             "curl -s http://127.0.0.1:3000/ 2>&1 | head -c 50000",
             timeout=15,
         )
         has_localhost = (
-            "localhost:3000/api" in page_html
-            or "127.0.0.1:3000/api" in page_html
+            "localhost:3000/api" in page_html or "127.0.0.1:3000/api" in page_html
         )
         if has_localhost:
-            checks.append({
-                "name": "no_localhost_urls",
-                "pass": False,
-                "error": "Page HTML contains hardcoded localhost API URLs",
-            })
+            checks.append(
+                {
+                    "name": "no_localhost_urls",
+                    "pass": False,
+                    "error": "Page HTML contains hardcoded localhost API URLs",
+                }
+            )
         else:
             checks.append({"name": "no_localhost_urls", "pass": True, "error": ""})
 
         n_pass = sum(1 for c in checks if c["pass"])
         n_fail = sum(1 for c in checks if not c["pass"])
-        logger.info(
-            "  [%s] Verify: %d passed, %d failed", label, n_pass, n_fail
-        )
+        logger.info("  [%s] Verify: %d passed, %d failed", label, n_pass, n_fail)
         for c in checks:
             if not c["pass"]:
                 logger.warning(
@@ -1227,12 +1240,17 @@ else:
                     return "", False
                 except Exception as e:
                     err_str = str(e)
-                    is_transient = any(code in err_str for code in ("502", "503", "504"))
+                    is_transient = any(
+                        code in err_str for code in ("502", "503", "504")
+                    )
                     if is_transient and attempt < max_retries - 1:
                         delay = 5 * (attempt + 1)
                         logger.warning(
                             "_exec transient error (attempt %d/%d), retrying in %ds: %s",
-                            attempt + 1, max_retries, delay, err_str[:200],
+                            attempt + 1,
+                            max_retries,
+                            delay,
+                            err_str[:200],
                         )
                         await asyncio.sleep(delay)
                         continue
@@ -1483,9 +1501,7 @@ else:
             except s3.exceptions.NoSuchKey:
                 continue
         else:
-            logger.warning(
-                "  Could not find sim tarball in S3 for %s", sim_name
-            )
+            logger.warning("  Could not find sim tarball in S3 for %s", sim_name)
             return
 
         dest.mkdir(parents=True, exist_ok=True)
@@ -1493,7 +1509,7 @@ else:
         with tarfile.open(fileobj=buf, mode="r:gz") as tar:
             for member in tar.getmembers():
                 if member.name.startswith("web/"):
-                    member.name = member.name[len("web/"):]
+                    member.name = member.name[len("web/") :]
                     if member.name:
                         tar.extract(member, dest)
         logger.info(
@@ -1539,7 +1555,9 @@ else:
             _sim_config.is_skill_gym = True  # type: ignore[attr-defined]
             _sim_config.skill_name = skill_gym  # type: ignore[attr-defined]
 
-        icon_url = self._icon_svg_to_data_uri(icon_svg) or "https://plato.so/favicon.ico"
+        icon_url = (
+            self._icon_svg_to_data_uri(icon_svg) or "https://plato.so/favicon.ico"
+        )
 
         m = re.match(r"^(.*)-v(\d+)$", base_name)
         if m:
@@ -1548,9 +1566,7 @@ else:
                 f"{stem}-v{n}" for n in range(start_v + 1, start_v + 100)
             ]
         else:
-            candidates = [base_name] + [
-                f"{base_name}-v{n}" for n in range(2, 100)
-            ]
+            candidates = [base_name] + [f"{base_name}-v{n}" for n in range(2, 100)]
         for name in candidates:
             try:
                 await create_simulator.asyncio(
@@ -1573,7 +1589,9 @@ else:
                     continue
                 logger.warning(
                     "  [%s] Could not create simulator '%s': %s",
-                    label, name, e,
+                    label,
+                    name,
+                    e,
                 )
                 return base_name
         return base_name
@@ -1603,7 +1621,10 @@ else:
             if skipped:
                 logger.info(
                     "  [%s] Autoverify gate: publishing %d/%d tasks (%d failed verification)",
-                    vs.variant_key, len(verified), len(tasks), skipped,
+                    vs.variant_key,
+                    len(verified),
+                    len(tasks),
+                    skipped,
                 )
             tasks = verified
 
@@ -1626,7 +1647,9 @@ else:
         config = self.config
         sim_name = vs.sim_name
         if not sim_name:
-            logger.error("  [%s] sim_name not set, cannot create testcases", vs.variant_key)
+            logger.error(
+                "  [%s] sim_name not set, cannot create testcases", vs.variant_key
+            )
             return []
 
         from plato._generated.api.v2.testcases import create_testcase
@@ -1651,7 +1674,8 @@ else:
                     v2_scoring_config = av_config
                     logger.info(
                         "  [%s] Using autoverify scoring config for '%s'",
-                        vs.variant_key, task.get("name", "unnamed"),
+                        vs.variant_key,
+                        task.get("name", "unnamed"),
                     )
                 else:
                     v2_scoring_config = _build_v2_scoring_config(task, sim_name)
@@ -1779,7 +1803,9 @@ else:
             scoring_type = task.get("scoring_type", "output")
             instruction = task.get("instruction", "")
             hint = task.get("hint", "")
-            output_schema = task.get("output_schema") if scoring_type == "output" else None
+            output_schema = (
+                task.get("output_schema") if scoring_type == "output" else None
+            )
 
             prompt = instruction
             if output_schema:
@@ -1795,36 +1821,58 @@ else:
 
             logger.info(
                 "  [%s] Autoverify '%s' (%s) — %d sessions",
-                vs.variant_key, task_name, scoring_type, config.autoverify_sessions,
+                vs.variant_key,
+                task_name,
+                scoring_type,
+                config.autoverify_sessions,
             )
 
             async def _av_one(sess_num: int):
                 async with av_sem:
                     try:
                         result = await self._run_autoverify_session(
-                            chronos_http, config, sim_name, artifact_id,
-                            prompt, hint, task_name, sess_num,
+                            chronos_http,
+                            config,
+                            sim_name,
+                            artifact_id,
+                            prompt,
+                            hint,
+                            task_name,
+                            sess_num,
                             vs.variant_key,
-                            launch_job, LaunchJobRequest, WorldConfigInput,
-                            WorldRuntimeConfig, VMResources,
+                            launch_job,
+                            LaunchJobRequest,
+                            WorldConfigInput,
+                            WorldRuntimeConfig,
+                            VMResources,
                         )
                         if result:
                             agent_output = await self._extract_agent_output(
-                                chronos_http, result["chronos_id"], config.plato_api_key,
+                                chronos_http,
+                                result["chronos_id"],
+                                config.plato_api_key,
                                 get_session_logs,
                             )
                             session_id = result.get("plato_id") or result["chronos_id"]
                             logger.info(
                                 "    [%s/%d/%d] session=%s output=%s",
-                                task_name, sess_num + 1, config.autoverify_sessions,
+                                task_name,
+                                sess_num + 1,
+                                config.autoverify_sessions,
                                 session_id,
                                 "yes" if agent_output is not None else "none",
                             )
-                            return {"session_id": session_id, "agent_output": agent_output}
+                            return {
+                                "session_id": session_id,
+                                "agent_output": agent_output,
+                            }
                     except Exception as e:
                         logger.error(
                             "    [%s/%d/%d] autoverify session error: %s",
-                            task_name, sess_num + 1, config.autoverify_sessions, e,
+                            task_name,
+                            sess_num + 1,
+                            config.autoverify_sessions,
+                            e,
                         )
                     return None
 
@@ -1834,16 +1882,25 @@ else:
             collected = [r for r in results if r is not None]
 
             if not collected:
-                logger.warning("  [%s] No autoverify sessions for '%s', keeping LLM config",
-                               vs.variant_key, task_name)
+                logger.warning(
+                    "  [%s] No autoverify sessions for '%s', keeping LLM config",
+                    vs.variant_key,
+                    task_name,
+                )
                 return
 
             MIN_AGREE = 3
-            outputs_with_data = [s for s in collected if s.get("agent_output") is not None]
+            outputs_with_data = [
+                s for s in collected if s.get("agent_output") is not None
+            ]
             if len(outputs_with_data) < MIN_AGREE:
                 logger.warning(
                     "  [%s] Autoverify FAILED for '%s': only %d/%d sessions returned output (need %d)",
-                    vs.variant_key, task_name, len(outputs_with_data), len(collected), MIN_AGREE,
+                    vs.variant_key,
+                    task_name,
+                    len(outputs_with_data),
+                    len(collected),
+                    MIN_AGREE,
                 )
                 return
 
@@ -1856,7 +1913,11 @@ else:
             if len(agreeing) < MIN_AGREE:
                 logger.warning(
                     "  [%s] Autoverify FAILED for '%s': only %d/%d outputs agree (need %d)",
-                    vs.variant_key, task_name, len(agreeing), len(outputs_with_data), MIN_AGREE,
+                    vs.variant_key,
+                    task_name,
+                    len(agreeing),
+                    len(outputs_with_data),
+                    MIN_AGREE,
                 )
                 return
 
@@ -1875,7 +1936,10 @@ else:
                 }
                 logger.info(
                     "  [%s] Autoverify PASSED for '%s' (%d/%d sessions agree)",
-                    vs.variant_key, task_name, n_used, len(collected),
+                    vs.variant_key,
+                    task_name,
+                    n_used,
+                    len(collected),
                 )
 
         async with httpx.AsyncClient(
@@ -1886,17 +1950,31 @@ else:
             )
 
     async def _run_autoverify_session(
-        self, http, config, sim_name, artifact_id,
-        prompt, hint, task_name, sess_num, variant_key,
-        launch_job_mod, LaunchJobRequest, WorldConfigInput,
-        WorldRuntimeConfig, VMResources,
+        self,
+        http,
+        config,
+        sim_name,
+        artifact_id,
+        prompt,
+        hint,
+        task_name,
+        sess_num,
+        variant_key,
+        launch_job_mod,
+        LaunchJobRequest,
+        WorldConfigInput,
+        WorldRuntimeConfig,
+        VMResources,
     ) -> dict | None:
         """Launch a single CUA benchmark session for autoverify and wait for completion."""
         agent_config: dict = {
             "model_name": config.autoverify_model,
             "max_turns": config.eval_max_turns,
         }
-        if "anthropic" in config.autoverify_model or "claude" in config.autoverify_model:
+        if (
+            "anthropic" in config.autoverify_model
+            or "claude" in config.autoverify_model
+        ):
             if config.anthropic_api_key:
                 agent_config["anthropic_api_key"] = config.anthropic_api_key
         if config.aws_access_key_id:
@@ -1909,7 +1987,9 @@ else:
             agent_config["aws_session_token"] = config.aws_session_token
             agent_config["envgen_aws_session_token"] = config.aws_session_token
         agent_config.setdefault("envgen_aws_region", "us-west-1")
-        agent_config.setdefault("envgen_aws_s3_bucket", "plato-browser-session-data-prod")
+        agent_config.setdefault(
+            "envgen_aws_s3_bucket", "plato-browser-session-data-prod"
+        )
 
         av_instruction = prompt
         if hint:
@@ -1918,7 +1998,9 @@ else:
         world_config = {
             "version": "2",
             "instruction": av_instruction,
-            "envs": [{"type": "artifact", "artifact_id": artifact_id, "alias": sim_name}],
+            "envs": [
+                {"type": "artifact", "artifact_id": artifact_id, "alias": sim_name}
+            ],
             "login_flow": True,
             "login_flow_retries": 4,
             "login_flow_retry_delay_ms": 10000,
@@ -1937,7 +2019,9 @@ else:
         request = LaunchJobRequest(
             world=WorldConfigInput(
                 package=config.cua_world_package,
-                runtime=WorldRuntimeConfig(type="vm", vm=VMResources(cpus=2, memory=4096)),
+                runtime=WorldRuntimeConfig(
+                    type="vm", vm=VMResources(cpus=2, memory=4096)
+                ),
                 config=world_config,
             ),
         )
@@ -1945,12 +2029,18 @@ else:
         max_attempts = 4
         for attempt in range(1, max_attempts + 1):
             resp = await launch_job_mod.asyncio(
-                client=http, body=request, x_api_key=config.plato_api_key,
+                client=http,
+                body=request,
+                x_api_key=config.plato_api_key,
             )
             chronos_id = resp.session_id
             logger.info(
                 "    [%s] AV session %d launched: %s (attempt %d/%d)",
-                variant_key, sess_num + 1, chronos_id, attempt, max_attempts,
+                variant_key,
+                sess_num + 1,
+                chronos_id,
+                attempt,
+                max_attempts,
             )
 
             status = await self._poll_until_done(http, chronos_id, config.plato_api_key)
@@ -1965,27 +2055,38 @@ else:
             if is_infra and attempt < max_attempts:
                 logger.warning(
                     "    AV session %s infra failure (status=%s), retrying (%d/%d)…",
-                    chronos_id, status.get("status"), attempt, max_attempts,
+                    chronos_id,
+                    status.get("status"),
+                    attempt,
+                    max_attempts,
                 )
                 continue
 
             logger.warning(
                 "    AV session %s ended with status=%s",
-                chronos_id, status.get("status"),
+                chronos_id,
+                status.get("status"),
             )
             return None
 
         return None
 
     async def _extract_agent_output(
-        self, http, chronos_id: str, api_key: str, get_session_logs_mod,
+        self,
+        http,
+        chronos_id: str,
+        api_key: str,
+        get_session_logs_mod,
     ) -> dict | None:
         """Extract structured agent output from Chronos OTel logs."""
         import json as _json
 
         try:
             logs_resp = await get_session_logs_mod.asyncio(
-                client=http, public_id=chronos_id, limit=10000, x_api_key=api_key,
+                client=http,
+                public_id=chronos_id,
+                limit=10000,
+                x_api_key=api_key,
             )
             logs = logs_resp.logs or []
 
@@ -2001,7 +2102,11 @@ else:
                 if name == "computer_use_session" and attrs:
                     result = attrs.get("computer_use.result")
                     if result:
-                        raw_output = _json.dumps(result) if isinstance(result, (dict, list)) else str(result)
+                        raw_output = (
+                            _json.dumps(result)
+                            if isinstance(result, (dict, list))
+                            else str(result)
+                        )
                         break
             if raw_output is None:
                 for log in reversed(logs):
@@ -2010,7 +2115,11 @@ else:
                     if name == "session" and attrs:
                         result = attrs.get("atif.session.result")
                         if result:
-                            raw_output = _json.dumps(result) if isinstance(result, (dict, list)) else str(result)
+                            raw_output = (
+                                _json.dumps(result)
+                                if isinstance(result, (dict, list))
+                                else str(result)
+                            )
                             break
 
             if raw_output is None:
@@ -2024,8 +2133,12 @@ else:
                 pass
 
             # Try extracting JSON from markdown code blocks or brace matching
-            for pattern in [r"```(?:json)?\s*(\{.*?\})\s*```", r"(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})"]:
+            for pattern in [
+                r"```(?:json)?\s*(\{.*?\})\s*```",
+                r"(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})",
+            ]:
                 import re as _re
+
                 match = _re.search(pattern, raw_output, _re.DOTALL)
                 if match:
                     try:
@@ -2038,7 +2151,9 @@ else:
             return None
 
         except Exception as e:
-            logger.warning("Failed to extract output from session %s: %s", chronos_id, e)
+            logger.warning(
+                "Failed to extract output from session %s: %s", chronos_id, e
+            )
             return None
 
     # ------------------------------------------------------------------
@@ -2716,7 +2831,8 @@ else:
 
         # API fallback: fetch testcase data if local tasks.json missing (resume)
         missing = [
-            vs for vs in self.state.variants
+            vs
+            for vs in self.state.variants
             if vs.testcase_ids and not self._all_tasks.get(vs.variant_key)
         ]
         if missing:
@@ -2773,12 +2889,8 @@ else:
 
             # Variant-level iteration-0 for backward compat / summary
             if not vs.hillclimb_iterations:
-                passed = sum(
-                    1 for r in vs.task_results if r.get("outcome") == "PASS"
-                )
-                failed = sum(
-                    1 for r in vs.task_results if r.get("outcome") == "FAIL"
-                )
+                passed = sum(1 for r in vs.task_results if r.get("outcome") == "PASS")
+                failed = sum(1 for r in vs.task_results if r.get("outcome") == "FAIL")
                 completed = passed + failed
                 rate = passed / completed if completed else 0.0
                 vs.hillclimb_iterations.append(
@@ -2805,12 +2917,22 @@ else:
         for vs in variants_with_work:
             tc_list = []
             for tc_id, tc_state in vs.testcase_hillclimb_state.items():
-                status = "NEEDS_WORK" if tc_state.best_pass_rate > target_max_pass_rate else "OK"
-                tc_list.append(f"{tc_id[:12]} ({status}, {tc_state.best_pass_rate*100:.0f}%)")
+                status = (
+                    "NEEDS_WORK"
+                    if tc_state.best_pass_rate > target_max_pass_rate
+                    else "OK"
+                )
+                tc_list.append(
+                    f"{tc_id[:12]} ({status}, {tc_state.best_pass_rate * 100:.0f}%)"
+                )
             logger.info(
                 "HILLCLIMB [%s] %d/%d testcases exceed target, processing sequentially",
                 vs.variant_key,
-                sum(1 for s in vs.testcase_hillclimb_state.values() if s.best_pass_rate > target_max_pass_rate),
+                sum(
+                    1
+                    for s in vs.testcase_hillclimb_state.values()
+                    if s.best_pass_rate > target_max_pass_rate
+                ),
                 len(vs.testcase_hillclimb_state),
             )
             for tc_info in tc_list:
@@ -2823,14 +2945,15 @@ else:
 
         sem = asyncio.Semaphore(config.vm_concurrency)
 
-        if config.coder_agent and config.coder_agent.max_parallel < config.vm_concurrency:
+        if (
+            config.coder_agent
+            and config.coder_agent.max_parallel < config.vm_concurrency
+        ):
             config.coder_agent.max_parallel = config.vm_concurrency
 
         async def _hillclimb_one(vs: VariantStatus) -> None:
             async with sem:
-                await self._hillclimb_variant(
-                    vs, target_max_pass_rate, hc.max_retries
-                )
+                await self._hillclimb_variant(vs, target_max_pass_rate, hc.max_retries)
 
         await asyncio.gather(*[_hillclimb_one(vs) for vs in variants_with_work])
 
@@ -2926,8 +3049,7 @@ else:
                     continue
 
                 edits_summary = (
-                    edits.get("iteration_summary")
-                    or edits.get("rationale", "")
+                    edits.get("iteration_summary") or edits.get("rationale", "")
                 )[:500]
                 edit_type = edits.get("edit_type", "testcase_only")
                 sim_changed = edits.get("sim_changed", False) or edit_type in (
@@ -2957,18 +3079,24 @@ else:
                     if not tc_file.exists():
                         logger.error(
                             "HILLCLIMB [%s][tc-%03d] testcase file not found after sim change",
-                            vs.variant_key, tc_idx,
+                            vs.variant_key,
+                            tc_idx,
                         )
                         continue
                     target_task = self._task_dict_from_file(tc_file)
                     if not target_task:
                         logger.error(
                             "HILLCLIMB [%s][tc-%03d] could not parse testcase file",
-                            vs.variant_key, tc_idx,
+                            vs.variant_key,
+                            tc_idx,
                         )
                         continue
 
-                    prev_tc_id = tc_state.iterations[-1].testcase_id if tc_state.iterations else None
+                    prev_tc_id = (
+                        tc_state.iterations[-1].testcase_id
+                        if tc_state.iterations
+                        else None
+                    )
 
                     published = await self._autoverify_and_publish(
                         vs, [target_task], new_artifact_id
@@ -2989,7 +3117,9 @@ else:
                         if n:
                             logger.info(
                                 "HILLCLIMB [%s][tc-%03d] archived superseded testcase %s",
-                                vs.variant_key, tc_idx, prev_tc_id[:12],
+                                vs.variant_key,
+                                tc_idx,
+                                prev_tc_id[:12],
                             )
                 else:
                     # Testcase-only → autoverify + publish just the edited testcase
@@ -3003,7 +3133,11 @@ else:
                         new_tc_id = None
                     else:
                         # Get previous testcase ID for this specific TC
-                        prev_tc_id = tc_state.iterations[-1].testcase_id if tc_state.iterations else None
+                        prev_tc_id = (
+                            tc_state.iterations[-1].testcase_id
+                            if tc_state.iterations
+                            else None
+                        )
 
                         task = self._task_dict_from_file(tc_file)
                         if task:
@@ -3020,7 +3154,9 @@ else:
                             if n:
                                 logger.info(
                                     "HILLCLIMB [%s][tc-%03d] archived superseded testcase %s",
-                                    vs.variant_key, tc_idx, prev_tc_id[:12],
+                                    vs.variant_key,
+                                    tc_idx,
+                                    prev_tc_id[:12],
                                 )
 
                 if not new_tc_id:
@@ -3035,12 +3171,8 @@ else:
                 new_results = await self._hc_rerun_benchmark(vs, [new_tc_id])
 
                 # (f) Score and compare
-                passed = sum(
-                    1 for r in new_results if r.get("outcome") == "PASS"
-                )
-                failed = sum(
-                    1 for r in new_results if r.get("outcome") == "FAIL"
-                )
+                passed = sum(1 for r in new_results if r.get("outcome") == "PASS")
+                failed = sum(1 for r in new_results if r.get("outcome") == "FAIL")
                 completed = passed + failed
                 new_rate = passed / completed if completed else 0.0
 
@@ -3057,7 +3189,8 @@ else:
 
                 session_urls = [
                     r.get("chronos_url", r.get("plato_url", ""))
-                    for r in new_results if r.get("chronos_url") or r.get("plato_url")
+                    for r in new_results
+                    if r.get("chronos_url") or r.get("plato_url")
                 ]
                 logger.info(
                     "HILLCLIMB [%s][tc-%03d] iteration %d: %.1f%% → %.1f%%  "
@@ -3073,7 +3206,9 @@ else:
                 for url in session_urls:
                     logger.info(
                         "  HILLCLIMB [%s][tc-%03d]   session: %s",
-                        vs.variant_key, tc_idx, url,
+                        vs.variant_key,
+                        tc_idx,
+                        url,
                     )
 
                 if new_rate < tc_state.best_pass_rate:
@@ -3133,7 +3268,9 @@ else:
         workspace_dir: Path,
     ) -> None:
         """Write workspace focused on a single target testcase for the agent."""
-        spec = next((s for s in self._variant_specs if s.get("slug") == vs.variant_key), {})
+        spec = next(
+            (s for s in self._variant_specs if s.get("slug") == vs.variant_key), {}
+        )
         skill_def = next((s for s in self._skills if s.name == vs.skill_name), None)
 
         (workspace_dir / "skill.json").write_text(
@@ -3176,9 +3313,7 @@ else:
             }
             for r in target_results
         ]
-        (workspace_dir / "results.json").write_text(
-            json.dumps(results_list, indent=2)
-        )
+        (workspace_dir / "results.json").write_text(json.dumps(results_list, indent=2))
 
         # Write ALL testcase configs (agent needs context if sim changes)
         tc_dir = workspace_dir / "testcases"
@@ -3210,18 +3345,22 @@ else:
             prior = []
             for it in tc_state.iterations:
                 if it.iteration == 0:
-                    prior.append({
-                        "iteration": 0,
-                        "pass_rate": it.pass_rate,
-                        "note": "Original baseline — no edits applied.",
-                    })
+                    prior.append(
+                        {
+                            "iteration": 0,
+                            "pass_rate": it.pass_rate,
+                            "note": "Original baseline — no edits applied.",
+                        }
+                    )
                 else:
-                    prior.append({
-                        "iteration": it.iteration,
-                        "pass_rate": it.pass_rate,
-                        "edit_type": it.edit_type,
-                        "edits_summary": it.edits_summary,
-                    })
+                    prior.append(
+                        {
+                            "iteration": it.iteration,
+                            "pass_rate": it.pass_rate,
+                            "edit_type": it.edit_type,
+                            "edits_summary": it.edits_summary,
+                        }
+                    )
             (workspace_dir / "prior_iterations.json").write_text(
                 json.dumps(prior, indent=2)
             )
@@ -3422,15 +3561,12 @@ else:
         spec = next(
             (s for s in self._variant_specs if s.get("slug") == vs.variant_key), {}
         )
-        api_routes = [
-            r for r in spec.get("api_routes", []) if isinstance(r, dict)
-        ]
+        api_routes = [r for r in spec.get("api_routes", []) if isinstance(r, dict)]
 
         async with httpx.AsyncClient(
             base_url=api_url,
             timeout=httpx.Timeout(300.0, connect=30.0),
         ) as http:
-
             try:
                 from plato._generated.models import (
                     AppSchemasBuildModelsSimConfigCompute as SimConfigCompute,
@@ -3481,8 +3617,8 @@ else:
                 )
 
                 await _exec(
-                    f'{preamble} && '
-                    'command -v node >/dev/null 2>&1 || '
+                    f"{preamble} && "
+                    "command -v node >/dev/null 2>&1 || "
                     'ln -sf "$(command -v bun)" /usr/local/bin/node',
                     timeout=10,
                 )
@@ -3536,9 +3672,7 @@ else:
                 )
 
                 if not all(c["pass"] for c in verify_checks):
-                    failed_checks = [
-                        c for c in verify_checks if not c["pass"]
-                    ]
+                    failed_checks = [c for c in verify_checks if not c["pass"]]
                     failed_names = [c["name"] for c in failed_checks]
                     logger.error(
                         "HILLCLIMB [%s] verify failed (%s) — agent should "
@@ -3556,14 +3690,16 @@ else:
                     return None
 
                 # ── Seed + Snapshot (new artifact on existing sim) ────
-                await self._seed_api_routes(
-                    _exec, api_routes, f"hc-{vs.variant_key}"
-                )
+                await self._seed_api_routes(_exec, api_routes, f"hc-{vs.variant_key}")
                 flows_yaml = self._build_flows_yaml(vs.variant_key)
                 try:
                     new_artifact_id = await self._take_snapshot(
-                        http, session_id, api_key, base_sim_name,
-                        flows_yaml, f"hc-{vs.variant_key}",
+                        http,
+                        session_id,
+                        api_key,
+                        base_sim_name,
+                        flows_yaml,
+                        f"hc-{vs.variant_key}",
                     )
                 except RuntimeError as e:
                     logger.error("HILLCLIMB [%s] %s", vs.variant_key, e)
@@ -3571,7 +3707,9 @@ else:
 
                 logger.info(
                     "HILLCLIMB [%s] new artifact %s on sim '%s'",
-                    vs.variant_key, new_artifact_id, base_sim_name,
+                    vs.variant_key,
+                    new_artifact_id,
+                    base_sim_name,
                 )
                 return new_artifact_id
 
@@ -3630,11 +3768,11 @@ else:
                             result["session_num"] = session_num
                             result["attempt"] = attempt
 
-                            result["outcome"] = self._classify_session_outcome(
-                                result
-                            )
+                            result["outcome"] = self._classify_session_outcome(result)
                             is_infra = result.get("status", "") in (
-                                "failed", "error", "cancelled",
+                                "failed",
+                                "error",
+                                "cancelled",
                             )
 
                             if is_infra and attempt < 3:
@@ -3715,12 +3853,8 @@ else:
                     n_iters,
                 )
                 for idx, it in enumerate(tc_state.iterations):
-                    marker = (
-                        " <- best" if idx == tc_state.best_iteration_idx else ""
-                    )
-                    edits = (
-                        f"  edits: {it.edits_summary}" if it.edits_summary else ""
-                    )
+                    marker = " <- best" if idx == tc_state.best_iteration_idx else ""
+                    edits = f"  edits: {it.edits_summary}" if it.edits_summary else ""
                     logger.info(
                         "    iter %d: %.1f%% (tc=%s, artifact=%s)%s%s",
                         it.iteration,
@@ -3773,7 +3907,10 @@ else:
             timeout=httpx.Timeout(30.0),
         ) as http:
             for vs in self.state.variants:
-                if vs.variant_key in self._all_tasks and self._all_tasks[vs.variant_key]:
+                if (
+                    vs.variant_key in self._all_tasks
+                    and self._all_tasks[vs.variant_key]
+                ):
                     continue
                 if not vs.testcase_ids:
                     continue
@@ -3796,20 +3933,22 @@ else:
                         v2_config = tc.get("v2ScoringConfig")
                         if v2_config:
                             scoring_config["v2_scoring_config"] = v2_config
-                        tasks.append({
-                            "_testcase_id": tc_id,
-                            "name": tc.get("name", ""),
-                            "instruction": tc.get("prompt", ""),
-                            "start_url": tc.get("startUrl", "/"),
-                            "scoring_type": (
-                                tc.get("scoringTypes", ["output"])[0]
-                                if tc.get("scoringTypes")
-                                else "output"
-                            ),
-                            "expected_output": tc.get("expectedOutput"),
-                            "output_schema": tc.get("outputSchema"),
-                            "scoring_config": scoring_config,
-                        })
+                        tasks.append(
+                            {
+                                "_testcase_id": tc_id,
+                                "name": tc.get("name", ""),
+                                "instruction": tc.get("prompt", ""),
+                                "start_url": tc.get("startUrl", "/"),
+                                "scoring_type": (
+                                    tc.get("scoringTypes", ["output"])[0]
+                                    if tc.get("scoringTypes")
+                                    else "output"
+                                ),
+                                "expected_output": tc.get("expectedOutput"),
+                                "output_schema": tc.get("outputSchema"),
+                                "scoring_config": scoring_config,
+                            }
+                        )
                     except Exception as e:
                         logger.warning(
                             "Failed to fetch testcase %s from API: %s", tc_id, e
@@ -3978,17 +4117,19 @@ else:
                     )
                     resp.raise_for_status()
                     oos_ok += 1
-                    logger.info("  Set sim '%s' (ID %d) to out_of_service", sim_name, sim_id)
+                    logger.info(
+                        "  Set sim '%s' (ID %d) to out_of_service", sim_name, sim_id
+                    )
                 except Exception as e:
                     logger.warning(
                         "  Failed to set sim '%s' (ID %d) OOS: %s",
-                        sim_name, sim_id, e,
+                        sim_name,
+                        sim_id,
+                        e,
                     )
                     oos_fail += 1
 
-            logger.info(
-                "Sim status updates: %d ok, %d failed", oos_ok, oos_fail
-            )
+            logger.info("Sim status updates: %d ok, %d failed", oos_ok, oos_fail)
 
         logger.info("=" * 60)
         logger.info(
@@ -4011,6 +4152,7 @@ else:
 
         # Group variants by skill
         from collections import defaultdict
+
         skill_variants: dict[str, list] = defaultdict(list)
         for vs in self.state.variants:
             skill_variants[vs.skill_name].append(vs)
@@ -4036,7 +4178,7 @@ else:
                 )
                 v_completed = v_pass + v_fail
                 v_rate = (
-                    f"{v_pass}/{v_completed} ({v_pass/v_completed*100:.0f}%)"
+                    f"{v_pass}/{v_completed} ({v_pass / v_completed * 100:.0f}%)"
                     if v_completed
                     else "N/A"
                 )
@@ -4044,8 +4186,7 @@ else:
                 lines.append(
                     f"  SPEC: {vs.variant_key}  "
                     f"[sim: {vs.sim_name or 'N/A'}]  "
-                    f"pass_rate={v_rate}"
-                    + (f"  ({v_error} errors)" if v_error else "")
+                    f"pass_rate={v_rate}" + (f"  ({v_error} errors)" if v_error else "")
                 )
 
                 if v_completed > 0:
@@ -4066,21 +4207,17 @@ else:
                     tc_pass = sum(1 for r in results if r.get("outcome") == "PASS")
                     tc_fail = sum(1 for r in results if r.get("outcome") == "FAIL")
                     tc_err = sum(
-                        1 for r in results
+                        1
+                        for r in results
                         if r.get("outcome") == "ERROR"
                         or r.get("status") in ("failed", "error", "cancelled")
                     )
                     tc_done = tc_pass + tc_fail
-                    tc_rate = (
-                        f"{tc_pass}/{tc_done}"
-                        if tc_done
-                        else "N/A"
-                    )
+                    tc_rate = f"{tc_pass}/{tc_done}" if tc_done else "N/A"
 
                     lines.append(
                         f"    TESTCASE: {task_name}  [{tc_id[:16]}]  "
-                        f"pass={tc_rate}"
-                        + (f"  ({tc_err} errors)" if tc_err else "")
+                        f"pass={tc_rate}" + (f"  ({tc_err} errors)" if tc_err else "")
                     )
 
                     for r in results:
@@ -4102,16 +4239,18 @@ else:
 
                 # Hillclimb iterations
                 if vs.testcase_hillclimb_state:
-                    lines.append(f"    HILLCLIMB ITERATIONS:")
+                    lines.append("    HILLCLIMB ITERATIONS:")
                     for hc_tc_id, tc_state in vs.testcase_hillclimb_state.items():
                         lines.append(
                             f"      TC {hc_tc_id[:16]}: "
-                            f"{tc_state.original_pass_rate*100:.0f}% → "
-                            f"{tc_state.best_pass_rate*100:.0f}% "
-                            f"({len(tc_state.iterations)-1} retries)"
+                            f"{tc_state.original_pass_rate * 100:.0f}% → "
+                            f"{tc_state.best_pass_rate * 100:.0f}% "
+                            f"({len(tc_state.iterations) - 1} retries)"
                         )
                         for idx, it in enumerate(tc_state.iterations):
-                            best = " ← BEST" if idx == tc_state.best_iteration_idx else ""
+                            best = (
+                                " ← BEST" if idx == tc_state.best_iteration_idx else ""
+                            )
                             summary = (
                                 f" | {it.edits_summary[:80]}"
                                 if it.edits_summary
@@ -4119,7 +4258,7 @@ else:
                             )
                             lines.append(
                                 f"        iter {it.iteration}: "
-                                f"{it.pass_rate*100:.0f}% "
+                                f"{it.pass_rate * 100:.0f}% "
                                 f"(tc={it.testcase_id[:12]}, "
                                 f"artifact={it.artifact_id[:12] if it.artifact_id else 'n/a'})"
                                 f"{best}{summary}"
@@ -4143,11 +4282,10 @@ else:
         if total_completed:
             lines.append(
                 f"Pass rate (excl. errors): {overall_pass}/{total_completed} "
-                f"= {overall_pass/total_completed*100:.1f}%"
+                f"= {overall_pass / total_completed * 100:.1f}%"
             )
         lines.append(
-            f"Total: {overall_pass} PASS | {overall_fail} FAIL | "
-            f"{overall_error} ERROR"
+            f"Total: {overall_pass} PASS | {overall_fail} FAIL | {overall_error} ERROR"
         )
         lines.append(f"Finalized sims (with completed sessions): {finalized_sims}")
         lines.append("=" * 72)
