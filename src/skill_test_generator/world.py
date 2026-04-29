@@ -1086,17 +1086,9 @@ else:
                     http, session_id, api_key, sim_name, flows_yaml, vs.variant_key
                 )
 
-                try:
-                    from plato._generated.api.v1.cluster import prefetch_snapshot
-                    from plato._generated.models import PrefetchRequest
-
-                    prefetch_snapshot.sync(
-                        client=httpx.Client(base_url=api_url, timeout=60.0),
-                        body=PrefetchRequest(artifact_id=artifact_id),
-                        x_api_key=api_key,
-                    )
-                except Exception:
-                    pass
+                await self._prefetch_snapshot_artifact(
+                    api_url, api_key, artifact_id, vs.variant_key
+                )
 
                 return {
                     "artifact_id": artifact_id,
@@ -1339,6 +1331,35 @@ else:
 
         logger.info("  [%s] Snapshot: %s", label, artifact_id)
         return artifact_id
+
+    @staticmethod
+    async def _prefetch_snapshot_artifact(
+        api_url: str, api_key: str, artifact_id: str, label: str
+    ) -> None:
+        """Best-effort prefetch to warm snapshot files for artifact boot."""
+        if not artifact_id:
+            return
+        try:
+            from plato._generated.api.v1.cluster import prefetch_snapshot
+            from plato._generated.models import PrefetchRequest
+
+            def _prefetch() -> None:
+                with httpx.Client(base_url=api_url, timeout=60.0) as client:
+                    prefetch_snapshot.sync(
+                        client=client,
+                        body=PrefetchRequest(artifact_id=artifact_id),
+                        x_api_key=api_key,
+                    )
+
+            await asyncio.to_thread(_prefetch)
+            logger.info("  [%s] Prefetched artifact %s", label, artifact_id[:12])
+        except Exception as e:
+            logger.warning(
+                "  [%s] Artifact prefetch failed for %s: %s",
+                label,
+                artifact_id[:12],
+                e,
+            )
 
     @staticmethod
     async def _seed_api_routes(
@@ -1689,7 +1710,18 @@ else:
                         task.get("name", "unnamed"),
                     )
 
-                tc_name = f"{vs.slug}-{task.get('name', 'unnamed')}"
+                raw_task_name = task.get("name", "unnamed")
+                # Strip skill-slug prefix from task name if duplicated
+                # (LLM often includes the skill slug in its generated name)
+                slug_parts = vs.slug.split("-")
+                for i in range(1, len(slug_parts)):
+                    suffix = "-".join(slug_parts[i:])
+                    if raw_task_name.startswith(suffix + "-"):
+                        raw_task_name = raw_task_name[len(suffix) + 1:]
+                        break
+                    elif raw_task_name == suffix:
+                        break
+                tc_name = f"{vs.slug}-{raw_task_name}"
                 hint = task.get("hint", "") or ""
                 req = CreateTestCaseRequest(
                     name=tc_name,
@@ -1744,7 +1776,7 @@ else:
                 try:
                     resp = await http.get(
                         "/api/v1/testcases",
-                        params={"public_id": pub_id, "page_size": 1},
+                        params={"test_case_public_id": pub_id, "page_size": 1},
                     )
                     resp.raise_for_status()
                     for tc in resp.json().get("testcases", []):
@@ -1876,47 +1908,88 @@ else:
                         )
                     return None
 
-            results = await asyncio.gather(
-                *[_av_one(i) for i in range(config.autoverify_sessions)]
-            )
-            collected = [r for r in results if r is not None]
+            # Retry AV at task level if outputs disagree: run fresh AV sessions
+            # and accumulate outputs across attempts. Stop as soon as we have
+            # MIN_AGREE agreeing outputs.
+            AV_TASK_MAX_ATTEMPTS = 3
+            MIN_AGREE = min(3, max(1, int(config.autoverify_sessions)))
+            all_outputs_with_data: list[dict] = []
 
-            if not collected:
-                logger.warning(
-                    "  [%s] No autoverify sessions for '%s', keeping LLM config",
-                    vs.variant_key,
-                    task_name,
+            for attempt in range(1, AV_TASK_MAX_ATTEMPTS + 1):
+                results = await asyncio.gather(
+                    *[_av_one(i) for i in range(config.autoverify_sessions)]
                 )
-                return
+                collected = [r for r in results if r is not None]
+                outputs_with_data = [
+                    s for s in collected if s.get("agent_output") is not None
+                ]
+                all_outputs_with_data.extend(outputs_with_data)
 
-            MIN_AGREE = 3
-            outputs_with_data = [
-                s for s in collected if s.get("agent_output") is not None
-            ]
-            if len(outputs_with_data) < MIN_AGREE:
+                if not all_outputs_with_data:
+                    logger.warning(
+                        "  [%s] No autoverify outputs for '%s' (attempt %d/%d)",
+                        vs.variant_key,
+                        task_name,
+                        attempt,
+                        AV_TASK_MAX_ATTEMPTS,
+                    )
+                    if attempt < AV_TASK_MAX_ATTEMPTS:
+                        continue
+                    logger.warning(
+                        "  [%s] Autoverify FAILED for '%s': no outputs after %d attempts, keeping LLM config",
+                        vs.variant_key,
+                        task_name,
+                        AV_TASK_MAX_ATTEMPTS,
+                    )
+                    return
+
+                # Find the largest agreeing group across ALL attempts
+                from collections import Counter as _Counter
+
+                try:
+                    keys = [
+                        _json.dumps(s["agent_output"], sort_keys=True)
+                        for s in all_outputs_with_data
+                    ]
+                    ctr = _Counter(keys)
+                    top_key, top_n = ctr.most_common(1)[0]
+                    agreeing = [
+                        s
+                        for s, k in zip(all_outputs_with_data, keys)
+                        if k == top_key
+                    ]
+                    consensus_output = _json.loads(top_key)
+                except Exception:
+                    # Fall back to the first output equality check
+                    first_output = all_outputs_with_data[0]["agent_output"]
+                    agreeing = [all_outputs_with_data[0]]
+                    for s in all_outputs_with_data[1:]:
+                        if s["agent_output"] == first_output:
+                            agreeing.append(s)
+                    top_n = len(agreeing)
+                    consensus_output = first_output
+
+                if top_n >= MIN_AGREE:
+                    break
+
                 logger.warning(
-                    "  [%s] Autoverify FAILED for '%s': only %d/%d sessions returned output (need %d)",
+                    "  [%s] Autoverify attempt %d/%d: only %d/%d outputs agree (need %d), retrying with fresh sessions",
                     vs.variant_key,
-                    task_name,
-                    len(outputs_with_data),
-                    len(collected),
+                    attempt,
+                    AV_TASK_MAX_ATTEMPTS,
+                    top_n,
+                    len(all_outputs_with_data),
                     MIN_AGREE,
                 )
-                return
-
-            first_output = outputs_with_data[0]["agent_output"]
-            agreeing = [outputs_with_data[0]]
-            for s in outputs_with_data[1:]:
-                if s["agent_output"] == first_output:
-                    agreeing.append(s)
-
-            if len(agreeing) < MIN_AGREE:
+            else:
+                # Loop exhausted without break (all attempts failed agreement)
                 logger.warning(
-                    "  [%s] Autoverify FAILED for '%s': only %d/%d outputs agree (need %d)",
+                    "  [%s] Autoverify FAILED for '%s': best %d/%d outputs agree across %d attempts (need %d)",
                     vs.variant_key,
                     task_name,
-                    len(agreeing),
-                    len(outputs_with_data),
+                    top_n,
+                    len(all_outputs_with_data),
+                    AV_TASK_MAX_ATTEMPTS,
                     MIN_AGREE,
                 )
                 return
@@ -1927,7 +2000,7 @@ else:
                 task["_av_scoring_config"] = {
                     "output_config": {
                         "type": "json_schema",
-                        "scoring_schema": first_output,
+                        "scoring_schema": consensus_output,
                         "num_sessions_used": n_used,
                         "created_at": now_ms,
                     },
@@ -1939,7 +2012,7 @@ else:
                     vs.variant_key,
                     task_name,
                     n_used,
-                    len(collected),
+                    len(all_outputs_with_data),
                 )
 
         async with httpx.AsyncClient(
@@ -2028,6 +2101,13 @@ else:
 
         max_attempts = 4
         for attempt in range(1, max_attempts + 1):
+            await self._prefetch_snapshot_artifact(
+                config.plato_api_url,
+                config.plato_api_key,
+                artifact_id,
+                f"{variant_key}/av",
+            )
+
             resp = await launch_job_mod.asyncio(
                 client=http,
                 body=request,
@@ -2953,7 +3033,10 @@ else:
 
         async def _hillclimb_one(vs: VariantStatus) -> None:
             async with sem:
-                await self._hillclimb_variant(vs, target_max_pass_rate, hc.max_retries)
+                try:
+                    await self._hillclimb_variant(vs, target_max_pass_rate, hc.max_retries)
+                except Exception:
+                    logger.exception("HILLCLIMB [%s] variant failed with unhandled error", vs.variant_key)
 
         await asyncio.gather(*[_hillclimb_one(vs) for vs in variants_with_work])
 
@@ -2969,19 +3052,32 @@ else:
         config = self.config
         current_artifact_id = vs.artifact_id
 
+        hc = config.hillclimb
+        tc_target = hc.target_testcases_per_variant if hc else None
+
         exceeding = [
             (tc_id, tc_state)
             for tc_id, tc_state in vs.testcase_hillclimb_state.items()
             if tc_state.best_pass_rate > target_max_pass_rate
         ]
         logger.info(
-            "HILLCLIMB [%s] %d/%d testcases exceed target, processing sequentially",
+            "HILLCLIMB [%s] %d/%d testcases exceed target, processing sequentially"
+            " (target_per_variant=%s)",
             vs.variant_key,
             len(exceeding),
             len(vs.testcase_hillclimb_state),
+            tc_target or "all",
         )
 
+        tcs_reached_target = 0
         for tc_id, tc_state in exceeding:
+            if tc_target and tcs_reached_target >= tc_target:
+                logger.info(
+                    "HILLCLIMB [%s] reached target_testcases_per_variant=%d, stopping",
+                    vs.variant_key,
+                    tc_target,
+                )
+                break
             tc_idx = next(
                 (i for i, tid in enumerate(vs.testcase_ids) if tid == tc_id), -1
             )
@@ -2993,8 +3089,10 @@ else:
                 )
                 continue
 
+            tc_done = False
             for retry in range(1, max_retries + 1):
                 if tc_state.best_pass_rate <= target_max_pass_rate:
+                    tc_done = True
                     logger.info(
                         "HILLCLIMB [%s][tc-%03d] within target after %d iterations",
                         vs.variant_key,
@@ -3037,54 +3135,57 @@ else:
                 )
 
                 # (c) Launch agent focused on this testcase
-                edits = await self._hc_run_agent(
-                    vs, workspace_dir, retry, target_tc_idx=tc_idx
-                )
-                if not edits:
-                    logger.warning(
-                        "HILLCLIMB [%s][tc-%03d] no edits.json, skipping iteration",
-                        vs.variant_key,
-                        tc_idx,
+                try:
+                    edits = await self._hc_run_agent(
+                        vs, workspace_dir, retry, target_tc_idx=tc_idx
                     )
-                    continue
 
-                edits_summary = (
-                    edits.get("iteration_summary") or edits.get("rationale", "")
-                )[:500]
-                edit_type = edits.get("edit_type", "testcase_only")
-                sim_changed = edits.get("sim_changed", False) or edit_type in (
-                    "sim_and_testcase",
-                    "sim_only",
-                )
-
-                # (d) Apply edits
-                new_artifact_id = current_artifact_id
-                new_tc_id: str | None = None
-
-                if sim_changed:
-                    new_artifact_id = await self._hc_apply_sim_edits(
-                        vs, workspace_dir, current_artifact_id, edits
-                    )
-                    if not new_artifact_id:
-                        logger.error(
-                            "HILLCLIMB [%s][tc-%03d] sim edit failed",
+                    if not edits:
+                        logger.warning(
+                            "HILLCLIMB [%s][tc-%03d] no edits.json, skipping iteration",
                             vs.variant_key,
                             tc_idx,
                         )
                         continue
-                    current_artifact_id = new_artifact_id
 
-                    # Sim changed → only republish the TARGET testcase against the new artifact
+                    edits_summary = (
+                        edits.get("iteration_summary") or edits.get("rationale", "")
+                    )[:500]
+                    edit_type = edits.get("edit_type", "testcase_only")
+                    sim_changed = edits.get("sim_changed", False) or edit_type in (
+                        "sim_and_testcase",
+                        "sim_only",
+                    )
+
+                    # (d) Apply edits — build new artifact if sim changed
+                    new_artifact_id = current_artifact_id
+                    new_tc_id: str | None = None
+
+                    if sim_changed:
+                        new_artifact_id = await self._hc_apply_sim_edits(
+                            vs, workspace_dir, current_artifact_id, edits
+                        )
+                        if not new_artifact_id:
+                            logger.error(
+                                "HILLCLIMB [%s][tc-%03d] sim edit failed",
+                                vs.variant_key,
+                                tc_idx,
+                            )
+                            continue
+                        # Don't update current_artifact_id yet — wait for
+                        # benchmark to confirm improvement.
+
+                    # Publish new testcase (don't archive old yet — benchmark first)
                     tc_file = workspace_dir / "testcases" / f"tc-{tc_idx:03d}.json"
                     if not tc_file.exists():
                         logger.error(
-                            "HILLCLIMB [%s][tc-%03d] testcase file not found after sim change",
+                            "HILLCLIMB [%s][tc-%03d] testcase file not found",
                             vs.variant_key,
                             tc_idx,
                         )
                         continue
-                    target_task = self._task_dict_from_file(tc_file)
-                    if not target_task:
+                    task = self._task_dict_from_file(tc_file)
+                    if not task:
                         logger.error(
                             "HILLCLIMB [%s][tc-%03d] could not parse testcase file",
                             vs.variant_key,
@@ -3092,82 +3193,24 @@ else:
                         )
                         continue
 
-                    prev_tc_id = (
-                        tc_state.iterations[-1].testcase_id
-                        if tc_state.iterations
-                        else None
-                    )
+                    prev_tc_id = tc_state.best_testcase_id
 
                     published = await self._autoverify_and_publish(
-                        vs, [target_task], new_artifact_id
+                        vs, [task], new_artifact_id
                     )
                     if not published:
                         logger.error(
-                            "HILLCLIMB [%s][tc-%03d] testcase publish failed "
-                            "after sim change",
+                            "HILLCLIMB [%s][tc-%03d] testcase publish failed",
                             vs.variant_key,
                             tc_idx,
                         )
                         continue
                     new_tc_id = published[0]
+                finally:
+                    import shutil
+                    shutil.rmtree(workspace_dir, ignore_errors=True)
 
-                    # Archive the superseded testcase
-                    if prev_tc_id and prev_tc_id != new_tc_id:
-                        n = await self._archive_testcases([prev_tc_id])
-                        if n:
-                            logger.info(
-                                "HILLCLIMB [%s][tc-%03d] archived superseded testcase %s",
-                                vs.variant_key,
-                                tc_idx,
-                                prev_tc_id[:12],
-                            )
-                else:
-                    # Testcase-only → autoverify + publish just the edited testcase
-                    tc_file = workspace_dir / "testcases" / f"tc-{tc_idx:03d}.json"
-                    if not tc_file.exists():
-                        logger.error(
-                            "HILLCLIMB [%s] testcase file %s not found",
-                            vs.variant_key,
-                            tc_file,
-                        )
-                        new_tc_id = None
-                    else:
-                        # Get previous testcase ID for this specific TC
-                        prev_tc_id = (
-                            tc_state.iterations[-1].testcase_id
-                            if tc_state.iterations
-                            else None
-                        )
-
-                        task = self._task_dict_from_file(tc_file)
-                        if task:
-                            published = await self._autoverify_and_publish(
-                                vs, [task], current_artifact_id
-                            )
-                            new_tc_id = published[0] if published else None
-                        else:
-                            new_tc_id = None
-
-                        # Archive the superseded testcase
-                        if new_tc_id and prev_tc_id and prev_tc_id != new_tc_id:
-                            n = await self._archive_testcases([prev_tc_id])
-                            if n:
-                                logger.info(
-                                    "HILLCLIMB [%s][tc-%03d] archived superseded testcase %s",
-                                    vs.variant_key,
-                                    tc_idx,
-                                    prev_tc_id[:12],
-                                )
-
-                if not new_tc_id:
-                    logger.error(
-                        "HILLCLIMB [%s][tc-%03d] no testcase ID after publish",
-                        vs.variant_key,
-                        tc_idx,
-                    )
-                    continue
-
-                # (e) Rerun benchmark for THIS testcase only
+                # (e) Rerun benchmark for the NEW testcase
                 new_results = await self._hc_rerun_benchmark(vs, [new_tc_id])
 
                 # (f) Score and compare
@@ -3187,11 +3230,6 @@ else:
                 )
                 tc_state.iterations.append(iter_record)
 
-                session_urls = [
-                    r.get("chronos_url", r.get("plato_url", ""))
-                    for r in new_results
-                    if r.get("chronos_url") or r.get("plato_url")
-                ]
                 logger.info(
                     "HILLCLIMB [%s][tc-%03d] iteration %d: %.1f%% → %.1f%%  "
                     "tc=%s artifact=%s",
@@ -3203,26 +3241,57 @@ else:
                     new_tc_id[:12],
                     new_artifact_id[:12] if new_artifact_id else "n/a",
                 )
-                for url in session_urls:
-                    logger.info(
-                        "  HILLCLIMB [%s][tc-%03d]   session: %s",
-                        vs.variant_key,
-                        tc_idx,
-                        url,
-                    )
+                for r in new_results:
+                    url = r.get("chronos_url") or r.get("plato_url", "")
+                    if url:
+                        logger.info(
+                            "  HILLCLIMB [%s][tc-%03d]   session: %s",
+                            vs.variant_key,
+                            tc_idx,
+                            url,
+                        )
 
+                # (g) Keep or rollback: only archive old if new is strictly better
                 if new_rate < tc_state.best_pass_rate:
                     tc_state.best_iteration_idx = len(tc_state.iterations) - 1
                     tc_state.best_pass_rate = new_rate
                     tc_state.best_testcase_id = new_tc_id
+                    if sim_changed:
+                        current_artifact_id = new_artifact_id
+                    if prev_tc_id and prev_tc_id != new_tc_id:
+                        n = await self._archive_testcases([prev_tc_id])
+                        if n:
+                            logger.info(
+                                "HILLCLIMB [%s][tc-%03d] archived old testcase %s (improved)",
+                                vs.variant_key,
+                                tc_idx,
+                                prev_tc_id[:12],
+                            )
+                else:
+                    # New testcase is not better — archive it, keep old
+                    n = await self._archive_testcases([new_tc_id])
+                    if n:
+                        logger.info(
+                            "HILLCLIMB [%s][tc-%03d] reverted — archived new testcase %s "
+                            "(%.1f%% not better than %.1f%%)",
+                            vs.variant_key,
+                            tc_idx,
+                            new_tc_id[:12],
+                            new_rate * 100,
+                            tc_state.best_pass_rate * 100,
+                        )
 
                 if new_rate <= target_max_pass_rate:
+                    tc_done = True
                     logger.info(
                         "HILLCLIMB [%s][tc-%03d] target reached",
                         vs.variant_key,
                         tc_idx,
                     )
                     break
+
+            if tc_done:
+                tcs_reached_target += 1
 
     async def _hc_fetch_trajectories(
         self, vs: VariantStatus, task_results: list[dict]
@@ -3384,9 +3453,33 @@ else:
                     indent=2,
                 )
             )
-            (sd / "trajectory.json").write_text(
-                json.dumps(tdata["trajectory"], indent=2, default=str)
-            )
+            # Truncate large trajectory fields to avoid overloading the HC agent
+            traj = tdata["trajectory"]
+            if isinstance(traj, dict):
+                traj = dict(traj)
+                steps = traj.get("steps", [])
+                if steps:
+                    trimmed_steps = []
+                    for step in steps:
+                        step = dict(step)
+                        # Truncate screenshot/image data and very long text fields
+                        for field in ("screenshot", "image", "image_data", "base64"):
+                            if field in step and isinstance(step[field], str) and len(step[field]) > 500:
+                                step[field] = step[field][:200] + "...[truncated]"
+                        # Truncate long observation/response strings
+                        for field in ("observation", "response", "content", "message", "reasoning"):
+                            if field in step and isinstance(step[field], str) and len(step[field]) > 4000:
+                                step[field] = step[field][:4000] + "\n...[truncated for brevity]"
+                        trimmed_steps.append(step)
+                    traj["steps"] = trimmed_steps
+            raw = json.dumps(traj, indent=2, default=str)
+            # Hard cap: if still > 500KB, keep only first 30 steps
+            if len(raw) > 500_000 and isinstance(traj, dict) and traj.get("steps"):
+                traj = dict(traj)
+                traj["steps"] = traj["steps"][:30]
+                traj["_truncated"] = True
+                raw = json.dumps(traj, indent=2, default=str)
+            (sd / "trajectory.json").write_text(raw)
 
         # Copy sim source code
         sim_src = self._code_data_dir() / "variants" / vs.variant_key / "web"
@@ -3705,6 +3798,10 @@ else:
                     logger.error("HILLCLIMB [%s] %s", vs.variant_key, e)
                     return None
 
+                await self._prefetch_snapshot_artifact(
+                    api_url, api_key, new_artifact_id, f"hc-{vs.variant_key}"
+                )
+
                 logger.info(
                     "HILLCLIMB [%s] new artifact %s on sim '%s'",
                     vs.variant_key,
@@ -3938,6 +4035,7 @@ else:
                                 "_testcase_id": tc_id,
                                 "name": tc.get("name", ""),
                                 "instruction": tc.get("prompt", ""),
+                                "hint": tc.get("hint", "") or "",
                                 "start_url": tc.get("startUrl", "/"),
                                 "scoring_type": (
                                     tc.get("scoringTypes", ["output"])[0]
