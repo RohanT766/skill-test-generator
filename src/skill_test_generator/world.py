@@ -1722,6 +1722,30 @@ else:
                     elif raw_task_name == suffix:
                         break
                 tc_name = f"{vs.slug}-{raw_task_name}"
+
+                # Deduplicate testcase name: if a TC with this name already
+                # exists (on any sim), append -v2, -v3, etc.
+                try:
+                    check_resp = await http.get(
+                        "/api/v1/testcases",
+                        params={"name": tc_name, "page_size": 1},
+                        headers={"X-API-Key": config.plato_api_key},
+                    )
+                    if check_resp.status_code == 200:
+                        existing = check_resp.json().get("testcases", [])
+                        if existing:
+                            for v_num in range(2, 100):
+                                candidate = f"{tc_name}-v{v_num}"
+                                ck = await http.get(
+                                    "/api/v1/testcases",
+                                    params={"name": candidate, "page_size": 1},
+                                    headers={"X-API-Key": config.plato_api_key},
+                                )
+                                if ck.status_code == 200 and not ck.json().get("testcases"):
+                                    tc_name = candidate
+                                    break
+                except Exception:
+                    pass
                 hint = task.get("hint", "") or ""
                 req = CreateTestCaseRequest(
                     name=tc_name,
