@@ -152,10 +152,11 @@ class SkillTestGeneratorConfig(RunConfig):
     """Configuration for the skill-test-generator world.
 
     Provide a list of skill capabilities to test. The world will:
-    1. Generate a specialized web app for each skill
-    2. Build, publish it as a Plato simulator, and create testcases
-    3. Launch CUA benchmark sessions via Chronos to evaluate the agent
-    4. Report pass/fail per testcase with Chronos + Plato session links
+    1. Generate adversarial web apps for each skill (multiple variants per skill)
+    2. Build, verify, and snapshot each as a Plato simulator
+    3. Generate testcases from live API data, autoverify via agent consensus
+    4. Launch CUA benchmark sessions to evaluate the agent
+    5. Hillclimb: iteratively tune simulator difficulty until agents fail reliably
     """
 
     s3_skills: list[str] = Field(
@@ -230,7 +231,8 @@ class SkillTestGeneratorConfig(RunConfig):
         description=(
             "Pre-existing variant data to resume from. Each dict needs "
             "skill_name, slug, sim_name, artifact_id, testcase_ids. "
-            "When set, skips INGEST/DESIGN/CODEGEN and runs RUN+EVALUATE."
+            "When set, skips INGEST/DESIGN/CODEGEN and runs "
+            "RUN+EVALUATE+HILLCLIMB (if hillclimb is enabled)."
         ),
     )
     design_concurrency: int = Field(

@@ -71,16 +71,17 @@ def _resolve_template_source(template_name: str) -> Path:
 class SkillTestGeneratorWorld(
     BaseWorld[SkillTestGeneratorConfig, SkillTestGeneratorState]
 ):
-    """Generates targeted skill-test simulators from benchmark-review skill gaps.
+    """Generates adversarial skill-test simulators from benchmark-review skill gaps.
 
-    Pipeline:
-      Config → INGEST  → skills from S3
-             → DESIGN  → variant specs (parallel LLM calls)
-             → CODEGEN → claude-code agents on Chronos VMs (parallel, 1 per spec)
-             → TASKS   → testcase definitions (parallel LLM calls)
-             → PUBLISH → Plato sims + testcases
-             → RUN     → CUA benchmark via Chronos
-             → EVALUATE → collect results
+    Pipeline stages (all variants run in parallel):
+      INGEST    → Load skill definitions from S3 benchmark-review data
+      DESIGN    → Generate app specs via LLM with reference screenshots
+      CODEGEN   → Build Next.js apps on pipeline VMs, verify, snapshot, generate
+                  testcases, autoverify, and publish (per-variant streaming pipeline)
+      RUN       → Launch CUA benchmark sessions via Chronos
+      EVALUATE  → Compute pass rates from benchmark results
+      HILLCLIMB → Iteratively tune difficulty with Claude Code agents until
+                  agents fail at the target rate
     """
 
     def __init__(self) -> None:
@@ -1824,7 +1825,7 @@ else:
         return archived
 
     # ------------------------------------------------------------------
-    # AUTOVERIFY: run agent sessions → call v2 auto_verify → get scoring config
+    # AUTOVERIFY: run agent sessions → check consensus → derive scoring config
     # ------------------------------------------------------------------
 
     async def _autoverify_tasks(
@@ -1834,9 +1835,9 @@ else:
         artifact_id: str,
         av_sem: asyncio.Semaphore,
     ) -> None:
-        """Run autoverify for each task: launch agent sessions, extract output,
-        call the v2 auto_verify endpoint, and replace the LLM-generated scoring
-        config with the one derived from real agent runs.
+        """Run autoverify for each task: launch parallel agent sessions, extract
+        outputs, check for N-of-M agreement, and build a scoring config from the
+        consensus output. Tasks without sufficient agreement are dropped.
         """
         config = self.config
         sim_name = vs.sim_name
